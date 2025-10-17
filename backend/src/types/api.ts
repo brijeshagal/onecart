@@ -52,3 +52,84 @@ export interface PaginatedResponse<T> {
     hasPrev: boolean;
   };
 }
+
+// Feed API types
+export interface FeedRequest {
+  lat: number;
+  lng: number;
+  offset?: number;
+  limit?: number;
+}
+
+// TODO: Add FeedProduct and FeedSection interfaces when implementing actual Blinkit integration
+
+// Search Items API types
+export interface SearchItemsRequest {
+  // Location options (at least one required)
+  receiverUsername?: string;
+  lat?: number;
+  lng?: number;
+  presetAddressId?: string;
+  newAddress?: {
+    name: string;
+    address: string;
+    floor?: string;
+    landmark?: string;
+    phone: string;
+    saveAs: string;
+  };
+
+  // Search query (required)
+  query: string;
+
+  // Pagination (optional)
+  offset?: number;
+  limit?: number;
+}
+
+export interface SearchItem {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
+  brand?: string;
+  inStock: boolean;
+  rating?: number;
+  discount?: number;
+}
+
+export interface SearchItemsResponse {
+  success: boolean;
+  data?: {
+    items: SearchItem[];
+    searchQuery: string;
+    pagination: {
+      offset: number;
+      limit: number;
+      total: number;
+      hasMore: boolean;
+    };
+  };
+  error?: string;
+  timestamp?: string;
+}
+
+export interface FeedResponse {
+  success: boolean;
+  data?: {
+    sections: any[]; // TODO: Replace with proper FeedSection[] when implementing actual structure
+    location: {
+      lat: number;
+      lng: number;
+      city?: string;
+    };
+    pagination: {
+      offset: number;
+      limit: number;
+      hasMore: boolean;
+    };
+  };
+  error?: string;
+  timestamp?: string;
+}

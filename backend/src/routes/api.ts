@@ -63,13 +63,19 @@ router.get('/', (_req, res) => {
     endpoints: {
       health: '/health',
       api: '/api',
-      location: {
-        search: 'POST /api/search-location',
-      },
-      user: {
-        register: 'POST /api/register',
-        profile: 'GET /api/user/:id',
-      },
+                     location: {
+                         search: 'POST /api/search-location',
+                       },
+                       user: {
+                         register: 'POST /api/register',
+                         profile: 'GET /api/user/:id',
+                       },
+                       feed: {
+                         home: 'GET /api/feed',
+                       },
+                       search: {
+                         items: 'GET /api/search-items',
+                       },
     },
     documentation: 'API documentation available at /api/docs',
   });

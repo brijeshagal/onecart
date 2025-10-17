@@ -1,6 +1,6 @@
 # OneCart Backend
 
-A modern TypeScript Node.js backend API server built with Express.js.
+A modern TypeScript Node.js backend API server built with Express.js for e-commerce integration with Blinkit India.
 
 ## Features
 
@@ -10,6 +10,9 @@ A modern TypeScript Node.js backend API server built with Express.js.
 - 🧪 **Testing** - Jest testing framework with TypeScript support
 - 🔧 **Development** - Hot reload with nodemon, ESLint, Prettier
 - 📦 **Package Manager** - pnpm for fast and efficient package management
+- 🌍 **Location Services** - Blinkit API integration for location search
+- 🛒 **E-commerce Integration** - Product feed and search functionality
+- 📱 **User Management** - User registration and profile management
 
 ## Quick Start
 
@@ -62,6 +65,19 @@ pnpm clean        # Clean build directory
 - `GET /api` - API information
 - `GET /api/status` - API status
 
+### Location Services
+- `POST /api/search-location` - Search for location suggestions using Blinkit API
+
+### User Management
+- `POST /api/register` - Register new user
+- `GET /api/user/:id` - Get user profile
+
+### Feed Services
+- `GET /api/feed` - Get home page product feed based on location (Blinkit India)
+
+### Search Services
+- `GET /api/search-items` - Search for products based on query and location
+
 ## Project Structure
 
 ```
@@ -94,10 +110,16 @@ CORS_ORIGIN=http://localhost:3000
 The project uses:
 - **TypeScript** for type safety
 - **Express.js** for the web framework
+- **MongoDB** for database
 - **Jest** for testing
 - **ESLint** for code linting
 - **Prettier** for code formatting
 - **nodemon** for development hot reload
+- **Swagger** for API documentation
+
+## API Documentation
+
+Visit `http://localhost:4000/api-docs` for interactive API documentation.
 
 ## Production
 

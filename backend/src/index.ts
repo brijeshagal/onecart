@@ -13,6 +13,8 @@ import { apiRoutes } from './routes/api';
 import { healthRoutes } from './routes/health';
 import { locationRoutes } from './routes/location';
 import { userRoutes } from './routes/user';
+import { feedRoutes } from './routes/feed';
+import { searchItemsRoutes } from './routes/searchItems';
 import swaggerUi from 'swagger-ui-express';
 
 const app: Application = express();
@@ -44,6 +46,8 @@ app.use('/health', healthRoutes);
 app.use('/api', apiRoutes);
 app.use('/api', locationRoutes);
 app.use('/api', userRoutes);
+app.use('/api', feedRoutes);
+app.use('/api', searchItemsRoutes);
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {

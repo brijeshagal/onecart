@@ -7,7 +7,7 @@ const options = {
     info: {
       title: 'OneCart API',
       version: '1.0.0',
-      description: 'OneCart Backend API - Location search and user management',
+      description: 'OneCart Backend API - E-commerce integration with Blinkit India. Provides location search, user management, product feeds, and search functionality.',
       contact: {
         name: 'OneCart Team',
         email: 'support@onecart.com',
@@ -372,6 +372,199 @@ const options = {
             },
           },
           required: ['socialLogins', 'phone', 'walletAddresses', 'addresses'],
+        },
+        // TODO: Add FeedProduct and FeedSection schemas when implementing actual Blinkit integration
+        SearchItemsRequest: {
+          type: 'object',
+          properties: {
+            receiverUsername: {
+              type: 'string',
+              example: 'john_doe',
+            },
+            lat: {
+              type: 'number',
+              minimum: -90,
+              maximum: 90,
+              example: 28.7041,
+            },
+            lng: {
+              type: 'number',
+              minimum: -180,
+              maximum: 180,
+              example: 77.1025,
+            },
+            presetAddressId: {
+              type: 'string',
+              example: '507f1f77bcf86cd799439011',
+            },
+            newAddress: {
+              type: 'object',
+              properties: {
+                name: {
+                  type: 'string',
+                  example: 'Home',
+                },
+                address: {
+                  type: 'string',
+                  example: '123 Main Street',
+                },
+                floor: {
+                  type: 'string',
+                  example: '4th Floor',
+                },
+                landmark: {
+                  type: 'string',
+                  example: 'Near Central Park',
+                },
+                phone: {
+                  type: 'string',
+                  example: '+1234567890',
+                },
+                saveAs: {
+                  type: 'string',
+                  example: 'home',
+                },
+              },
+              required: ['name', 'address', 'phone', 'saveAs'],
+            },
+            query: {
+              type: 'string',
+              minLength: 1,
+              example: 'milk',
+            },
+            offset: {
+              type: 'integer',
+              minimum: 0,
+              default: 0,
+              example: 0,
+            },
+            limit: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 50,
+              default: 20,
+              example: 20,
+            },
+          },
+          required: ['query'],
+        },
+        SearchItem: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              example: 'item-123',
+            },
+            name: {
+              type: 'string',
+              example: 'Fresh Milk 1L',
+            },
+            price: {
+              type: 'number',
+              example: 60,
+            },
+            image: {
+              type: 'string',
+              example: '/images/milk.jpg',
+            },
+            category: {
+              type: 'string',
+              example: 'Dairy & Eggs',
+            },
+            brand: {
+              type: 'string',
+              example: 'Amul',
+            },
+            inStock: {
+              type: 'boolean',
+              example: true,
+            },
+            rating: {
+              type: 'number',
+              example: 4.2,
+            },
+            discount: {
+              type: 'number',
+              example: 10,
+            },
+          },
+          required: ['id', 'name', 'price', 'image', 'category', 'inStock'],
+        },
+        FeedRequest: {
+          type: 'object',
+          properties: {
+            lat: {
+              type: 'number',
+              minimum: -90,
+              maximum: 90,
+              example: 28.4652382,
+            },
+            lng: {
+              type: 'number',
+              minimum: -180,
+              maximum: 180,
+              example: 77.0615957,
+            },
+            offset: {
+              type: 'integer',
+              minimum: 0,
+              default: 0,
+              example: 0,
+            },
+            limit: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 50,
+              default: 20,
+              example: 20,
+            },
+          },
+          required: ['lat', 'lng'],
+        },
+        SearchItemsResponse: {
+          type: 'object',
+          properties: {
+            success: {
+              type: 'boolean',
+              example: true,
+            },
+            data: {
+              type: 'object',
+              properties: {
+                items: {
+                  type: 'array',
+                  items: {
+                    $ref: '#/components/schemas/SearchItem',
+                  },
+                },
+                searchQuery: {
+                  type: 'string',
+                  example: 'milk',
+                },
+                pagination: {
+                  type: 'object',
+                  properties: {
+                    offset: {
+                      type: 'number',
+                    },
+                    limit: {
+                      type: 'number',
+                    },
+                    total: {
+                      type: 'number',
+                    },
+                    hasMore: {
+                      type: 'boolean',
+                    },
+                  },
+                },
+              },
+            },
+            timestamp: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
         },
       },
     },

@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { LocationController } from '@/controllers/locationController';
-import { validateSearchLocation } from '@/middleware/validation';
+import { LocationController } from '../controllers/locationController';
+import { validateSearchLocation } from '../middleware/validation';
 
 /**
  * Location routes

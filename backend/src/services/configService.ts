@@ -1,4 +1,4 @@
-import { env } from '@/config/env';
+import { env } from '../config/env';
 
 /**
  * Configuration service that provides type-safe access to environment variables

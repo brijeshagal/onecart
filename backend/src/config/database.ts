@@ -24,23 +24,16 @@ export class Database {
     }
 
     try {
-      console.log(`🔗 Connecting to MongoDB: ${env.MONGODB_URI}`);
+      // Log connection attempt (hide credentials)
+      console.log(`🔗 Connecting to MongoDB`);
 
-      const options = {
-        maxPoolSize: 10, // Maintain up to 10 socket connections
-        serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-        socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-        bufferCommands: false, // Disable mongoose buffering
-        bufferMaxEntries: 0, // Disable mongoose buffering
-      };
-
-      await mongoose.connect(env.MONGODB_URI, options);
+      await mongoose.connect(env.MONGODB_URI);
 
       this.isConnected = true;
       console.log('✅ MongoDB connected successfully');
 
       // Handle connection events
-      mongoose.connection.on('error', (error) => {
+      mongoose.connection.on('error', error => {
         console.error('❌ MongoDB connection error:', error);
         this.isConnected = false;
       });
@@ -54,7 +47,6 @@ export class Database {
         console.log('🔄 MongoDB reconnected');
         this.isConnected = true;
       });
-
     } catch (error) {
       console.error('❌ Failed to connect to MongoDB:', error);
       this.isConnected = false;
@@ -92,6 +84,21 @@ export class Database {
    */
   public getConnection() {
     return mongoose.connection;
+  }
+
+  /**
+   * Get the connection state
+   */
+  public getConnectionState(): string {
+    const states = {
+      0: 'disconnected',
+      1: 'connected',
+      2: 'connecting',
+      3: 'disconnecting',
+    };
+    return (
+      states[mongoose.connection.readyState as keyof typeof states] || 'unknown'
+    );
   }
 }
 

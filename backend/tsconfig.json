@@ -26,18 +26,7 @@
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "baseUrl": "./src",
-    "paths": {
-      "@/*": ["*"],
-      "@/config/*": ["config/*"],
-      "@/controllers/*": ["controllers/*"],
-      "@/middleware/*": ["middleware/*"],
-      "@/routes/*": ["routes/*"],
-      "@/services/*": ["services/*"],
-      "@/types/*": ["types/*"],
-      "@/utils/*": ["utils/*"]
-    }
+    "emitDecoratorMetadata": true
   },
   "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist"]

@@ -4,16 +4,16 @@ import express, { Application } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-import { env } from '@/config/env';
-import { database } from '@/config/database';
-import { swaggerSpec } from '@/config/swagger';
-import { errorHandler } from '@/middleware/errorHandler';
-import { notFoundHandler } from '@/middleware/notFoundHandler';
-import { apiRoutes } from '@/routes/api';
-import { healthRoutes } from '@/routes/health';
-import { locationRoutes } from '@/routes/location';
-import { userRoutes } from '@/routes/user';
-import * as swaggerUi from 'swagger-ui-express';
+import { env } from './config/env';
+import { database } from './config/database';
+import { swaggerSpec } from './config/swagger';
+import { errorHandler } from './middleware/errorHandler';
+import { notFoundHandler } from './middleware/notFoundHandler';
+import { apiRoutes } from './routes/api';
+import { healthRoutes } from './routes/health';
+import { locationRoutes } from './routes/location';
+import { userRoutes } from './routes/user';
+import swaggerUi from 'swagger-ui-express';
 
 const app: Application = express();
 const PORT = env.PORT;
@@ -72,20 +72,15 @@ app.get('/', (_req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Initialize database connection (don't exit on failure for development)
-database.connect().then(() => {
-  console.log('✅ MongoDB connected successfully');
-}).catch((error) => {
-  console.warn('⚠️ MongoDB connection failed, running in fallback mode:', error.message);
-});
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  // Initialize database connection (don't exit on failure for development)
+  await database.connect();
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔗 API endpoint: http://localhost:${PORT}/api`);
+  console.log(`📊 Health check: http://localhost:${PORT}`);
+  console.log(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
   console.log(`🌍 Environment: ${env.NODE_ENV}`);
-  console.log(`🔗 MongoDB: ${database.getConnectionStatus() ? 'Connected' : 'Disconnected'}`);
 });
 
 export default app;

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+  import { NextFunction, Request, Response } from 'express';
 
 export class AppError extends Error {
   statusCode?: number;
@@ -14,28 +14,28 @@ export class AppError extends Error {
 
 export const errorHandler = (
   err: AppError,
-  req: Request,
+  _: Request,
   res: Response,
   _next: NextFunction
 ): void => {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
 
-  console.error('Error:', {
-    message: err.message,
-    stack: err.stack,
-    url: req.url,
-    method: req.method,
-    ip: req.ip,
-    userAgent: req.get('User-Agent'),
-  });
+  // console.error('Error:', {
+  //   message: err.message,
+  //   stack: err.stack,
+  //   url: req.url,
+  //   method: req.method,
+  //   ip: req.ip,
+  //   userAgent: req.get('User-Agent'),
+  // });
 
   res.status(statusCode).json({
     success: false,
     error: {
       message,
       statusCode,
-      ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+      ...(process.env['NODE_ENV'] === 'development' && { stack: err.stack }),
     },
     timestamp: new Date().toISOString(),
   });

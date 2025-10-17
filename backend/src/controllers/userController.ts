@@ -1,6 +1,6 @@
-import { AppError } from '@/middleware/errorHandler';
-import { userModel } from '@/models/User';
-import { RegisterUserRequest, RegisterUserResponse } from '@/types/user';
+import { AppError } from '../middleware/errorHandler';
+import { userModel } from '../models/User';
+import { RegisterUserRequest, RegisterUserResponse } from '../types/user';
 import { NextFunction, Request, Response } from 'express';
 
 /**
@@ -84,8 +84,7 @@ export class UserController {
         defaultAddressIndex,
         askBeforeReceiving,
         walletAddresses,
-        farcasterWalletAddress: -1, // Default -1 if not connected
-        primaryWalletIndex: -1, // Default -1 if no wallet selected
+        receiveAddressIndex: defaultAddressIndex,
       });
 
       console.log(
@@ -107,8 +106,6 @@ export class UserController {
             walletAddresses: newUser.walletAddresses,
             farcasterWalletAddress: newUser.farcasterWalletAddress,
             primaryWalletIndex: newUser.primaryWalletIndex,
-            created_at: newUser.createdAt,
-            updated_at: newUser.updatedAt,
           },
           message: 'User registered successfully',
         },
@@ -159,8 +156,6 @@ export class UserController {
           walletAddresses: user.walletAddresses,
           farcasterWalletAddress: user.farcasterWalletAddress,
           primaryWalletIndex: user.primaryWalletIndex,
-          created_at: user.createdAt,
-          updated_at: user.updatedAt,
         },
         timestamp: new Date().toISOString(),
       });

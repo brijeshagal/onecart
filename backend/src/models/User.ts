@@ -1,6 +1,6 @@
-import { UserAddress } from '@/types/address';
-import { User as IUser } from '@/types/user';
 import mongoose, { Schema } from 'mongoose';
+import { UserAddress } from '../types/address';
+import { User as IUser } from '../types/user';
 
 // Create Address sub-schema
 const AddressSchema = new Schema<UserAddress>(
@@ -76,85 +76,82 @@ const UserSchema = new Schema<IUser>(
   }
 );
 
-// Create indexes for better performance
-UserSchema.index({ phone: 1 });
-UserSchema.index({ username: 1 });
-UserSchema.index({ email: 1 });
+// Lazy model creation - only create when Mongoose is connected
+let UserModel: mongoose.Model<IUser> | null = null;
 
-// Create and export User model
-export const UserModel = mongoose.model<IUser>('User', UserSchema);
-
-// In-memory fallback for development/testing when MongoDB is not available
-class FallbackUserModel {
-  private users: Map<string, any> = new Map();
-  private nextId = 1;
-
-  async create(userData: any): Promise<any> {
-    const id = this.nextId.toString();
-    this.nextId++;
-
-    const user = {
-      _id: id,
-      id,
-      ...userData,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    this.users.set(id, user);
-    return user;
-  }
-
-  async findById(id: string): Promise<any> {
-    return this.users.get(id) || null;
-  }
-
-  async findOne(conditions: any): Promise<any> {
-    for (const user of this.users.values()) {
-      if (this.matchesConditions(user, conditions)) {
-        return user;
-      }
+export function getUserModel(): mongoose.Model<IUser> {
+  if (!UserModel) {
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error('MongoDB not connected. Cannot create User model.');
     }
-    return null;
+    UserModel = mongoose.model<IUser>('User', UserSchema);
   }
-
-  async findByUsername(username: string): Promise<any> {
-    return this.findOne({ username });
-  }
-
-  async findByPhone(phone: string): Promise<any> {
-    return this.findOne({ phone });
-  }
-
-  async updateOne(filter: any, update: any): Promise<any> {
-    const user = await this.findOne(filter);
-    if (!user) return null;
-
-    const updatedUser = { ...user, ...update, updatedAt: new Date() };
-    this.users.set(user._id, updatedUser);
-    return updatedUser;
-  }
-
-  async deleteOne(conditions: any): Promise<boolean> {
-    const user = await this.findOne(conditions);
-    if (!user) return false;
-
-    this.users.delete(user._id);
-    return true;
-  }
-
-  private matchesConditions(obj: any, conditions: any): boolean {
-    for (const key in conditions) {
-      if (obj[key] !== conditions[key]) {
-        return false;
-      }
-    }
-    return true;
-  }
+  return UserModel;
 }
 
-// Use MongoDB model if connected, otherwise use fallback
-export const userModel =
-  mongoose.connection.readyState === 1
-    ? UserModel
-    : (new FallbackUserModel() as any);
+// For backward compatibility, export a model that will work with both connected and fallback scenarios
+export const userModel = {
+  create: async (data: any) => {
+    try {
+      const Model = getUserModel();
+      return await Model.create(data);
+    } catch (error) {
+      console.error('❌ Failed to create user:', error);
+      throw error;
+    }
+  },
+  findById: async (id: string) => {
+    try {
+      const Model = getUserModel();
+      return await Model.findById(id);
+    } catch (error) {
+      console.error('❌ Failed to find user by ID:', error);
+      return null;
+    }
+  },
+  findOne: async (conditions: any) => {
+    try {
+      const Model = getUserModel();
+      return await Model.findOne(conditions);
+    } catch (error) {
+      console.error('❌ Failed to find user:', error);
+      return null;
+    }
+  },
+  updateOne: async (filter: any, update: any) => {
+    try {
+      const Model = getUserModel();
+      return await Model.updateOne(filter, update);
+    } catch (error) {
+      console.error('❌ Failed to update user:', error);
+      throw error;
+    }
+  },
+  deleteOne: async (conditions: any) => {
+    try {
+      const Model = getUserModel();
+      return await Model.deleteOne(conditions);
+    } catch (error) {
+      console.error('❌ Failed to delete user:', error);
+      throw error;
+    }
+  },
+  findByUsername: async (username: string) => {
+    try {
+      const Model = getUserModel();
+      return await Model.findOne({ username });
+    } catch (error) {
+      console.error('❌ Failed to find user by username:', error);
+      return null;
+    }
+  },
+  findByPhone: async (phone: string) => {
+    try {
+      const Model = getUserModel();
+      return await Model.findOne({ phone });
+    } catch (error) {
+      console.error('❌ Failed to find user by phone:', error);
+      return null;
+    }
+  },
+} as any;

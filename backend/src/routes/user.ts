@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { UserController } from '@/controllers/userController';
-import { validateRegisterUser } from '@/middleware/validation';
+import { UserController } from '../controllers/userController';
+import { validateRegisterUser } from '../middleware/validation';
 
 /**
  * User routes

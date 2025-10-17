@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { BlinkitService } from '@/services/blinkitService';
-import { SearchLocationRequest, SearchLocationResponse } from '@/types/api';
-import { AppError } from '@/middleware/errorHandler';
+import { BlinkitService } from '../services/blinkitService';
+import { SearchLocationRequest, SearchLocationResponse } from '../types/api';
+import { AppError } from '../middleware/errorHandler';
 
 /**
  * Location Controller
@@ -47,8 +47,6 @@ export class LocationController {
         },
         timestamp: new Date().toISOString(),
       };
-
-      console.log(`✅ Location search completed: ${blinkitData.suggestions.length} suggestions found`);
 
       res.status(200).json(response);
     } catch (error) {

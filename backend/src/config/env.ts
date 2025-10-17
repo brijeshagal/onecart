@@ -1,7 +1,8 @@
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from the backend directory
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 // Define the shape of our environment variables
 interface Environment {
@@ -18,20 +19,20 @@ interface Environment {
 
 // Type-safe environment variable getter
 function getEnvVar(key: keyof Environment): string | undefined {
-  return process.env[key];
+  return process.env[key as string];
 }
 
 // Type-safe environment variable getter with default
 function getEnvVarWithDefault<T>(key: keyof Environment, defaultValue: T): string | T {
-  return process.env[key] || defaultValue;
+  return process.env[key as string] || defaultValue;
 }
 
 // Validate required environment variables
 function validateEnv(): void {
   const requiredVars: (keyof Environment)[] = ['NODE_ENV'];
-  
+
   for (const varName of requiredVars) {
-    if (!process.env[varName]) {
+    if (!process.env[varName as string]) {
       throw new Error(`Missing required environment variable: ${varName}`);
     }
   }
@@ -42,15 +43,15 @@ const parseEnv = (): Environment => {
   validateEnv();
 
   return {
-    NODE_ENV: (process.env.NODE_ENV as Environment['NODE_ENV']) || 'development',
-    PORT: parseInt(process.env.PORT || '3000', 10),
-    CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    NODE_ENV: (process.env['NODE_ENV'] as Environment['NODE_ENV']) || 'development',
+    PORT: parseInt(process.env['PORT'] || '3000', 10),
+    CORS_ORIGIN: process.env['CORS_ORIGIN'] || 'http://localhost:3000',
     MONGODB_URI: process.env['MONGODB_URI'] || 'mongodb://localhost:27017/onecart',
-    REDIS_URL: process.env.REDIS_URL,
-    JWT_SECRET: process.env.JWT_SECRET,
-    JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
-    API_VERSION: process.env.API_VERSION,
-    API_PREFIX: process.env.API_PREFIX,
+    REDIS_URL: process.env['REDIS_URL'] || undefined,
+    JWT_SECRET: process.env['JWT_SECRET'] || undefined,
+    JWT_EXPIRES_IN: process.env['JWT_EXPIRES_IN'] || undefined,
+    API_VERSION: process.env['API_VERSION'] || undefined,
+    API_PREFIX: process.env['API_PREFIX'] || undefined,
   };
 };
 

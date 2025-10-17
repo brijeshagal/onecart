@@ -1,4 +1,4 @@
-import swaggerJSDoc from 'swagger-jsdoc';
+import * as swaggerJSDoc from 'swagger-jsdoc';
 import { env } from './env';
 
 const options = {
@@ -388,4 +388,4 @@ const options = {
   ],
 };
 
-export const swaggerSpec = swaggerJSDoc(options);
+export const swaggerSpec = swaggerJSDoc.default(options);

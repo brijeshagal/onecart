@@ -1,0 +1,62 @@
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+// Define the shape of our environment variables
+interface Environment {
+  NODE_ENV: 'development' | 'production' | 'test';
+  PORT: number;
+  CORS_ORIGIN: string;
+  MONGODB_URI: string;
+  REDIS_URL?: string | undefined;
+  JWT_SECRET?: string | undefined;
+  JWT_EXPIRES_IN?: string | undefined;
+  API_VERSION?: string | undefined;
+  API_PREFIX?: string | undefined;
+}
+
+// Type-safe environment variable getter
+function getEnvVar(key: keyof Environment): string | undefined {
+  return process.env[key];
+}
+
+// Type-safe environment variable getter with default
+function getEnvVarWithDefault<T>(key: keyof Environment, defaultValue: T): string | T {
+  return process.env[key] || defaultValue;
+}
+
+// Validate required environment variables
+function validateEnv(): void {
+  const requiredVars: (keyof Environment)[] = ['NODE_ENV'];
+  
+  for (const varName of requiredVars) {
+    if (!process.env[varName]) {
+      throw new Error(`Missing required environment variable: ${varName}`);
+    }
+  }
+}
+
+// Parse and validate environment variables
+const parseEnv = (): Environment => {
+  validateEnv();
+
+  return {
+    NODE_ENV: (process.env.NODE_ENV as Environment['NODE_ENV']) || 'development',
+    PORT: parseInt(process.env.PORT || '3000', 10),
+    CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    MONGODB_URI: process.env['MONGODB_URI'] || 'mongodb://localhost:27017/onecart',
+    REDIS_URL: process.env.REDIS_URL,
+    JWT_SECRET: process.env.JWT_SECRET,
+    JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+    API_VERSION: process.env.API_VERSION,
+    API_PREFIX: process.env.API_PREFIX,
+  };
+};
+
+// Export the parsed environment configuration
+export const env = parseEnv();
+
+// Export individual getters for convenience
+export const getEnv = getEnvVar;
+export const getEnvWithDefault = getEnvVarWithDefault;

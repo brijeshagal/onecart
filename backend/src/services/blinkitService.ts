@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { AppError } from '../middleware/errorHandler';
 import { UIData } from '../types/ui';
 
@@ -28,23 +27,22 @@ export class BlinkitService {
           'user-agent': 'Mozilla/5.0 (Node)',
         },
       });
+
+      if (!response.ok) {
+        throw new AppError(`Blinkit API error: ${response.status} - ${response.statusText}`);
+      }
+
       const data = await response.json();
       return data as unknown as UIData;
     } catch (error) {
       console.error('❌ Blinkit API Error:', error);
 
-      if (axios.isAxiosError(error)) {
-        if (error.code === 'ECONNABORTED') {
-          throw new AppError('Blinkit API request timeout');
-        }
-        if (error.response) {
-          throw new AppError(
-            `Blinkit API error: ${error.response.status} - ${error.response.statusText}`
-          );
-        }
-        if (error.request) {
-          throw new AppError('Unable to reach Blinkit API');
-        }
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new AppError('Unable to reach Blinkit API');
+      }
+
+      if (error instanceof AppError) {
+        throw error;
       }
 
       throw new AppError(

@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { userModel } from '../models/User';
+import { AddressData } from '../types/address';
 import { SearchItemsRequest, SearchItemsResponse } from '../types/api';
-import BrowserManager from '../utils/BrowserManager';
+import {
+  createIncognitoPage,
+  launchBrowser,
+} from '../utils/blinkit/browserUtils';
 import {
   setAddressOnPage,
   waitForSearchResults,
@@ -38,7 +42,8 @@ export class SearchItemsController {
         `🔍 Search items request: query="${query}", location options provided`
       );
 
-      const page = await BrowserManager.createPage();
+      const browser = await launchBrowser();
+      const { page, context } = await createIncognitoPage(browser);
       await page.goto('https://www.blinkit.com', {
         waitUntil: 'domcontentloaded',
       });
@@ -46,50 +51,45 @@ export class SearchItemsController {
       // Resolve address context: from presetAddressId or user's default address
       let addressData: any = '';
       if (_presetAddressId && userId) {
-        addressData = await userModel.findOne({
+        const userDetails = await userModel.findOne({
           _id: userId,
           'addresses._id': _presetAddressId,
         });
-        if (!addressData) {
+        if (!userDetails) {
           res.status(404).json({
             success: false,
             error: 'Address not found',
           });
           return;
         }
-        addressData = addressData.addresses.find(
-          (a: any) => String(a._id) === String(_presetAddressId)
-        ) as any;
-        if (!addressData) {
-          res.status(404).json({
-            success: false,
-            error: 'Address not found',
-          });
-          return;
-        }
+        console.log('userDetails: ', userDetails);
+        const addressDetails = userDetails.addresses.find(
+          (a: any) => String(a._id.toString()) === String(_presetAddressId)
+        ) as AddressData;
+        console.log(addressDetails);
+        addressData = addressDetails.display_address;
       } else if (receiverUsername) {
-        const user = await userModel.findOne({
+        const userDetails = await userModel.findOne({
           username: receiverUsername,
         });
-        if (!user) {
+        if (!userDetails) {
           res.status(404).json({
             success: false,
             error: 'User not found',
           });
           return;
         }
-        addressData = user.addresses[user.receiveAddressIndex];
-        if (!addressData) {
-          res.status(404).json({
-            success: false,
-            error: 'Address not found',
-          });
-          return;
-        }
+        const addressDetails =
+          userDetails.addresses[userDetails.receiveAddressIndex];
+        addressData = addressDetails.display_address;
       }
+      console.log('addressData: ', addressData);
       await setAddressOnPage(addressData, page);
       const blinkitSearchResponse = await waitForSearchResults(page, query);
       await page.close();
+      if (context) {
+        await context.close();
+      }
       res.status(200).json({
         success: true,
         data: blinkitSearchResponse,

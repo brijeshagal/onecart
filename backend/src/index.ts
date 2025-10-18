@@ -1,21 +1,19 @@
-import compression from 'compression';
 import cors from 'cors';
 import express, { Application } from 'express';
 import helmet from 'helmet';
-import morgan from 'morgan';
 
-import { env } from './config/env';
+import swaggerUi from 'swagger-ui-express';
 import { database } from './config/database';
+import { env } from './config/env';
 import { swaggerSpec } from './config/swagger';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
 import { apiRoutes } from './routes/api';
+import { feedRoutes } from './routes/feed';
 import { healthRoutes } from './routes/health';
 import { locationRoutes } from './routes/location';
-import { userRoutes } from './routes/user';
-import { feedRoutes } from './routes/feed';
 import { searchItemsRoutes } from './routes/searchItems';
-import swaggerUi from 'swagger-ui-express';
+import { userRoutes } from './routes/user';
 
 const app: Application = express();
 const PORT = env.PORT;
@@ -32,14 +30,14 @@ app.use(
 );
 
 // Compression middleware
-app.use(compression());
+// app.use(compression());
 
 // Logging middleware
-app.use(morgan('combined'));
+// app.use(morgan('combined'));
 
 // Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// app.use(express.json({ limit: '10mb' }));
+// app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Routes
 app.use('/health', healthRoutes);
@@ -50,11 +48,15 @@ app.use('/api', feedRoutes);
 app.use('/api', searchItemsRoutes);
 
 // Swagger documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  explorer: true,
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'OneCart API Documentation',
-}));
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'OneCart API Documentation',
+  })
+);
 
 // Serve swagger.json
 app.get('/swagger.json', (_req, res) => {
@@ -75,7 +77,6 @@ app.get('/', (_req, res) => {
 // Error handling middleware
 app.use(notFoundHandler);
 app.use(errorHandler);
-
 
 // Start server
 app.listen(PORT, async () => {

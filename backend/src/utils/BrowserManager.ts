@@ -1,5 +1,5 @@
-import puppeteer, { Browser, LaunchOptions, Page } from "puppeteer";
-import { env } from "../config/env";
+import { Browser, LaunchOptions, Page } from 'puppeteer';
+import { launchBrowser } from './blinkit/browserUtils';
 
 export class BrowserManager {
   private static browser: Browser | null = null;
@@ -8,24 +8,14 @@ export class BrowserManager {
     options: LaunchOptions = {
       headless: false,
       defaultViewport: null,
-      args: ["--start-maximized"],
+      args: ['--start-maximized'],
     }
   ): Promise<Browser> {
     if (!BrowserManager.browser) {
-      const isLocal = env.NODE_ENV === 'development';
-      const launchOptions: LaunchOptions = isLocal ? options : { 
-        headless: true,
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-geolocation",
-          "--use-fake-ui-for-media-stream",
-        ],
-      };
-      BrowserManager.browser = await puppeteer.launch(launchOptions);
+      BrowserManager.browser = await launchBrowser(options);
 
       // Listen for browser disconnect to reset state
-      BrowserManager.browser.on("disconnected", () => {
+      BrowserManager.browser.on('disconnected', () => {
         BrowserManager.resetState();
       });
     }

@@ -1,7 +1,7 @@
+import { NextFunction, Request, Response } from 'express';
 import { AppError } from '../middleware/errorHandler';
 import { userModel } from '../models/User';
 import { RegisterUserRequest, RegisterUserResponse } from '../types/user';
-import { NextFunction, Request, Response } from 'express';
 
 /**
  * User Controller
@@ -15,7 +15,7 @@ export class UserController {
    * @returns {Promise<RegisterUserResponse>} Registration response with user data
    */
   static async registerUser(
-    req: Request<{}, RegisterUserResponse, RegisterUserRequest>,
+        req: Request<{}, RegisterUserRequest>,
     res: Response<RegisterUserResponse>,
     next: NextFunction
   ): Promise<void> {
@@ -26,10 +26,11 @@ export class UserController {
         phone,
         walletAddresses,
         addresses,
-        defaultAddressIndex = -1,
-        askBeforeReceiving = true,
-        currentLatitude,
-        currentLongitude,
+        defaultAddressIndex,
+        receiveAddressIndex,
+        askBeforeReceiving,
+        farcasterWalletAddress,
+        primaryWalletIndex,
       } = req.body;
 
       console.log(
@@ -60,31 +61,18 @@ export class UserController {
         }
       }
 
-      // Create user addresses with coordinates if provided
-      const userAddresses = addresses.map((address, index) => ({
-        name: address.name,
-        address: address.address,
-        floor: address.floor,
-        landmark: address.landmark,
-        phone: address.phone,
-        save_as: address.save_as,
-        latitude:
-          address.latitude || (index === 0 ? currentLatitude : undefined),
-        longitude:
-          address.longitude || (index === 0 ? currentLongitude : undefined),
-        is_default: index === defaultAddressIndex,
-      }));
-
       // Create user
       const newUser = await userModel.create({
         username: socialLogins[0]!.username, // Use first social login as primary username
         email: email || undefined,
         phone,
-        addresses: userAddresses,
+        addresses,
         defaultAddressIndex,
         askBeforeReceiving,
         walletAddresses,
-        receiveAddressIndex: defaultAddressIndex,
+        receiveAddressIndex,
+        farcasterWalletAddress,
+        primaryWalletIndex,
       });
 
       console.log(

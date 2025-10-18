@@ -60,41 +60,10 @@ export interface AddressData {
     is_share_address_enabled: boolean;
   };
 }
-
-// Simplified address structure for our database
-export interface UserAddress {
-  id?: string;
-  name?: string; // Address display name
-  address?: string; // Main address details (max 60 chars)
-  floor?: string; // Floor information
-  landmark?: string; // Landmark information
-  phone?: string; // Phone number for this address
-  save_as?: string; // Address alias
-  latitude?: number | undefined;
-  longitude?: number | undefined;
-  is_default?: boolean;
-  created_at?: Date;
-  updated_at?: Date;
-}
-
-// Request/Response types for address operations
-export interface CreateAddressRequest {
-  name: string;
-  address: string;
-  floor: string;
-  landmark: string;
-  phone: string;
-  save_as: string;
-  latitude?: number;
-  longitude?: number;
-}
-
-export interface UpdateAddressRequest extends Partial<CreateAddressRequest> {
-  id: string;
-}
+export type UpdateAddressRequest = Partial<AddressData>;
 
 export interface AddressResponse {
   success: boolean;
-  data?: UserAddress;
+  data?: AddressData;
   error?: string;
 }

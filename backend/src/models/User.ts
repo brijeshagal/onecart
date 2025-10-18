@@ -1,19 +1,28 @@
 import mongoose, { Schema } from 'mongoose';
-import { UserAddress } from '../types/address';
+import { AddressData } from '../types/address';
 import { User as IUser } from '../types/user';
 
 // Create Address sub-schema
-const AddressSchema = new Schema<UserAddress>(
+const AddressSchema = new Schema<AddressData>(
   {
     name: { type: String, required: true },
-    address: { type: String, required: true, maxlength: 60 },
-    floor: { type: String, required: true },
+    address_details_info: { type: Object, required: true },
+    address_meta: { type: Object, required: true },
+    location: { type: Object, required: true },
+    coordinates: { type: Object, required: true },
+    corrected_location_info: { type: Object, required: true },
+    location_info: { type: Object, required: true },
+    display_address: { type: String, required: true },
     landmark: { type: String, required: true },
-    phone: { type: String, required: true },
-    save_as: { type: String, required: true },
     latitude: { type: Number, required: true },
     longitude: { type: Number, required: true },
-    is_default: { type: Boolean, default: false },
+    use_corrected_location: { type: Boolean, required: true },
+    install_ts: { type: String, required: true },
+    update_ts: { type: String, required: true },
+    line1: { type: String, required: true },
+    line2: { type: String, required: true },
+    ui_data: { type: Object, required: false },
+    label: { type: String, required: true },
   },
   {
     timestamps: true,

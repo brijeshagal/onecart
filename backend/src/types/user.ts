@@ -1,4 +1,4 @@
-import { UserAddress, CreateAddressRequest } from './address';
+import { AddressData } from './address';
 
 // User data structure
 export interface User {
@@ -6,7 +6,7 @@ export interface User {
   username: string; // Farcaster username
   email?: string | undefined; // Optional email
   phone: string; // Phone number with country code
-  addresses: UserAddress[]; // Array of user addresses
+  addresses: AddressData[]; // Array of user addresses
   defaultAddressIndex: number; // Index of default address (-1 if none)
   receiveAddressIndex: number; // Index of receive address (-1 if none)
   askBeforeReceiving: boolean; // Default true
@@ -24,33 +24,25 @@ export interface SocialLogin {
   walletAddress?: string;
 }
 
-// User registration request
+// User registration response
+export interface RegisterUserResponse {
+  success: boolean;
+  data: {
+    user: User;
+    message: string;
+  };
+  timestamp: string;
+}
+
 export interface RegisterUserRequest {
   socialLogins: SocialLogin[];
   email?: string;
   phone: string;
+  addresses: AddressData[];
+  defaultAddressIndex: number;
+  receiveAddressIndex: number;
+  askBeforeReceiving: boolean;
   walletAddresses: string[];
-  addresses: CreateAddressRequest[];
-  defaultAddressIndex?: number; // Default -1
-  askBeforeReceiving?: boolean; // Default true
-  currentLatitude?: number;
-  currentLongitude?: number;
-}
-
-// User registration response
-export interface RegisterUserResponse {
-  success: boolean;
-  data?: {
-    user: User;
-    message: string;
-  };
-  error?: string;
-  timestamp?: string;
-}
-
-// User profile response
-export interface UserProfileResponse {
-  success: boolean;
-  data?: User;
-  error?: string;
+  farcasterWalletAddress: number;
+  primaryWalletIndex: number;
 }

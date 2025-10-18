@@ -85,65 +85,106 @@ const options = {
         UserAddress: {
           type: 'object',
           properties: {
-            id: {
+            _id: {
               type: 'string',
+              description: 'MongoDB ObjectId of the address subdocument',
               example: '507f1f77bcf86cd799439011',
             },
-            name: {
+            name: { type: 'string', example: 'Home' },
+            label: { type: 'string', example: 'Saved Address' },
+            label_id: { type: 'string', example: 'home' },
+            line1: { type: 'string', example: '123 Main Street' },
+            line2: { type: 'string', example: 'Apartment 4B' },
+            display_address: {
               type: 'string',
-              example: 'Home',
+              example: '123 Main Street, Apartment 4B, New Delhi',
             },
-            address: {
-              type: 'string',
-              maxLength: 60,
-              example: '123 Main Street, Apartment 4B',
+            landmark: { type: 'string', example: 'Near Central Park' },
+            latitude: { type: 'number', example: 28.4652382 },
+            longitude: { type: 'number', example: 77.0615957 },
+            use_corrected_location: { type: 'boolean', example: true },
+            install_ts: { type: 'string', example: '2024-01-01T00:00:00.000Z' },
+            update_ts: { type: 'string', example: '2024-01-02T00:00:00.000Z' },
+            corrected_location_info: {
+              type: 'object',
+              properties: {
+                confidence: { type: 'string', example: 'high' },
+                landmark: { type: 'string', example: 'Park Entry' },
+                latitude: { type: 'number', example: 28.4652382 },
+                longitude: { type: 'number', example: 77.0615957 },
+              },
             },
-            floor: {
-              type: 'string',
-              example: '4th Floor',
+            location_info: {
+              type: 'object',
+              properties: {
+                state: { type: 'string', example: 'Delhi' },
+                postal_code: { type: 'string', example: '110001' },
+                city: { type: 'string', example: 'New Delhi' },
+              },
             },
-            landmark: {
-              type: 'string',
-              example: 'Near Central Park',
+            address_meta: {
+              type: 'object',
+              properties: {
+                source: { type: 'string', example: 'user' },
+                source_ref_id: { type: 'string', example: 'user_123' },
+              },
             },
-            phone: {
-              type: 'string',
-              example: '+1234567890',
+            location: {
+              type: 'object',
+              properties: {
+                latitude: { type: 'number', example: 28.4652382 },
+                longitude: { type: 'number', example: 77.0615957 },
+              },
             },
-            save_as: {
-              type: 'string',
-              example: 'home',
+            coordinates: {
+              type: 'object',
+              properties: {
+                lat: { type: 'number', example: 28.4652382 },
+                lon: { type: 'number', example: 77.0615957 },
+              },
             },
-            latitude: {
-              type: 'number',
-              example: 28.4652382,
+            address_details_info: {
+              type: 'object',
+              properties: {
+                tower: { type: 'string', example: 'A' },
+                house: { type: 'string', example: '12' },
+                floor: { type: 'string', example: '4' },
+                phone: { type: 'string', example: '+1234567890' },
+                landmark: { type: 'string', example: 'Near Central Park' },
+                tags: { type: 'string', example: 'home' },
+                template_id: { type: 'number', example: 1 },
+                alias_id: { type: 'number', example: 0 },
+                name: { type: 'string', example: 'Home' },
+              },
             },
-            longitude: {
-              type: 'number',
-              example: 77.0615957,
-            },
-            is_default: {
-              type: 'boolean',
-              example: true,
-            },
-            created_at: {
-              type: 'string',
-              format: 'date-time',
-              example: '2024-01-01T00:00:00.000Z',
-            },
-            updated_at: {
-              type: 'string',
-              format: 'date-time',
-              example: '2024-01-01T00:00:00.000Z',
+            ui_data: {
+              type: 'object',
+              properties: {
+                left_image: { type: 'string', example: 'https://example.com/img.png' },
+                distance: { type: 'string', example: '1.2 km' },
+                is_share_address_enabled: { type: 'boolean', example: false },
+              },
             },
           },
           required: [
             'name',
-            'address',
-            'floor',
+            'label',
+            'label_id',
+            'line1',
+            'line2',
+            'display_address',
             'landmark',
-            'phone',
-            'save_as',
+            'latitude',
+            'longitude',
+            'use_corrected_location',
+            'install_ts',
+            'update_ts',
+            'corrected_location_info',
+            'location_info',
+            'address_meta',
+            'location',
+            'coordinates',
+            'address_details_info',
           ],
         },
         User: {
@@ -343,6 +384,7 @@ const options = {
               },
             },
             addresses: {
+              description: 'Array of Blinkit AddressData objects captured via location flow',
               type: 'array',
               items: {
                 $ref: '#/components/schemas/UserAddress',
@@ -377,6 +419,11 @@ const options = {
         SearchItemsRequest: {
           type: 'object',
           properties: {
+            userId: {
+              type: 'string',
+              description: 'User ID to resolve default/selected address context',
+              example: '664f1f77bcf86cd799439011',
+            },
             receiverUsername: {
               type: 'string',
               example: 'john_doe',

@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/userController';
-import { validateRegisterUser } from '../middleware/validation';
 
 /**
  * User routes
@@ -62,7 +61,7 @@ const router: Router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/register', validateRegisterUser, UserController.registerUser);
+router.post('/register', UserController.registerUser);
 
 /**
  * @swagger

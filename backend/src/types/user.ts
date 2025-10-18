@@ -19,9 +19,10 @@ export interface User {
 
 // Social login types
 export interface SocialLogin {
-  platform: 'farcaster' | 'twitter' | 'discord' | 'telegram';
-  username: string;
-  walletAddress?: string;
+  farcaster?: {
+    walletAddress?: string;
+    username: string;
+  };
 }
 
 // User registration response
@@ -35,7 +36,8 @@ export interface RegisterUserResponse {
 }
 
 export interface RegisterUserRequest {
-  socialLogins: SocialLogin[];
+  socialLogins?: SocialLogin; // optional object with farcaster login
+  username?: string; // required if no socialLogins provided
   email?: string;
   phone: string;
   addresses: AddressData[];

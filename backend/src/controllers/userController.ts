@@ -1,61 +1,63 @@
 import { NextFunction, Request, Response } from 'express';
 import { AppError } from '../middleware/errorHandler';
 import { userModel } from '../models/User';
-import { RegisterUserRequest, RegisterUserResponse } from '../types/user';
+import {
+  RegisterUserRequest,
+  RegisterUserResponse,
+} from '../types/user'; 
 
 /**
  * User Controller
  * Handles user registration and profile management
  */
 export class UserController {
-  /**
-   * Register a new user with social logins and addresses
-   * @route POST /api/register
-   * @param {RegisterUserRequest} req.body - User registration data
-   * @returns {Promise<RegisterUserResponse>} Registration response with user data
-   */
   static async registerUser(
-        req: Request<{}, RegisterUserRequest>,
+    req: Request<{}, RegisterUserResponse, RegisterUserRequest>,
     res: Response<RegisterUserResponse>,
     next: NextFunction
   ): Promise<void> {
     try {
       const {
         socialLogins,
+        username,
         email,
         phone,
-        walletAddresses,
-        addresses,
-        defaultAddressIndex,
-        receiveAddressIndex,
-        askBeforeReceiving,
-        farcasterWalletAddress,
-        primaryWalletIndex,
+        walletAddresses = [],
+        addresses = [],
+        defaultAddressIndex = -1,
+        receiveAddressIndex = -1,
+        askBeforeReceiving = true,
+        farcasterWalletAddress = -1,
+        primaryWalletIndex = -1,
       } = req.body;
 
-      console.log(
-        `👤 User registration request: phone=${phone}, socialLogins=${socialLogins.length}`
-      );
+      console.log('Register request:', { phone, username, socialLogins: socialLogins ? Object.keys(socialLogins) : 'none' });
 
       // Check if user already exists by phone
       const existingUserByPhone = await userModel.findOne({ phone });
       if (existingUserByPhone) {
-        const error = new AppError(
-          'User with this phone number already exists'
-        );
+        const error = new AppError('User with this phone number already exists');
         error.statusCode = 409;
         return next(error);
       }
 
-      // Check if user already exists by username (from social logins)
-      for (const socialLogin of socialLogins) {
+      // Check if user already exists by username (from social logins or direct username)
+      if (socialLogins?.farcaster?.username) {
         const existingUserByUsername = await userModel.findOne({
-          username: socialLogin.username,
+          'socialLogins.farcaster.username': socialLogins.farcaster.username,
         });
         if (existingUserByUsername) {
           const error = new AppError(
-            `User with username ${socialLogin.username} already exists`
+            `User with username ${socialLogins.farcaster.username} already exists`
           );
+          error.statusCode = 409;
+          return next(error);
+        }
+      }
+      if (username) {
+        const existingUserByUsername = await userModel.findOne({ username });
+        if (existingUserByUsername) {
+          const error = new AppError(`User with username ${username} already exists`);
           error.statusCode = 409;
           return next(error);
         }
@@ -63,7 +65,7 @@ export class UserController {
 
       // Create user
       const newUser = await userModel.create({
-        username: socialLogins[0]!.username, // Use first social login as primary username
+        username,
         email: email || undefined,
         phone,
         addresses,

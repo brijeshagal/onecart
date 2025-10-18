@@ -65,22 +65,16 @@ const options = {
         },
         SocialLogin: {
           type: 'object',
+          description: 'Farcaster social login information (currently the only supported platform)',
           properties: {
-            platform: {
-              type: 'string',
-              enum: ['farcaster', 'twitter', 'discord', 'telegram'],
-              example: 'farcaster',
-            },
-            username: {
-              type: 'string',
-              example: 'testuser123',
-            },
-            walletAddress: {
-              type: 'string',
-              example: '0x1234567890abcdef',
+            farcaster: {
+              type: 'object',
+              properties: {
+                username: { type: 'string', example: 'alice' },
+                walletAddress: { type: 'string', example: '0x1234567890abcdef1234567890abcdef12345678' },
+              },
             },
           },
-          required: ['platform', 'username'],
         },
         UserAddress: {
           type: 'object',
@@ -359,13 +353,16 @@ const options = {
         },
         RegisterUserRequest: {
           type: 'object',
+          description: 'Register user payload. Provide username or socialLogins (at least one).',
           properties: {
             socialLogins: {
-              type: 'array',
-              items: {
-                $ref: '#/components/schemas/SocialLogin',
-              },
-              minItems: 1,
+              description: 'Optional Farcaster login object',
+              $ref: '#/components/schemas/SocialLogin',
+            },
+            username: {
+              type: 'string',
+              description: 'Required username, required if socialLogins is omitted',
+              example: 'alice',
             },
             email: {
               type: 'string',
@@ -396,9 +393,24 @@ const options = {
               minimum: -1,
               example: 0,
             },
+            receiveAddressIndex: {
+              type: 'number',
+              minimum: -1,
+              example: 0,
+            },
             askBeforeReceiving: {
               type: 'boolean',
               example: true,
+            },
+            farcasterWalletAddress: {
+              type: 'number',
+              description: 'Index of farcaster-linked wallet if any, -1 otherwise',
+              example: -1,
+            },
+            primaryWalletIndex: {
+              type: 'number',
+              description: 'Index of the primary wallet in walletAddresses',
+              example: 0,
             },
             currentLatitude: {
               type: 'number',
@@ -413,7 +425,90 @@ const options = {
               example: 77.0615957,
             },
           },
-          required: ['socialLogins', 'phone', 'walletAddresses', 'addresses'],
+          required: ['phone', 'walletAddresses', 'addresses'],
+          oneOf: [
+            {
+              required: ['username'],
+            },
+            {
+              properties: {
+                socialLogins: {
+                  type: 'array',
+                  minItems: 1,
+                },
+              },
+              required: ['socialLogins'],
+            },
+          ],
+          example: {
+            username: 'alice',
+            socialLogins: { farcaster: { username: 'alice', walletAddress: '0x1234567890abcdef1234567890abcdef12345678' } },
+            email: 'alice@example.com',
+            phone: '+11234567890',
+            walletAddresses: ['0x1234567890abcdef1234567890abcdef12345678'],
+            addresses: [
+              {
+                name: 'Home',
+                label: 'Saved Address',
+                label_id: 'home',
+                line1: '123 Main Street',
+                line2: 'Apartment 4B',
+                display_address: '123 Main Street, Apartment 4B, New Delhi',
+                landmark: 'Near Central Park',
+                latitude: 28.4652382,
+                longitude: 77.0615957,
+                use_corrected_location: true,
+                install_ts: '2024-01-01T00:00:00.000Z',
+                update_ts: '2024-01-02T00:00:00.000Z',
+                corrected_location_info: {
+                  confidence: 'high',
+                  landmark: 'Park Entry',
+                  latitude: 28.4652382,
+                  longitude: 77.0615957,
+                },
+                location_info: {
+                  state: 'Delhi',
+                  postal_code: '110001',
+                  city: 'New Delhi',
+                },
+                address_meta: {
+                  source: 'user',
+                  source_ref_id: 'user_123',
+                },
+                location: {
+                  latitude: 28.4652382,
+                  longitude: 77.0615957,
+                },
+                coordinates: {
+                  lat: 28.4652382,
+                  lon: 77.0615957,
+                },
+                address_details_info: {
+                  tower: 'A',
+                  house: '12',
+                  floor: '4',
+                  phone: '+11234567890',
+                  landmark: 'Near Central Park',
+                  tags: 'home',
+                  template_id: 1,
+                  alias_id: 0,
+                  name: 'Home',
+                },
+                ui_data: {
+                  left_image: 'https://example.com/img.png',
+                  distance: '1.2 km',
+                  is_share_address_enabled: false,
+                },
+              },
+            ],
+            defaultAddressIndex: 0,
+            receiveAddressIndex: 0,
+            askBeforeReceiving: true,
+            farcasterWalletAddress: -1,
+            primaryWalletIndex: 0,
+            currentLatitude: 28.4652382,
+            currentLongitude: 77.0615957,
+          },
         },
         // TODO: Add FeedProduct and FeedSection schemas when implementing actual Blinkit integration
         SearchItemsRequest: {

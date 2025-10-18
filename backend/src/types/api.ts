@@ -66,6 +66,7 @@ export interface FeedRequest {
 // Search Items API types
 export interface SearchItemsRequest {
   // Location options (at least one required)
+  userId?: string; // optional: used to fetch user and resolve addresses
   receiverUsername?: string;
   lat?: number;
   lng?: number;

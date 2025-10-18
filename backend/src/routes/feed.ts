@@ -104,6 +104,8 @@ const router: Router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/', validateFeedRequest, (req, res, next) => FeedController.getFeed(req as any, res, next));
+router.get('/', validateFeedRequest, (req, res, next) =>
+  FeedController.getFeed(req as any, res, next)
+);
 
 export { router as feedRoutes };

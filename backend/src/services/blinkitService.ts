@@ -29,11 +29,13 @@ export class BlinkitService {
       });
 
       if (!response.ok) {
-        throw new AppError(`Blinkit API error: ${response.status} - ${response.statusText}`);
+        throw new AppError(
+          `Blinkit API error: ${response.status} - ${response.statusText}`
+        );
       }
 
       const data = await response.json();
-      return data as unknown as UIData;
+      return (data as { ui_data: UIData }).ui_data;
     } catch (error) {
       console.error('❌ Blinkit API Error:', error);
 

@@ -25,6 +25,13 @@ const router: Router = Router();
  *           example: "milk"
  *         description: Search query string
  *       - in: query
+ *         name: userId
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: "664f1f77bcf86cd799439011"
+ *         description: User ID to fetch context and default address
+ *       - in: query
  *         name: receiverUsername
  *         required: false
  *         schema:

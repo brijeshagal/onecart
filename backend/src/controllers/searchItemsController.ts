@@ -1,5 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { userModel } from '../models/User';
 import { SearchItemsRequest, SearchItemsResponse } from '../types/api';
+import BrowserManager from '../utils/BrowserManager';
+import {
+  setAddressOnPage,
+  waitForSearchResults,
+} from '../utils/blinkit/searchUtils';
 
 /**
  * Search Items Controller
@@ -20,43 +26,75 @@ export class SearchItemsController {
   ): Promise<void> {
     try {
       const {
-        receiverUsername: _receiverUsername,
+        userId,
+        receiverUsername,
         lat: _lat,
         lng: _lng,
         presetAddressId: _presetAddressId,
         query,
-        offset = 0,
-        limit = 20,
       } = req.query;
 
       console.log(
         `🔍 Search items request: query="${query}", location options provided`
       );
 
-      // TODO: Implement actual search functionality:
-      // 1. Open new browser, new page, give session login
-      // 2. Search for products to avoid parallel search issues
-      // 3. If not logged in or possible via session login in puppeteer,
-      //    then login on the site ourselves
-      // 4. Return actual search results from Blinkit
+      const page = await BrowserManager.createPage();
+      await page.goto('https://www.blinkit.com', {
+        waitUntil: 'domcontentloaded',
+      });
 
-      // For now, return a stub response
-      const response: SearchItemsResponse = {
+      // Resolve address context: from presetAddressId or user's default address
+      let addressData: any = '';
+      if (_presetAddressId && userId) {
+        addressData = await userModel.findOne({
+          _id: userId,
+          'addresses._id': _presetAddressId,
+        });
+        if (!addressData) {
+          res.status(404).json({
+            success: false,
+            error: 'Address not found',
+          });
+          return;
+        }
+        addressData = addressData.addresses.find(
+          (a: any) => String(a._id) === String(_presetAddressId)
+        ) as any;
+        if (!addressData) {
+          res.status(404).json({
+            success: false,
+            error: 'Address not found',
+          });
+          return;
+        }
+      } else if (receiverUsername) {
+        const user = await userModel.findOne({
+          username: receiverUsername,
+        });
+        if (!user) {
+          res.status(404).json({
+            success: false,
+            error: 'User not found',
+          });
+          return;
+        }
+        addressData = user.addresses[user.receiveAddressIndex];
+        if (!addressData) {
+          res.status(404).json({
+            success: false,
+            error: 'Address not found',
+          });
+          return;
+        }
+      }
+      await setAddressOnPage(addressData, page);
+      const blinkitSearchResponse = await waitForSearchResults(page, query);
+      await page.close();
+      res.status(200).json({
         success: true,
-        data: {
-          items: [], // TODO: Replace with actual search results
-          searchQuery: query,
-          pagination: {
-            offset,
-            limit,
-            total: 0, // TODO: Replace with actual total count
-            hasMore: false,
-          },
-        },
+        data: blinkitSearchResponse,
         timestamp: new Date().toISOString(),
-      };
-
-      res.status(200).json(response);
+      } as any);
     } catch (error) {
       console.error('❌ Search items error:', error);
       next(error);

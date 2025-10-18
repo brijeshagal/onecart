@@ -96,6 +96,7 @@ export const validateFeedRequest = (req: Request, _res: Response, next: NextFunc
 // Validation middleware for search items request
 export const validateSearchItemsRequest = (req: Request, _res: Response, next: NextFunction): void => {
   const {
+    userId,
     receiverUsername,
     lat,
     lng,
@@ -114,9 +115,9 @@ export const validateSearchItemsRequest = (req: Request, _res: Response, next: N
   }
 
   // Check that at least one location option is provided
-  const hasLocationOption = receiverUsername || (lat && lng) || presetAddressId || newAddress;
+  const hasLocationOption = receiverUsername || (lat && lng) || presetAddressId || newAddress || userId;
   if (!hasLocationOption) {
-    const error = new Error('Missing location: at least one of receiverUsername, lat+lng, presetAddressId, or newAddress is required') as AppError;
+    const error = new Error('Missing context: provide one of userId, receiverUsername, lat+lng, presetAddressId, or newAddress') as AppError;
     error.statusCode = 400;
     return next(error);
   }

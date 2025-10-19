@@ -63,6 +63,91 @@ export interface FeedRequest {
 
 // TODO: Add FeedProduct and FeedSection interfaces when implementing actual Blinkit integration
 
+// Cart API types
+export interface CartAddRequest {
+  senderUserId: string;
+  receiverUserId: string;
+  receiveAddress: any; // AddressData type - keeping flexible for complex object
+  product: {
+    identity: { id: string };
+    product_id: string;
+    name: { text: string };
+  };
+  quantity: number;
+  orderNotes?: string;
+}
+
+export interface CartResponse {
+  success: boolean;
+  data?: {
+    cartId?: string;
+    senderUserId?: string;
+    receiverUserId?: string;
+    receiveAddress?: any;
+    items?: Array<{
+      productId: string;
+      identityId: string;
+      name: string;
+      quantity: number;
+      addedAt: string;
+    }>;
+    totalItems?: number;
+    cartStatus?: string;
+    orderTimestamp?: string;
+    fulfillmentTimestamp?: string;
+    orderNotes?: string;
+    totalAmount?: number;
+    product?: {
+      productId: string;
+      identityId: string;
+      name: string;
+      quantity: number;
+    };
+    removedProductId?: string;
+    userId?: string;
+    orders?: Array<{
+      cartId: string;
+      receiverUserId: string;
+      receiveAddress: any;
+      items: Array<{
+        productId: string;
+        identityId: string;
+        name: string;
+        quantity: number;
+        addedAt: string;
+      }>;
+      totalItems: number;
+      cartStatus: string;
+      orderTimestamp: string;
+      fulfillmentTimestamp?: string;
+      orderNotes?: string;
+      totalAmount?: number;
+    }>;
+    receivedOrders?: Array<{
+      cartId: string;
+      senderUserId: string;
+      receiveAddress: any;
+      items: Array<{
+        productId: string;
+        identityId: string;
+        name: string;
+        quantity: number;
+        addedAt: string;
+      }>;
+      totalItems: number;
+      cartStatus: string;
+      orderTimestamp: string;
+      fulfillmentTimestamp?: string;
+      orderNotes?: string;
+      totalAmount?: number;
+    }>;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+  error?: string;
+  timestamp?: string;
+}
+
 // Search Items API types
 export interface SearchItemsRequest {
   // Location options (at least one required)

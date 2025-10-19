@@ -78,6 +78,22 @@ const UserSchema = new Schema<IUser>(
       type: Number,
       default: -1,
     },
+    // Cart references for multi-user cart system
+    activeCartId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Cart',
+      default: null,
+    },
+    previousOrders: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Cart',
+      default: [],
+    }],
+    receiveOrders: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Cart',
+      default: [],
+    }],
   },
   {
     timestamps: true,

@@ -9,6 +9,7 @@ import { swaggerSpec } from './config/swagger';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
 import { apiRoutes } from './routes/api';
+import { cartRoutes } from './routes/cart';
 import { feedRoutes } from './routes/feed';
 import { healthRoutes } from './routes/health';
 import { locationRoutes } from './routes/location';
@@ -46,6 +47,7 @@ app.use('/api', locationRoutes);
 app.use('/api', userRoutes);
 app.use('/api', feedRoutes);
 app.use('/api', searchItemsRoutes);
+app.use('/api', cartRoutes);
 
 // Swagger documentation
 app.use(

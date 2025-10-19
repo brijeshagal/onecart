@@ -1,5 +1,5 @@
 /** Root response */
-interface BlinkitProductResponse {
+export interface BlinkitProductResponse {
   data: DataItem;
   tracking: TrackingData;
   widget_type: string;
@@ -9,7 +9,7 @@ interface BlinkitProductResponse {
 }
 
 /** Main Product Data Object */
-interface DataItem {
+export interface DataItem {
   identity: {
     id: string;
   };
@@ -110,7 +110,7 @@ interface DataItem {
 }
 
 /** Tracking section */
-interface TrackingData {
+export interface TrackingData {
   widget_meta: {
     widget_id: string;
     widget_name: string;
@@ -186,27 +186,27 @@ interface TrackingData {
 }
 
 /** Shared Subtypes */
-interface ColorData {
+export interface ColorData {
   type: string;
   tint: string;
 }
 
-interface FontData {
+export interface FontData {
   size: string;
   weight: string;
 }
 
-interface ImageData {
+export interface ImageData {
   url: string;
 }
 
-interface TextStyle {
+export interface TextStyle {
   text: string;
   color: ColorData;
   font: FontData;
 }
 
-interface VariantData extends TextStyle {
+export interface VariantData extends TextStyle {
   number_of_lines: number;
   suffix_icon: {
     color: ColorData;
@@ -214,7 +214,7 @@ interface VariantData extends TextStyle {
   };
 }
 
-interface CartItem {
+export interface CartItem {
   product_id: number;
   merchant_id: number;
   product_name: string;
@@ -233,7 +233,7 @@ interface CartItem {
   display_name: string;
 }
 
-interface MediaItem {
+export interface MediaItem {
   media_type: string;
   image: {
     url: string;
@@ -241,7 +241,7 @@ interface MediaItem {
   };
 }
 
-interface ProductBadge {
+export interface ProductBadge {
   type: string;
   label: string;
   text_data: TextStyle;

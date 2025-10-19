@@ -7,8 +7,8 @@ import {
   launchBrowser,
 } from '../utils/blinkit/browserUtils';
 import {
-  setAddressOnPage,
   performBlinkitSearch,
+  setAddressOnPage,
 } from '../utils/blinkit/searchUtils';
 
 /**
@@ -62,11 +62,10 @@ export class SearchItemsController {
           });
           return;
         }
-        console.log('userDetails: ', userDetails);
+
         const addressDetails = userDetails.addresses.find(
           (a: any) => String(a._id.toString()) === String(_presetAddressId)
         ) as AddressData;
-        console.log(addressDetails);
         addressData = addressDetails.display_address;
       } else if (receiverUsername) {
         const userDetails = await userModel.findOne({
@@ -87,9 +86,9 @@ export class SearchItemsController {
       await setAddressOnPage(addressData, page);
       const blinkitSearchResponse = await performBlinkitSearch(page, query);
 
-      await page.close();
+      page.close();
       if (context) {
-        await context.close();
+        context.close();
       }
       res.status(200).json({
         success: true,

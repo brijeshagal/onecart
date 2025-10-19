@@ -76,6 +76,14 @@ router.get('/', (_req, res) => {
                        search: {
                          items: 'GET /api/search-items',
                        },
+                       cart: {
+                         add: 'POST /api/cart/add',
+                         active: 'GET /api/cart/active/:userId',
+                         orders: 'GET /api/cart/orders/:userId',
+                         received: 'GET /api/cart/received/:userId',
+                         remove: 'DELETE /api/cart/:userId/:productId',
+                         clear: 'DELETE /api/cart/clear/:userId',
+                       },
     },
     documentation: 'API documentation available at /api/docs',
   });

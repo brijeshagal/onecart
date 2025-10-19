@@ -15,6 +15,9 @@ export interface User {
   primaryWalletIndex: number; // Default -1 if no wallet selected
   created_at?: Date;
   updated_at?: Date;
+  activeCartId?: string;
+  previousOrders?: string[];
+  receiveOrders?: string[];
 }
 
 // Social login types

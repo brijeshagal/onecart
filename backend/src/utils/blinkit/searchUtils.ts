@@ -1,11 +1,10 @@
 import { Page } from 'puppeteer';
-import { SearchItemsResponse } from '../../types/api';
 import { AddressData } from '../../types/address';
-
+import { BlinkitProductResponse } from '../../types/cart';
 /**
  * Utility function to wait for search results from Blinkit's search API
  * This function listens for network responses to the search endpoint and extracts results
- * 
+ *
  * @param page - Puppeteer Page instance
  * @param query - Search query string
  * @param timeoutMs - Timeout in milliseconds (default: 4000ms)
@@ -15,17 +14,17 @@ export async function waitForSearchResults(
   page: Page,
   query: string,
   timeoutMs: number = 4000
-): Promise<SearchItemsResponse["data"]> {
+): Promise<BlinkitProductResponse> {
   return new Promise((resolve, reject) => {
     let settled = false;
 
     const responseHandler = async (response: any) => {
       try {
         const url = response.url();
-        if (!url.includes("/v1/layout/search")) return;
+        if (!url.includes('/v1/layout/search')) return;
 
         // Basic guard to ensure we're looking at the right query context
-        const firstToken = query.split(" ")[0];
+        const firstToken = query.split(' ')[0];
         if (firstToken && !url.includes(firstToken)) {
           return;
         }
@@ -42,19 +41,19 @@ export async function waitForSearchResults(
 
     const cleanup = () => {
       try {
-        page.off("response", responseHandler);
+        page.off('response', responseHandler);
       } catch {}
     };
 
     const timer = setTimeout(() => {
       if (settled) return;
       cleanup();
-      console.warn("Search request timeout for query:", query);
-      reject(new Error("Search request timeout"));
+      console.warn('Search request timeout for query:', query);
+      reject(new Error('Search request timeout'));
     }, timeoutMs);
 
     // attach
-    page.on("response", responseHandler);
+    page.on('response', responseHandler);
 
     // Ensure we clear timer on natural resolve/reject
     const originalResolve = resolve as any;
@@ -79,7 +78,7 @@ export async function waitForSearchResults(
 export async function performBlinkitSearch(
   page: Page,
   query: string
-): Promise<SearchItemsResponse["data"]> {
+): Promise<BlinkitProductResponse> {
   const blinkitSearchPromise = waitForSearchResults(page, query);
 
   const searchUrl = new URL('https://blinkit.com/s/');
@@ -109,16 +108,23 @@ export async function setAddressOnPage(
     await page.click('.LocationSearchBox__InputSelect-sc-1k8u6a6-0');
 
     // 2) Type the suggestion text
-    const queryText = typeof suggestion === 'string'
-      ? suggestion
-      : (suggestion.display_address || suggestion.line1 || suggestion.name || '');
+    const queryText =
+      typeof suggestion === 'string'
+        ? suggestion
+        : suggestion.display_address ||
+          suggestion.line1 ||
+          suggestion.name ||
+          '';
 
     if (queryText) {
-      await page.type('.LocationSearchBox__InputSelect-sc-1k8u6a6-0', queryText);
+      await page.type(
+        '.LocationSearchBox__InputSelect-sc-1k8u6a6-0',
+        queryText
+      );
     }
 
     // Small wait for suggestions to populate
-    await new Promise((resolve) => setTimeout(resolve, 900));
+    await new Promise(resolve => setTimeout(resolve, 900));
 
     // 3) Pick the first suggestion from the list
     await page.waitForSelector('.address-container-v1');
@@ -126,7 +132,7 @@ export async function setAddressOnPage(
 
     // Allow UI to settle
     if (waitAfterMs > 0) {
-      await new Promise((resolve) => setTimeout(resolve, waitAfterMs));
+      await new Promise(resolve => setTimeout(resolve, waitAfterMs));
     }
     // eslint-disable-next-line no-console
     console.log('Address successfully set and confirmed');
@@ -135,6 +141,6 @@ export async function setAddressOnPage(
     console.warn('Address confirmation timeout, but continuing...', error);
   } finally {
     // Final small wait to reduce race conditions after selection
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 500));
   }
 }

@@ -71,6 +71,28 @@ export async function waitForSearchResults(
 }
 
 /**
+ * Perform a complete Blinkit search by navigating to search URL and waiting for results
+ * @param page - Puppeteer Page instance
+ * @param query - Search query string
+ * @returns Promise that resolves with search results data
+ */
+export async function performBlinkitSearch(
+  page: Page,
+  query: string
+): Promise<SearchItemsResponse["data"]> {
+  const blinkitSearchPromise = waitForSearchResults(page, query);
+
+  const searchUrl = new URL('https://blinkit.com/s/');
+  searchUrl.searchParams.set('q', query);
+
+  await page.goto(searchUrl.toString(), {
+    waitUntil: 'networkidle2',
+  });
+
+  return await blinkitSearchPromise;
+}
+
+/**
  * Set delivery address on Blinkit using puppeteer automation.
  * Ensures subsequent searches are location-aware by updating the site address.
  */

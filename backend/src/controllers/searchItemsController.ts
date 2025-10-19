@@ -8,7 +8,7 @@ import {
 } from '../utils/blinkit/browserUtils';
 import {
   setAddressOnPage,
-  waitForSearchResults,
+  performBlinkitSearch,
 } from '../utils/blinkit/searchUtils';
 
 /**
@@ -83,9 +83,10 @@ export class SearchItemsController {
           userDetails.addresses[userDetails.receiveAddressIndex];
         addressData = addressDetails.display_address;
       }
-      console.log('addressData: ', addressData);
+
       await setAddressOnPage(addressData, page);
-      const blinkitSearchResponse = await waitForSearchResults(page, query);
+      const blinkitSearchResponse = await performBlinkitSearch(page, query);
+
       await page.close();
       if (context) {
         await context.close();

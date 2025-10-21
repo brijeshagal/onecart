@@ -22,8 +22,16 @@ class ApiService {
     return response.data;
   }
 
-  private async handleError(error: any): Promise<never> {
-    const errorMessage = error.response?.data?.error?.message || error.message || 'An error occurred';
+  private async handleError(error: unknown): Promise<never> {
+    let errorMessage = 'An error occurred';
+    
+    if (error && typeof error === 'object' && 'response' in error) {
+      const axiosError = error as { response?: { data?: { error?: { message?: string } } } };
+      errorMessage = axiosError.response?.data?.error?.message || errorMessage;
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    
     throw new Error(errorMessage);
   }
 

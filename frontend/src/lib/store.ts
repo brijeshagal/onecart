@@ -4,7 +4,7 @@ import { User, AppState } from '@/types';
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // Initial state
       user: null,
       isAuthenticated: false,

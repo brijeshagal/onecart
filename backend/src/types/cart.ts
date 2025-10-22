@@ -30,7 +30,7 @@ export interface DataItem {
   inventory: number;
   merchant_type: string;
   eta_identifier: string;
-  stepper_data: {
+  stepper_data?: {
     size: string;
     state: {
       title: {
@@ -38,6 +38,7 @@ export interface DataItem {
       };
     };
   };
+  stepper_data_v2?: StepperDataV2;
   eta_tag: {
     title: {
       text: string;
@@ -248,4 +249,179 @@ export interface ProductBadge {
   bg_color_data: ColorData;
   image_data: ImageData;
   padding: string;
+}
+
+export interface StepperDataV2 {
+  size: string;
+  max_count: number;
+  zero_layout_config: {
+    style: string;
+  };
+  non_zero_layout_config: {
+    style: string;
+  };
+  increment_actions: {
+    default: StepperAction[];
+    count_map: Record<string, StepperAction[]>;
+  };
+  decrement_actions: {
+    default: StepperAction[];
+  };
+}
+
+/* ---------- Helper Types ---------- */
+
+export interface StepperAction {
+  type: string;
+  add_to_cart?: {
+    cart_item: CartItem;
+  };
+  remove_from_cart?: {
+    cart_item: CartItem;
+    count_type?: string;
+  };
+  recommendation_action?: RecommendationAction;
+}
+
+export interface CartItem {
+  product_id: number;
+  merchant_id: number;
+  product_name: string;
+  quantity: number;
+  unavailable_quantity: number;
+  price: number;
+  mrp: number;
+  unit: string;
+  inventory: number;
+  meta: null | unknown;
+  image_url: string;
+  group_id: number;
+  merchant_type: string;
+  eta_identifier: string;
+  brand: string;
+  display_name: string;
+}
+
+/* ---------- Recommendation Actions ---------- */
+
+export interface RecommendationAction {
+  snippet_id: {
+    id: string;
+  };
+  actions: RecommendationSubAction[];
+}
+
+export type RecommendationSubAction =
+  | RemoveRecommendationAction
+  | AddRecommendationAction
+  | FetchApiAction;
+
+/* --- 1. Remove Recommendation --- */
+export interface RemoveRecommendationAction {
+  interaction_id: string;
+  max_trigger_count: number;
+  remove_recommendation: {
+    snippet_prefix_id_to_remove: string;
+    triggered_by_snippet_id?: string;
+  };
+  type: 'remove_recommendation';
+}
+
+/* --- 2. Add Recommendation --- */
+export interface AddRecommendationAction {
+  interaction_id: string;
+  max_trigger_count: number;
+  add_recommendation: {
+    snippets_to_add: Snippet[];
+    snippet_id_to_attach: string;
+    conflict_policy: {
+      match_config: Record<string, any>;
+    };
+    prefix_id: string;
+  };
+  type: 'add_recommendation';
+}
+
+/* --- 3. Fetch API --- */
+export interface FetchApiAction {
+  interaction_id: string;
+  max_trigger_count: number;
+  fetch_api: {
+    url: string;
+    type: string;
+    extra_params: {
+      product_id: string;
+      product_position: number;
+      recipe_keyterms: any[];
+      recommendation_type: string;
+      send_cart_items: boolean;
+    };
+    failure_actions: {
+      remove_recommendation: {
+        snippet_prefix_id_to_remove: string;
+      };
+      type: 'remove_recommendation';
+    }[];
+  };
+  type: 'fetch_api';
+}
+
+export interface Snippet {
+  data: {
+    items: any;
+    bg_color_hex: string;
+    bg_color: {
+      type: string;
+      tint: string;
+    };
+    identity: {
+      id: string;
+    };
+    container_layout_config: {
+      corner_radius: number;
+      stroke_color: {
+        type: string;
+        tint: string;
+      };
+      stroke_width: number;
+    };
+    layout_bg_color: string;
+    loading_overlay_data: {
+      api_request_type: string;
+      screen_type: string;
+      loading_error_state: string;
+      loading_error_overlay_size_type: string;
+      bg_color_data: {
+        type: string;
+        tint: string;
+      };
+      shimmer_res_id: string;
+      corner_radius: number;
+    };
+  };
+  tracking: {
+    widget_meta: {
+      widget_id: string;
+      widget_name: string;
+      widget_title: string;
+      widget_tracking_id: string;
+    };
+    impression_map: {
+      event_name: string;
+    };
+    click_map: {
+      event_name: string;
+    };
+    entry_source_map: {
+      entry_source_id: string;
+      entry_source_name: string;
+      entry_source_title: string;
+      entry_source_tracking_id: string;
+    };
+  };
+  widget_type: string;
+  layout_config: {
+    bg_color: string;
+    spacing: string;
+  };
 }

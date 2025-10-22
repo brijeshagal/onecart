@@ -11,109 +11,52 @@ const router: Router = Router();
 /**
  * @swagger
  * /api/search-items:
- *   get:
+ *   post:
  *     summary: Search for products
  *     description: Search for products based on query and location (receiver, coordinates, preset address, or new address)
  *     tags: [Search]
- *     parameters:
- *       - in: query
- *         name: query
- *         required: true
- *         schema:
- *           type: string
- *           minLength: 1
- *           example: "milk"
- *         description: Search query string
- *       - in: query
- *         name: userId
- *         required: false
- *         schema:
- *           type: string
- *           example: "664f1f77bcf86cd799439011"
- *         description: User ID to fetch context and default address
- *       - in: query
- *         name: receiverUsername
- *         required: false
- *         schema:
- *           type: string
- *           example: "john_doe"
- *         description: Username of the receiver (alternative to location coordinates)
- *       - in: query
- *         name: lat
- *         required: false
- *         schema:
- *           type: number
- *           format: float
- *           minimum: -90
- *           maximum: 90
- *           example: 28.7041
- *         description: Latitude coordinate (must be used with lng)
- *       - in: query
- *         name: lng
- *         required: false
- *         schema:
- *           type: number
- *           format: float
- *           minimum: -180
- *           maximum: 180
- *           example: 77.1025
- *         description: Longitude coordinate (must be used with lat)
- *       - in: query
- *         name: presetAddressId
- *         required: false
- *         schema:
- *           type: string
- *           example: "507f1f77bcf86cd799439011"
- *         description: ID of a preset address (alternative to coordinates)
- *       - in: query
- *         name: newAddress
- *         required: false
- *         schema:
- *           type: object
- *           properties:
- *             name:
- *               type: string
- *               example: "Home"
- *             address:
- *               type: string
- *               example: "123 Main Street"
- *             floor:
- *               type: string
- *               example: "4th Floor"
- *             landmark:
- *               type: string
- *               example: "Near Central Park"
- *             phone:
- *               type: string
- *               example: "+1234567890"
- *             saveAs:
- *               type: string
- *               example: "home"
- *           required:
- *             - name
- *             - address
- *             - phone
- *             - saveAs
- *         description: New address object (alternative to preset address)
- *       - in: query
- *         name: offset
- *         required: false
- *         schema:
- *           type: integer
- *           minimum: 0
- *           default: 0
- *           example: 0
- *         description: Pagination offset
- *       - in: query
- *         name: limit
- *         required: false
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 50
- *           default: 20
- *           example: 20
- *         description: Number of items per page
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - query
+ *             properties:
+ *               query:
+ *                 type: string
+ *                 minLength: 1
+ *                 example: "milk"
+ *                 description: Search query string
+ *               userId:
+ *                 type: string
+ *                 example: "507f1f77bcf86cd799439011"
+ *                 description: User ID (optional, used with presetAddressId)
+ *               receiverUsername:
+ *                 type: string
+ *                 example: "john_doe"
+ *                 description: Username of the receiver
+ *               presetAddressId:
+ *                 type: string
+ *                 example: "507f1f77bcf86cd799439012"
+ *                 description: ID of a preset address
+ *               newAddress:
+ *                 type: object
+ *                 description: Complete address data object
+ *               offset:
+ *                 type: integer
+ *                 minimum: 0
+ *                 default: 0
+ *                 example: 0
+ *                 description: Pagination offset
+ *               limit:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 100
+ *                 default: 20
+ *                 example: 20
+ *                 description: Number of items per page
  *     responses:
  *       200:
  *         description: Search results retrieved successfully
@@ -206,6 +149,6 @@ const router: Router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/', validateSearchItemsRequest, (req, res, next) => SearchItemsController.searchItems(req as any, res, next));
+router.post('/', validateSearchItemsRequest, (req, res, next) => SearchItemsController.searchItems(req as any, res, next));
 
 export { router as searchItemsRoutes };

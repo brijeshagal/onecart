@@ -24,7 +24,7 @@ export class SearchItemsController {
    * @returns {Promise<SearchItemsResponse>} Search results
    */
   static async searchItems(
-    req: Request<{}, SearchItemsResponse, {}, SearchItemsRequest>,
+    req: Request<{}, SearchItemsResponse, SearchItemsRequest>,
     res: Response<SearchItemsResponse>,
     next: NextFunction
   ): Promise<void> {
@@ -32,18 +32,17 @@ export class SearchItemsController {
       const {
         userId,
         receiverUsername,
-        lat: _lat,
-        lng: _lng,
         presetAddressId: _presetAddressId,
         query,
-      } = req.query;
+        newAddress,
+      } = req.body;
 
       console.log(
-        `🔍 Search items request: query="${query}", location options provided`
+        `🔍 Search items request: query="${query}", newAddress provided: ${!!newAddress}`
       );
 
       const browser = await launchBrowser();
-      const { page, context } = await createIncognitoPage(browser);
+      const { page } = await createIncognitoPage(browser);
       await page.goto('https://www.blinkit.com', {
         waitUntil: 'domcontentloaded',
       });
@@ -81,15 +80,24 @@ export class SearchItemsController {
         const addressDetails =
           userDetails.addresses[userDetails.receiveAddressIndex];
         addressData = addressDetails.display_address;
+      } else if (newAddress) {
+        // Use the UISuggestion data to construct address (max 50 chars)
+        const fullAddress = `${newAddress.subtitle.text}`.trim();
+        addressData = fullAddress.substring(0, 30);
+      }
+
+      if (!addressData) {
+        res.status(400).json({
+          success: false,
+          error: 'No valid location data provided',
+        });
+        return;
       }
 
       await setAddressOnPage(addressData, page);
       const blinkitSearchResponse = await performBlinkitSearch(page, query);
 
-      page.close();
-      if (context) {
-        context.close();
-      }
+      await browser.close();
       res.status(200).json({
         success: true,
         data: blinkitSearchResponse,

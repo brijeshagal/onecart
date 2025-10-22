@@ -1,4 +1,5 @@
 import { UISuggestion } from './ui';
+import { DataItem } from './cart';
 
 // API Request/Response types
 export interface SearchLocationRequest {
@@ -174,17 +175,8 @@ export interface SearchItemsRequest {
   // Location options (at least one required)
   userId?: string; // optional: used to fetch user and resolve addresses
   receiverUsername?: string;
-  lat?: number;
-  lng?: number;
   presetAddressId?: string;
-  newAddress?: {
-    name: string;
-    address: string;
-    floor?: string;
-    landmark?: string;
-    phone: string;
-    saveAs: string;
-  };
+  newAddress?: UISuggestion;
 
   // Search query (required)
   query: string;
@@ -194,17 +186,8 @@ export interface SearchItemsRequest {
   limit?: number;
 }
 
-export interface SearchItem {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-  brand?: string;
-  inStock: boolean;
-  rating?: number;
-  discount?: number;
-}
+// SearchItem is the same as DataItem from Blinkit cart types
+export type SearchItem = DataItem;
 
 export interface SearchItemsResponse {
   success: boolean;

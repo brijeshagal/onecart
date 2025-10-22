@@ -1,12 +1,12 @@
 /** Root response */
-export interface BlinkitProductResponse {
+export type BlinkitProductResponse = {
   data: DataItem;
   tracking: TrackingData;
   widget_type: string;
   layout_config: {
     spacing: string;
   };
-}
+}[];
 
 /** Main Product Data Object */
 export interface DataItem {

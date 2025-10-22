@@ -210,15 +210,6 @@ export default function RegisterPage() {
     }
   };
 
-  const handleAddressAdd = (address: AddressData) => {
-    setFormData((prev) => ({
-      ...prev,
-      addresses: [...(prev.addresses || []), address],
-      defaultAddressIndex: prev.addresses ? prev.addresses.length : 0,
-      receiveAddressIndex: prev.addresses ? prev.addresses.length : 0,
-    }));
-  };
-
   const handleAddressRemove = (index: number) => {
     setFormData((prev) => ({
       ...prev,
@@ -444,7 +435,6 @@ export default function RegisterPage() {
 
             <AddressSearch
               currentLocation={currentLocation}
-              onAddressAdd={handleAddressAdd}
               phone={formData.phone || ""}
             />
 

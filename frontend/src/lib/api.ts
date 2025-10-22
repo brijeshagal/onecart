@@ -4,6 +4,8 @@ import {
   RegisterUserResponse,
   SearchLocationRequest,
   SearchLocationResponse,
+  SearchItemsRequest,
+  SearchItemsResponse,
   ApiResponse,
   User
 } from '@/types';
@@ -60,6 +62,16 @@ class ApiService {
       const response = await this.client.get<SearchLocationResponse>('/location/search', {
         params: request
       });
+      return this.handleResponse(response);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  // Search Items API endpoints
+  async searchItems(request: SearchItemsRequest): Promise<SearchItemsResponse> {
+    try {
+      const response = await this.client.post<SearchItemsResponse>('/search-items', request);
       return this.handleResponse(response);
     } catch (error) {
       return this.handleError(error);

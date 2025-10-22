@@ -8,13 +8,7 @@ import { env } from './config/env';
 import { swaggerSpec } from './config/swagger';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
-import { apiRoutes } from './routes/api';
-import { cartRoutes } from './routes/cart';
-import { feedRoutes } from './routes/feed';
-import { healthRoutes } from './routes/health';
-import { locationRoutes } from './routes/location';
-import { searchItemsRoutes } from './routes/searchItems';
-import { userRoutes } from './routes/user';
+import { mainRouter } from './routes';
 
 const app: Application = express();
 const PORT = env.PORT;
@@ -41,13 +35,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Routes
-app.use('/health', healthRoutes);
-app.use('/api', apiRoutes);
-app.use('/api', locationRoutes);
-app.use('/api', userRoutes);
-app.use('/api', feedRoutes);
-app.use('/api', searchItemsRoutes);
-app.use('/api', cartRoutes);
+app.use('/api', mainRouter);
 
 // Swagger documentation
 app.use(

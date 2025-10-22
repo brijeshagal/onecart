@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import MiniAppKitWrapper from "./MiniAppKitWrapper";
+import WalletWrapper from "./WalletWrapper";
 
 export const metadata: Metadata = {
   title: "OneCart - Smart Shopping Assistant",
-  description: "AI-powered shopping assistant that helps you find and order products from multiple stores",
+  description:
+    "AI-powered shopping assistant that helps you find and order products from multiple stores",
 };
 
 export default function RootLayout({
@@ -14,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        {children}
+        <MiniAppKitWrapper>
+          <WalletWrapper>{children}</WalletWrapper>
+        </MiniAppKitWrapper>
       </body>
     </html>
   );

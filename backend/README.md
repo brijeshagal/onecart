@@ -66,7 +66,7 @@ pnpm clean        # Clean build directory
 - `GET /api/status` - API status
 
 ### Location Services
-- `POST /api/search-location` - Search for location suggestions using Blinkit API
+- `GET /api/location/search` - Search for location suggestions using Blinkit API
 
 ### User Management
 - `POST /api/register` - Register new user

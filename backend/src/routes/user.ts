@@ -9,10 +9,15 @@ const router: Router = Router();
 
 /**
  * @swagger
- * /api/register:
+ * /api/user/register:
  *   post:
  *     summary: Register a new user
- *     description: Register a new user with social logins, addresses, and wallet information
+ *     description: |
+ *       Register a new user with social logins, addresses, and wallet information.
+ *       
+ *       Each user can maintain multiple active carts (activeCartIds) to manage orders with different receivers
+ *       without interference. This enables users to send requests to multiple receivers while waiting for
+ *       each receiver to confirm the receipt.
  *     tags: [User]
  *     requestBody:
  *       required: true
@@ -68,7 +73,11 @@ router.post('/register', UserController.registerUser);
  * /api/user/{id}:
  *   get:
  *     summary: Get user profile
- *     description: Retrieve user profile information by ID
+ *     description: |
+ *       Retrieve user profile information by ID, including all active carts, previous orders, and received orders.
+ *       
+ *       **activeCartIds**: Array of cart IDs that are currently active (pending receiver confirmation). 
+ *       Users can have multiple active carts with different receivers simultaneously.
  *     tags: [User]
  *     parameters:
  *       - in: path
@@ -76,7 +85,8 @@ router.post('/register', UserController.registerUser);
  *         required: true
  *         schema:
  *           type: string
- *         description: User ID
+ *         description: User ID (MongoDB ObjectId)
+ *         example: "507f1f77bcf86cd799439011"
  *     responses:
  *       200:
  *         description: User profile retrieved successfully
@@ -106,6 +116,6 @@ router.post('/register', UserController.registerUser);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/user/:id', UserController.getUserProfile);
+router.get('/:id', UserController.getUserProfile);
 
 export { router as userRoutes };

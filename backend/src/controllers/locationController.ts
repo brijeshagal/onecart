@@ -1,7 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { BlinkitService } from '../services/blinkitService';
 import { SearchLocationRequest, SearchLocationResponse } from '../types/api';
-import { AppError } from '../middleware/errorHandler';
 
 /**
  * Location Controller
@@ -10,8 +9,8 @@ import { AppError } from '../middleware/errorHandler';
 export class LocationController {
   /**
    * Search for location suggestions
-   * @route POST /api/search-location
-   * @param {SearchLocationRequest} req.body - Location search parameters
+   * @route GET /api/location/search
+   * @param {SearchLocationRequest} req.query - Location search parameters
    * @returns {Promise<SearchLocationResponse>} Location suggestions
    */
   static async searchLocation(
@@ -20,16 +19,15 @@ export class LocationController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { lat, lng, query } = req.body;
+      const { lat, lng, query } = req.query as unknown as {
+        lat: number;
+        lng: number;
+        query: string;
+      };
 
-      console.log(`🔍 Location search request: query="${query}", lat=${lat}, lng=${lng}`);
-
-      // Validate coordinates
-      if (!BlinkitService.validateCoordinates(lat, lng)) {
-        const error = new AppError('Invalid coordinates provided');
-        error.statusCode = 400;
-        return next(error);
-      }
+      console.log(
+        `🔍 Location search request: query="${query}", lat=${lat}, lng=${lng}`
+      );
 
       // Call Blinkit API
       const blinkitData = await BlinkitService.searchLocation(query, lat, lng);
@@ -54,5 +52,4 @@ export class LocationController {
       next(error);
     }
   }
-
 }

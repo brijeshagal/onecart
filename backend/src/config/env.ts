@@ -15,6 +15,8 @@ interface Environment {
   JWT_EXPIRES_IN?: string | undefined;
   API_VERSION?: string | undefined;
   API_PREFIX?: string | undefined;
+  RZPAY_TEST_KEY_ID?: string | undefined;
+  RZPAY_TEST_KEY_SECRET?: string | undefined;
 }
 
 // Type-safe environment variable getter
@@ -52,6 +54,8 @@ const parseEnv = (): Environment => {
     JWT_EXPIRES_IN: process.env['JWT_EXPIRES_IN'] || undefined,
     API_VERSION: process.env['API_VERSION'] || undefined,
     API_PREFIX: process.env['API_PREFIX'] || undefined,
+    RZPAY_TEST_KEY_ID: process.env['RZPAY_TEST_KEY_ID'] || undefined,
+    RZPAY_TEST_KEY_SECRET: process.env['RZPAY_TEST_KEY_SECRET'] || undefined,
   };
 };
 

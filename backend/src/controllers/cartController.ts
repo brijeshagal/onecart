@@ -3,9 +3,15 @@ import { cartModel, ICart, ISimplifiedCartItem } from '../models/Cart';
 import { userModel } from '../models/User';
 import { AddressData } from '../types/address';
 import { CartResponse } from '../types/api';
-// UUID generation using crypto module
-const generateCartId = () =>
-  `cart_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+import {
+  clearCart,
+  createNewCart,
+  handleExistingCart,
+  removeCartItem,
+  validateAddToCartRequest,
+  validateCartOwnership,
+  validateUsersExist,
+} from '../utils/cartUtils';
 
 /**
  * Cart Controller
@@ -52,114 +58,70 @@ export class CartController {
         orderNotes,
       } = req.body;
 
-      if (
-        !senderUserId ||
-        !receiverUserId ||
-        !receiveAddress ||
-        !itemsOrdered.length
-      ) {
+      // Validate request body
+      const validation = validateAddToCartRequest(req.body);
+      if (!validation.isValid) {
         res.status(400).json({
           success: false,
-          error:
-            'Sender ID, receiver ID, address, product data, and quantity are required',
+          error: validation.error || '',
           timestamp: new Date().toISOString(),
         });
         return;
       }
 
-      if (quantity < 1) {
-        res.status(400).json({
-          success: false,
-          error: 'Quantity must be at least 1',
-          timestamp: new Date().toISOString(),
-        });
-        return;
-      }
-
-      // Verify both users exist
-      const sender = await userModel.findById(senderUserId);
-      const receiver = await userModel.findById(receiverUserId);
-
-      if (!sender || !receiver) {
+      // Validate users exist and get sender user data
+      const userValidation = await validateUsersExist(
+        senderUserId,
+        receiverUserId
+      );
+      if (!userValidation.isValid) {
         res.status(404).json({
           success: false,
-          error: 'Sender or receiver not found',
+          error: userValidation.error || '',
           timestamp: new Date().toISOString(),
         });
         return;
       }
-      if (activeCartId) {
-        // Find or create active cart for sender
-        const existingCart = await cartModel.findByCartId(activeCartId);
 
+      const senderUser = userValidation.sender;
+      let cart: ICart;
+
+      // Check if sender has an active cart
+      if (
+        activeCartId &&
+        senderUser?.activeCartIds &&
+        senderUser.activeCartIds.length > 0
+      ) {
+        // Handle existing cart - use the first active cart
+        const existingCart = await cartModel.findByCartId(activeCartId);
         if (!existingCart) {
-          res.json({
+          res.status(400).json({
             success: false,
-            error: 'Invalid active cart ID',
+            error: 'Invalid active cart ID stored in user',
             timestamp: new Date().toISOString(),
           });
           return;
         }
-        existingCart.itemsOrdered = itemsOrdered.map(
-          (item: ISimplifiedCartItem) => {
-            const itemIndex = existingCart.itemsOrdered.findIndex(
-              (i: ISimplifiedCartItem) => i.productId === item.productId
-            );
-            return itemIndex !== -1
-              ? {
-                  ...existingCart.itemsOrdered[itemIndex]!,
-                  quantity:
-                    existingCart.itemsOrdered[itemIndex]!.quantity! + quantity,
-                }
-              : { ...item, quantity: quantity };
-          }
-        );
 
-        existingCart.totalItems = existingCart.itemsOrdered.reduce(
-          (total: number, item: ISimplifiedCartItem) => total + item.quantity!,
-          0
-        );
-
-        await existingCart.save();
-
-        res.status(200).json({
-          success: true,
-          data: {
-            cartId: existingCart.cartId,
-          },
-          timestamp: new Date().toISOString(),
-        });
+        cart = await handleExistingCart(existingCart, itemsOrdered, quantity);
       } else {
-        const newCart: ICart = {
-          cartId: generateCartId(),
+        // Create new cart
+        cart = await createNewCart(
           senderUserId,
           receiverUserId,
           receiveAddress,
           itemsOrdered,
-          totalItems: itemsOrdered.reduce(
-            (total: number, item: ISimplifiedCartItem) =>
-              total + item.quantity!,
-            0
-          ),
-          cartStatus: 'open',
-          orderTimestamp: new Date(),
-          orderNotes: orderNotes || '',
-        };
-
-        await cartModel.create(newCart);
-
-        await userModel.updateOne(
-          { _id: senderUserId },
-          { activeCartId: newCart.cartId }
+          orderNotes
         );
-
-        res.status(200).json({
-          success: true,
-          data: {
-            cartId: newCart.cartId,
-          },
-        });
       }
+
+      res.status(200).json({
+        success: true,
+        data: {
+          cartId: cart.cartId,
+        },
+        timestamp: new Date().toISOString(),
+      });
     } catch (error) {
       console.error('❌ Add to cart error:', error);
       next(error);
@@ -258,48 +220,29 @@ export class CartController {
         return;
       }
 
-      const cart = await cartModel.findActiveCart(userId);
-
-      if (!cart) {
+      // Validate cart ownership
+      const cartValidation = await validateCartOwnership(userId);
+      if (!cartValidation.isValid) {
         res.status(404).json({
           success: false,
-          error: 'Active cart not found',
+          error: cartValidation.error,
           timestamp: new Date().toISOString(),
         });
         return;
       }
 
-      // Find the product in cart
-      const productIndex = cart.itemsOrdered.findIndex(
-        (item: ISimplifiedCartItem) => item.productId === productId
-      );
+      const cart = cartValidation.cart!;
 
-      if (productIndex === -1) {
+      // Remove item from cart
+      const removeResult = await removeCartItem(cart, productId);
+      if (!removeResult.success) {
         res.status(404).json({
           success: false,
-          error: 'Product not found in cart',
+          error: removeResult.error,
           timestamp: new Date().toISOString(),
         });
         return;
       }
-
-      // Remove the product from cart
-      cart.itemsOrdered.splice(productIndex, 1);
-
-      // Recalculate total items
-      cart.totalItems = cart.itemsOrdered.reduce(
-        (total: number, item: ISimplifiedCartItem) => total + item.quantity,
-        0
-      );
-
-      // Save updated cart
-      await cartModel.updateOne(
-        { cartId: cart.cartId },
-        {
-          itemsOrdered: cart.itemsOrdered,
-          totalItems: cart.itemsOrdered.length,
-        }
-      );
 
       console.log(
         `✅ Product removed from cart ${cart.cartId} for sender ${userId}`
@@ -309,7 +252,7 @@ export class CartController {
         success: true,
         data: {
           cartId: cart.cartId,
-          totalItems: cart.itemsOrdered.length,
+          totalItems: cart.totalItems,
           removedProductId: productId,
         },
         timestamp: new Date().toISOString(),
@@ -343,29 +286,35 @@ export class CartController {
         return;
       }
 
-      const cart = await cartModel.findActiveCart(userId);
-
-      if (!cart) {
-        res.status(200).json({
-          success: true,
-          message: 'No active cart to clear',
+      // Validate cart ownership
+      const cartValidation = await validateCartOwnership(userId);
+      if (!cartValidation.isValid) {
+        if (cartValidation.error === 'No active cart found') {
+          res.status(200).json({
+            success: true,
+            message: 'No active cart to clear',
+            timestamp: new Date().toISOString(),
+          });
+          return;
+        }
+        res.status(404).json({
+          success: false,
+          error: cartValidation.error,
           timestamp: new Date().toISOString(),
         });
         return;
       }
 
-      // Clear the cart
-      await cartModel.updateOne(
-        { cartId: cart.cartId },
-        {
-          itemsOrdered: [],
-          totalItems: 0,
-          cartStatus: 'cancelled',
-        }
-      );
+      const cart = cartValidation.cart!;
 
-      // Remove active cart reference from user
-      await userModel.updateOne({ _id: userId }, { activeCartId: null });
+      // Clear the cart
+      await clearCart(cart);
+
+      // Remove active cart reference from user's activeCartIds array
+      await userModel.updateOne(
+        { _id: userId },
+        { $pull: { activeCartIds: cart.cartId } }
+      );
 
       console.log(`✅ Cart ${cart.cartId} cleared for sender ${userId}`);
 

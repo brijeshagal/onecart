@@ -42,7 +42,7 @@ const router: Router = Router();
  *                       properties:
  *                         search:
  *                           type: string
- *                           example: 'POST /api/search-location'
+ *                           example: 'GET /api/location/search'
  *                     user:
  *                       type: object
  *                       properties:
@@ -64,7 +64,7 @@ router.get('/', (_req, res) => {
       health: '/health',
       api: '/api',
                      location: {
-                         search: 'POST /api/search-location',
+                         search: 'GET /api/location/search',
                        },
                        user: {
                          register: 'POST /api/register',

@@ -206,6 +206,6 @@ const router: Router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/search-items', validateSearchItemsRequest, (req, res, next) => SearchItemsController.searchItems(req as any, res, next));
+router.get('/', validateSearchItemsRequest, (req, res, next) => SearchItemsController.searchItems(req as any, res, next));
 
 export { router as searchItemsRoutes };

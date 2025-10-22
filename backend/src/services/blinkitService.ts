@@ -16,8 +16,8 @@ export class BlinkitService {
     try {
       const url = new URL(`${this.BASE_URL}${this.AUTO_SUGGEST_ENDPOINT}`);
       url.searchParams.set('query', query.trim() || '');
-      url.searchParams.set('lat', lat.toFixed(7).trim() || '');
-      url.searchParams.set('lng', lng.toFixed(7).trim() || '');
+      url.searchParams.set('lat', lat.toString());
+      url.searchParams.set('lng', lng.toString());
 
       console.log(`🔍 Calling Blinkit API: ${url}`);
 
@@ -65,18 +65,5 @@ export class BlinkitService {
       lng >= -180 &&
       lng <= 180
     );
-  }
-
-  /**
-   * Format coordinates for API call
-   */
-  static formatCoordinates(
-    lat: number,
-    lng: number
-  ): { lat: string; lng: string } {
-    return {
-      lat: lat.toFixed(7),
-      lng: lng.toFixed(7),
-    };
   }
 }

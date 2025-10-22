@@ -10,17 +10,35 @@ const router: Router = Router();
 
 /**
  * @swagger
- * /api/search-location:
- *   post:
+ * /api/location/search:
+ *   get:
  *     summary: Search for location suggestions
  *     description: Search for address suggestions using Blinkit API based on coordinates and query
  *     tags: [Location]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/SearchLocationRequest'
+ *     parameters:
+ *       - in: query
+ *         name: lat
+ *         required: true
+ *         schema:
+ *           type: number
+ *           format: float
+ *           example: 28.7041
+ *         description: Latitude coordinate
+ *       - in: query
+ *         name: lng
+ *         required: true
+ *         schema:
+ *           type: number
+ *           format: float
+ *           example: 77.1025
+ *         description: Longitude coordinate
+ *       - in: query
+ *         name: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Delhi"
+ *         description: Search query string
  *     responses:
  *       200:
  *         description: Location suggestions retrieved successfully
@@ -64,6 +82,6 @@ const router: Router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/search-location', validateSearchLocation, LocationController.searchLocation);
+router.get('/search', validateSearchLocation, LocationController.searchLocation);
 
 export { router as locationRoutes };

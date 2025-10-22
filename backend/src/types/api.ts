@@ -68,12 +68,23 @@ export interface CartAddRequest {
   senderUserId: string;
   receiverUserId: string;
   receiveAddress: any; // AddressData type - keeping flexible for complex object
-  product: {
-    identity: { id: string };
-    product_id: string;
-    name: { text: string };
-  };
+  receiverCountryCode?: string;
+  itemsOrdered: Array<{
+    productId: string;
+    identityId: string;
+    name: string;
+    quantity: number;
+    price?: {
+      senderCurrencyValue: number;
+      receiverCurrencyValue: number;
+    };
+  }>;
   quantity: number;
+  totalAmount?: {
+    senderCurrencyValue: number;
+    receiverCurrencyValue: number;
+  };
+  paymentMode?: 'cash' | 'card' | 'wallet' | 'upi' | 'bank_transfer';
   orderNotes?: string;
 }
 
@@ -84,19 +95,29 @@ export interface CartResponse {
     senderUserId?: string;
     receiverUserId?: string;
     receiveAddress?: any;
+    receiverCountryCode?: string;
     items?: Array<{
       productId: string;
       identityId: string;
       name: string;
       quantity: number;
+      price?: {
+        senderCurrencyValue: number;
+        receiverCurrencyValue: number;
+      };
       addedAt: string;
     }>;
     totalItems?: number;
+    totalAmount?: {
+      senderCurrencyValue: number;
+      receiverCurrencyValue: number;
+    };
+    paymentMode?: string;
+    paymentStatus?: string;
     cartStatus?: string;
     orderTimestamp?: string;
     fulfillmentTimestamp?: string;
     orderNotes?: string;
-    totalAmount?: number;
     product?: {
       productId: string;
       identityId: string;

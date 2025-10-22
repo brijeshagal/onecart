@@ -1,11 +1,17 @@
 "use client";
 
+import { AddressList } from "@/components/AddressList";
+import { AddressSearch } from "@/components/AddressSearch";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { apiService } from "@/lib/api";
 import { getCurrentLocation } from "@/lib/location";
 import { useAppStore } from "@/lib/store";
-import { AddressData, RegisterUserRequest, UISuggestion } from "@/types";
+import { AddressData, RegisterUserRequest } from "@/types";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAccount, useDisconnect } from "wagmi";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -29,12 +35,19 @@ export default function RegisterPage() {
     primaryWalletIndex: -1,
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isLocationSearchOpen, setIsLocationSearchOpen] = useState(false);
-  const [locationSearchQuery, setLocationSearchQuery] = useState("");
-  const [locationSuggestions, setLocationSuggestions] = useState<
-    UISuggestion[]
+  // Farcaster and wallet state
+  const [farcasterUsername, setFarcasterUsername] = useState("");
+  const [walletAddresses, setWalletAddresses] = useState<
+    Array<{
+      address: string;
+      verified: boolean;
+      id: string;
+    }>
   >([]);
+  const { address, isConnected, isConnecting } = useAccount();
+  const [isConnectingFarcaster, setIsConnectingFarcaster] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { disconnect } = useDisconnect();
 
   // Get current location on mount
   useEffect(() => {
@@ -51,29 +64,6 @@ export default function RegisterPage() {
     getLocation();
   }, []);
 
-  // Search locations when user types
-  useEffect(() => {
-    if (locationSearchQuery.length > 2 && currentLocation) {
-      const searchLocations = async () => {
-        try {
-          const response = await apiService.searchLocation({
-            lat: currentLocation.lat,
-            lng: currentLocation.lng,
-            query: locationSearchQuery,
-          });
-          if (response.success && response.data) {
-            setLocationSuggestions(response.data.suggestions);
-          }
-        } catch (error) {
-          console.error("Location search error:", error);
-        }
-      };
-      searchLocations();
-    } else {
-      setLocationSuggestions([]);
-    }
-  }, [locationSearchQuery, currentLocation]);
-
   const handleInputChange = (
     field: keyof RegisterUserRequest,
     value: string | boolean | number
@@ -83,6 +73,74 @@ export default function RegisterPage() {
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
+  };
+
+  const handleFarcasterConnect = async () => {
+    setIsConnectingFarcaster(true);
+    try {
+      // Simulate Farcaster connection
+      // In a real app, this would use Farcaster's SDK
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setFarcasterUsername("user123"); // This would come from Farcaster
+    } catch (error) {
+      console.error("Failed to connect Farcaster:", error);
+    } finally {
+      setIsConnectingFarcaster(false);
+    }
+  };
+
+  const handleAddConnectedWallet = () => {
+    if (!isConnected || !address) {
+      return;
+    }
+
+    // Check if address already exists
+    if (
+      walletAddresses.some(
+        (w) => w.address.toLowerCase() === address?.toLowerCase()
+      )
+    ) {
+      return;
+    }
+
+    const newWallet = {
+      address,
+      verified: false,
+      id: Date.now().toString(),
+    };
+
+    setWalletAddresses((prev) => [...prev, newWallet]);
+    
+    // Set the first wallet (index 0) as primary by default
+    if (walletAddresses.length === 0) {
+      setFormData((prev) => ({ ...prev, primaryWalletIndex: 0 }));
+    }
+  };
+
+  const handleRemoveWallet = (walletId: string) => {
+    const walletIndex = walletAddresses.findIndex((w) => w.id === walletId);
+    setWalletAddresses((prev) => prev.filter((w) => w.id !== walletId));
+    
+    // If we're removing the primary wallet, update the primary wallet index
+    if ((formData.primaryWalletIndex ?? -1) === walletIndex) {
+      setFormData((prev) => ({
+        ...prev,
+        primaryWalletIndex: walletAddresses.length > 1 ? 0 : -1
+      }));
+    } else if ((formData.primaryWalletIndex ?? -1) > walletIndex) {
+      // If we're removing a wallet before the primary wallet, adjust the index
+      setFormData((prev) => ({
+        ...prev,
+        primaryWalletIndex: (prev.primaryWalletIndex ?? 0) - 1
+      }));
+    }
+  };
+
+  const handleSetPrimaryWallet = (walletId: string) => {
+    setFormData((prev) => {
+      const walletIndex = walletAddresses.findIndex((w) => w.id === walletId);
+      return { ...prev, primaryWalletIndex: walletIndex };
+    });
   };
 
   const validateForm = (): boolean => {
@@ -98,6 +156,17 @@ export default function RegisterPage() {
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
     }
+    if (!farcasterUsername) {
+      newErrors.farcaster = "Farcaster connection is required";
+    }
+    if (walletAddresses.length === 0) {
+      newErrors.wallet = "At least one wallet address is required";
+    } else {
+      const verifiedWallets = walletAddresses.filter((w) => w.verified);
+      if (verifiedWallets.length === 0) {
+        newErrors.wallet = "At least one wallet address must be verified";
+      }
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -112,9 +181,21 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      const response = await apiService.registerUser(
-        formData as RegisterUserRequest
-      );
+      // Get verified wallet addresses
+      const verifiedWallets = walletAddresses.filter((w) => w.verified);
+
+      // Prepare registration data with Farcaster and wallet info
+      const registrationData: RegisterUserRequest = {
+        ...formData,
+        socialLogins: farcasterUsername
+          ? [{ platform: "farcaster", username: farcasterUsername }]
+          : [],
+        walletAddresses: verifiedWallets.map((w) => w.address),
+        farcasterWalletAddress: verifiedWallets.length > 0 ? 0 : -1,
+        primaryWalletIndex: (formData.primaryWalletIndex ?? -1) >= 0 ? (formData.primaryWalletIndex ?? -1) : (verifiedWallets.length > 0 ? 0 : -1),
+      } as RegisterUserRequest;
+
+      const response = await apiService.registerUser(registrationData);
 
       if (response.success && response.data) {
         setUser(response.data.user);
@@ -129,210 +210,243 @@ export default function RegisterPage() {
     }
   };
 
-  const addAddress = (suggestion?: UISuggestion) => {
-    let address: AddressData;
-
-    if (suggestion) {
-      // Use selected location suggestion
-      address = {
-        name: suggestion.title.text,
-        label: "Home",
-        label_id: "home",
-        line1: suggestion.title.text,
-        line2: suggestion.subtitle?.text || "",
-        display_address: `${suggestion.title.text}${
-          suggestion.subtitle?.text ? `, ${suggestion.subtitle.text}` : ""
-        }`,
-        landmark: null,
-        latitude: currentLocation?.lat || 0,
-        longitude: currentLocation?.lng || 0,
-        use_corrected_location: false,
-        install_ts: new Date().toISOString(),
-        update_ts: new Date().toISOString(),
-        corrected_location_info: {
-          confidence: "high",
-          landmark: "",
-          latitude: currentLocation?.lat || 0,
-          longitude: currentLocation?.lng || 0,
-        },
-        location_info: {
-          state: "Delhi",
-          postal_code: "110001",
-          city: "New Delhi",
-        },
-        address_meta: {
-          source: "user",
-          source_ref_id: "user_registration",
-        },
-        location: {
-          latitude: currentLocation?.lat || 0,
-          longitude: currentLocation?.lng || 0,
-        },
-        coordinates: {
-          lat: currentLocation?.lat || 0,
-          lon: currentLocation?.lng || 0,
-        },
-        address_details_info: {
-          tower: "",
-          house: "",
-          floor: "",
-          phone: formData.phone || "",
-          landmark: "",
-          tags: "home",
-          template_id: 1,
-          alias_id: 0,
-          name: "Home",
-        },
-      };
-    } else {
-      // Create default address
-      address = {
-        name: "Home",
-        label: "Home",
-        label_id: "home",
-        line1: "Enter your address",
-        line2: "",
-        display_address: "Enter your address",
-        landmark: null,
-        latitude: currentLocation?.lat || 28.7041,
-        longitude: currentLocation?.lng || 77.1025,
-        use_corrected_location: false,
-        install_ts: new Date().toISOString(),
-        update_ts: new Date().toISOString(),
-        corrected_location_info: {
-          confidence: "high",
-          landmark: "",
-          latitude: currentLocation?.lat || 28.7041,
-          longitude: currentLocation?.lng || 77.1025,
-        },
-        location_info: {
-          state: "Delhi",
-          postal_code: "110001",
-          city: "New Delhi",
-        },
-        address_meta: {
-          source: "user",
-          source_ref_id: "user_registration",
-        },
-        location: {
-          latitude: currentLocation?.lat || 28.7041,
-          longitude: currentLocation?.lng || 77.1025,
-        },
-        coordinates: {
-          lat: currentLocation?.lat || 28.7041,
-          lon: currentLocation?.lng || 77.1025,
-        },
-        address_details_info: {
-          tower: "",
-          house: "",
-          floor: "",
-          phone: formData.phone || "",
-          landmark: "",
-          tags: "home",
-          template_id: 1,
-          alias_id: 0,
-          name: "Home",
-        },
-      };
-    }
-
+  const handleAddressAdd = (address: AddressData) => {
     setFormData((prev) => ({
       ...prev,
       addresses: [...(prev.addresses || []), address],
       defaultAddressIndex: prev.addresses ? prev.addresses.length : 0,
       receiveAddressIndex: prev.addresses ? prev.addresses.length : 0,
     }));
+  };
 
-    setIsLocationSearchOpen(false);
-    setLocationSearchQuery("");
+  const handleAddressRemove = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      addresses: prev.addresses?.filter((_, i) => i !== index) || [],
+    }));
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-black mb-2">Create Account</h1>
-          <p className="text-gray-600">Join OneCart for seamless deliveries</p>
+          <p className="text-gray-600">
+            Join OneCart for seamless global deliveries
+          </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Username */}
-          <div>
-            <input
-              type="text"
-              placeholder="Username (optional)"
-              value={formData.username || ""}
-              onChange={(e) => handleInputChange("username", e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-colors"
-            />
-            {errors.username && (
-              <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+          {/* Farcaster Connection */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Social Logins
+            </label>
+            {farcasterUsername ? (
+              <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">F</span>
+                  </div>
+                  <span className="text-green-800 font-medium">
+                    @{farcasterUsername}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFarcasterUsername("")}
+                  className="text-red-600 hover:text-red-800 text-sm"
+                >
+                  Disconnect
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleFarcasterConnect}
+                disabled={isConnectingFarcaster}
+                className="text-gray-400 w-full flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                {isConnectingFarcaster ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                    <span>Connecting...</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">F</span>
+                    </div>
+                    <span>Connect with Farcaster</span>
+                  </>
+                )}
+              </button>
+            )}
+            {errors.farcaster && (
+              <p className="text-sm text-red-600">{errors.farcaster}</p>
             )}
           </div>
+
+          {/* Wallet Addresses */}
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700">
+              Wallet Addresses
+            </label>
+
+            {/* Connect Wallet */}
+            {!isConnected || !address ? (
+              <div className="mb-2">
+                <ConnectButton />
+              </div>
+            ) : (
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">W</span>
+                    </div>
+                    <span className="font-mono text-sm text-gray-400">
+                      {address?.slice(0, 6)}...{address?.slice(-4)}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      type="button"
+                      onClick={handleAddConnectedWallet}
+                      size="sm"
+                      className="text-xs cursor-pointer"
+                    >
+                      Add to List
+                    </Button>
+                    <button
+                      type="button"
+                      onClick={() => disconnect()}
+                      className="text-red-600 hover:text-red-800 text-xs cursor-pointer"
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Wallet List */}
+            {walletAddresses.length > 0 && (
+              <div className="space-y-2">
+                {walletAddresses.map((wallet, index) => {
+                  const isPrimary = formData.primaryWalletIndex === index;
+                  return (
+                    <div
+                      key={wallet.id}
+                      className={`p-3 rounded-lg border text-gray-400 cursor-pointer transition-colors ${
+                        isPrimary 
+                          ? "bg-blue-50 border-blue-200" 
+                          : "bg-green-50 border-green-200 hover:bg-green-100"
+                      }`}
+                      onClick={() => handleSetPrimaryWallet(wallet.id)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div
+                            className={`w-2 h-2 rounded-full ${
+                              isPrimary ? "bg-blue-500" : "bg-green-500"
+                            }`}
+                          ></div>
+                          <span className="font-mono text-sm text-gray-400">
+                            {wallet.address.slice(0, 6)}...
+                            {wallet.address.slice(-4)}
+                          </span>
+                          {isPrimary && (
+                            <div className="flex items-center space-x-1">
+                              <svg
+                                className="w-4 h-4 text-blue-600"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              <span className="text-xs text-blue-600 font-medium">
+                                Primary
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveWallet(wallet.id);
+                            }}
+                            className="text-red-600 hover:text-red-800 text-xs cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {errors.wallet && (
+              <p className="text-sm text-red-600">{errors.wallet}</p>
+            )}
+            <p className="text-xs text-gray-500">
+              Add your Ethereum wallet addresses and verify them for secure
+              transactions
+            </p>
+          </div>
+
+          {/* Username */}
+          <Input
+            type="text"
+            placeholder="Username (optional)"
+            value={formData.username || ""}
+            onChange={(e) => handleInputChange("username", e.target.value)}
+            error={errors.username}
+            className="text-gray-400 placeholder:text-gray-400 focus:text-gray-900"
+          />
 
           {/* Email */}
-          <div>
-            <input
-              type="email"
-              placeholder="Email (optional)"
-              value={formData.email || ""}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-colors"
-            />
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-            )}
-          </div>
+          <Input
+            type="email"
+            placeholder="Email (optional)"
+            value={formData.email || ""}
+            onChange={(e) => handleInputChange("email", e.target.value)}
+            error={errors.email}
+            className="text-gray-400 placeholder:text-gray-400 focus:text-gray-900"
+          />
 
           {/* Phone */}
-          <div>
-            <input
-              type="tel"
-              placeholder="Phone number *"
-              value={formData.phone || ""}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-colors"
-            />
-            {errors.phone && (
-              <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-            )}
-          </div>
+          <Input
+            type="tel"
+            placeholder="Phone number *"
+            value={formData.phone || ""}
+            onChange={(e) => handleInputChange("phone", e.target.value)}
+            error={errors.phone}
+            className="text-gray-400 placeholder:text-gray-400 focus:text-gray-900"
+          />
 
           {/* Address Section */}
           <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Delivery Address *
-            </label>
+            <AddressList
+              addresses={formData.addresses || []}
+              onRemove={handleAddressRemove}
+            />
 
-            {formData.addresses && formData.addresses.length > 0 ? (
-              <div className="space-y-2">
-                {formData.addresses.map((address, index) => (
-                  <div
-                    key={index}
-                    className="p-3 border border-gray-200 rounded-lg"
-                  >
-                    <p className="font-medium text-black">{address.name}</p>
-                    <p className="text-sm text-gray-600">
-                      {address.display_address}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500 italic">
-                No address added yet
-              </p>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setIsLocationSearchOpen(true)}
-              className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-black hover:text-black transition-colors"
-            >
-              + Add Address
-            </button>
+            <AddressSearch
+              currentLocation={currentLocation}
+              onAddressAdd={handleAddressAdd}
+              phone={formData.phone || ""}
+            />
 
             {errors.addresses && (
               <p className="text-sm text-red-600">{errors.addresses}</p>
@@ -362,85 +476,16 @@ export default function RegisterPage() {
           )}
 
           {/* Submit Button */}
-          <button
+          <Button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-black text-white py-3 px-4 rounded-lg hover:bg-gray-800 focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            isLoading={isLoading}
+            className="w-full"
           >
-            {isLoading ? "Creating Account..." : "Create Account"}
-          </button>
+            Create Account
+          </Button>
         </form>
       </div>
-
-      {/* Location Search Modal */}
-      {isLocationSearchOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold mb-4">Search Location</h3>
-
-            {/* Search Input */}
-            <div className="relative mb-4">
-              <input
-                type="text"
-                placeholder="Search for your area..."
-                value={locationSearchQuery}
-                onChange={(e) => setLocationSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
-                autoFocus
-              />
-            </div>
-
-            {/* Suggestions */}
-            <div className="max-h-48 overflow-y-auto mb-4">
-              {locationSuggestions.length > 0 ? (
-                <div className="space-y-2">
-                  {locationSuggestions.map((suggestion, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => addAddress(suggestion)}
-                      className="w-full text-left p-3 hover:bg-gray-50 rounded-lg border border-gray-200"
-                    >
-                      <p className="font-medium text-black">
-                        {suggestion.title.text}
-                      </p>
-                      {suggestion.subtitle && (
-                        <p className="text-sm text-gray-600">
-                          {suggestion.subtitle.text}
-                        </p>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              ) : locationSearchQuery.length > 2 ? (
-                <p className="text-sm text-gray-500 italic">No results found</p>
-              ) : (
-                <p className="text-sm text-gray-500 italic">
-                  Type to search locations
-                </p>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="flex space-x-3">
-              <button
-                type="button"
-                onClick={() => addAddress()}
-                className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Use Current Location
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsLocationSearchOpen(false)}
-                className="flex-1 bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

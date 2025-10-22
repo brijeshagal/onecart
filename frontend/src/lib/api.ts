@@ -8,7 +8,7 @@ import {
   User
 } from '@/types';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://localhost:4000/api';
 
 class ApiService {
   private client = axios.create({
@@ -57,7 +57,9 @@ class ApiService {
   // Location API endpoints
   async searchLocation(request: SearchLocationRequest): Promise<SearchLocationResponse> {
     try {
-      const response = await this.client.post<SearchLocationResponse>('/search-location', request);
+      const response = await this.client.get<SearchLocationResponse>('/location/search', {
+        params: request
+      });
       return this.handleResponse(response);
     } catch (error) {
       return this.handleError(error);

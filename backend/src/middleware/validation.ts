@@ -7,7 +7,7 @@ export const validateSearchLocation = (
   _res: Response,
   next: NextFunction
 ): void => {
-  const { lat, lng, query } = req.body;
+  const { lat, lng, query } = req.query;
 
   // Check required fields
   if (!lat || !lng || !query) {
@@ -19,7 +19,8 @@ export const validateSearchLocation = (
   }
 
   // Validate latitude
-  if (typeof lat !== 'number' || lat < -90 || lat > 90) {
+  const latNum = parseFloat(lat as string);
+  if (isNaN(latNum) || latNum < -90 || latNum > 90) {
     const error = new Error(
       'Invalid latitude: must be a number between -90 and 90'
     ) as AppError;
@@ -28,7 +29,8 @@ export const validateSearchLocation = (
   }
 
   // Validate longitude
-  if (typeof lng !== 'number' || lng < -180 || lng > 180) {
+  const lngNum = parseFloat(lng as string);
+  if (isNaN(lngNum) || lngNum < -180 || lngNum > 180) {
     const error = new Error(
       'Invalid longitude: must be a number between -180 and 180'
     ) as AppError;

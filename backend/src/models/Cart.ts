@@ -7,6 +7,10 @@ export interface ISimplifiedCartItem {
   identityId: string;
   name: string;
   quantity: number;
+  price?: {
+    senderCurrencyValue: number; // Price in sender's local currency
+    receiverCurrencyValue: number; // Price in receiver's local currency
+  };
   addedAt: Date;
 }
 
@@ -28,6 +32,13 @@ const SimplifiedCartItemSchema = new Schema<ISimplifiedCartItem>(
       type: Number,
       required: true,
       min: 1,
+    },
+    price: {
+      type: {
+        senderCurrencyValue: Number,
+        receiverCurrencyValue: Number,
+      },
+      default: null,
     },
     addedAt: {
       type: Date,
@@ -51,10 +62,21 @@ export interface ICart {
 
   // Delivery information
   receiveAddress: AddressData;
+  receiverCountryCode?: string; // Country code of receiver's address
 
   // Cart contents and metadata (simplified)
   itemsOrdered: ISimplifiedCartItem[];
   totalItems: number;
+
+  // Pricing information (dual currency)
+  totalAmount?: {
+    senderCurrencyValue: number; // Total in sender's local currency
+    receiverCurrencyValue: number; // Total in receiver's local currency
+  };
+
+  // Payment information
+  paymentMode?: 'cash' | 'card' | 'wallet' | 'upi' | 'bank_transfer';
+  paymentStatus?: 'pending' | 'completed' | 'failed';
 
   // Cart status and timestamps
   cartStatus: 'open' | 'in-progress' | 'fulfilled' | 'cancelled';
@@ -63,7 +85,6 @@ export interface ICart {
 
   // Additional metadata
   orderNotes?: string;
-  totalAmount?: number;
 
   createdAt?: Date;
   updatedAt?: Date;
@@ -91,10 +112,31 @@ const CartSchema = new Schema<ICart>(
       type: Schema.Types.Mixed, // AddressData is complex object
       required: true,
     },
+    receiverCountryCode: {
+      type: String,
+      default: null,
+    },
     itemsOrdered: [SimplifiedCartItemSchema],
     totalItems: {
       type: Number,
       default: 0,
+    },
+    totalAmount: {
+      type: {
+        senderCurrencyValue: Number,
+        receiverCurrencyValue: Number,
+      },
+      default: null,
+    },
+    paymentMode: {
+      type: String,
+      enum: ['cash', 'card', 'wallet', 'upi', 'bank_transfer'],
+      default: null,
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'completed', 'failed'],
+      default: 'pending',
     },
     cartStatus: {
       type: String,
@@ -114,10 +156,6 @@ const CartSchema = new Schema<ICart>(
     orderNotes: {
       type: String,
       default: '',
-    },
-    totalAmount: {
-      type: Number,
-      default: 0,
     },
   },
   {

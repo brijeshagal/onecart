@@ -13,13 +13,20 @@ const router: Router = Router();
  *   post:
  *     summary: Add item to sender's active cart
  *     description: |
- *       Add a product to the sender's active cart for delivery to a receiver.
+ *       Add product(s) to the sender's active cart for delivery to a receiver.
+ *       
+ *       **Behavior:**
+ *       - If an `activeCartId` is provided in the request, items are added to that specific cart.
+ *       - If `activeCartId` is not provided but sender has active carts, items are added to the first active cart.
+ *       - If sender has no active carts, a new cart is created.
+ *       - Users can maintain multiple active carts with different receivers, preventing interference when a receiver confirms orders.
  *
  *       **Example Request Body:**
  *       ```json
  *       {
  *         "senderUserId": "507f1f77bcf86cd799439011",
  *         "receiverUserId": "507f1f77bcf86cd799439012",
+ *         "activeCartId": "cart_1705314600000_abc123def",
  *         "receiveAddress": {
  *           "name": "John Doe",
  *           "display_address": "123 Main St, New York, NY 10001",
@@ -30,16 +37,25 @@ const router: Router = Router();
  *           "landmark": "Near Central Park",
  *           "label": "Home"
  *         },
- *         "product": {
- *           "identity": {
- *             "id": "12872"
- *           },
- *           "product_id": "12872",
- *           "name": {
- *             "text": "Amul Gold Full Cream Milk"
+ *         "receiverCountryCode": "US",
+ *         "itemsOrdered": [
+ *           {
+ *             "productId": "12872",
+ *             "identityId": "12872",
+ *             "name": "Amul Gold Full Cream Milk",
+ *             "quantity": 2,
+ *             "price": {
+ *               "senderCurrencyValue": 10.50,
+ *               "receiverCurrencyValue": 8.99
+ *             }
  *           }
- *         },
+ *         ],
  *         "quantity": 2,
+ *         "totalAmount": {
+ *           "senderCurrencyValue": 21.00,
+ *           "receiverCurrencyValue": 17.98
+ *         },
+ *         "paymentMode": "card",
  *         "orderNotes": "Please deliver by 5 PM"
  *       }
  *       ```
@@ -54,7 +70,7 @@ const router: Router = Router();
  *               - senderUserId
  *               - receiverUserId
  *               - receiveAddress
- *               - product
+ *               - itemsOrdered
  *               - quantity
  *             properties:
  *               senderUserId:
@@ -65,46 +81,142 @@ const router: Router = Router();
  *                 type: string
  *                 description: User ID of the receiver (person receiving order)
  *                 example: "507f1f77bcf86cd799439012"
+ *               activeCartId:
+ *                 type: string
+ *                 description: Optional - Specific cart ID to add items to. If provided, items are added to this cart. If not provided, system uses the first active cart or creates a new one.
+ *                 example: "cart_1705314600000_abc123def"
  *               receiveAddress:
  *                 type: object
  *                 description: Complete delivery address data
- *               product:
- *                 type: object
- *                 description: Simplified product data (only essential fields)
  *                 required:
- *                   - identity
- *                   - product_id
  *                   - name
+ *                   - display_address
+ *                   - line1
+ *                   - latitude
+ *                   - longitude
+ *                   - label
  *                 properties:
- *                   identity:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                         example: "12872"
- *                   product_id:
- *                     type: string
- *                     example: "12872"
  *                   name:
- *                     type: object
- *                     properties:
- *                       text:
- *                         type: string
- *                         example: "Amul Gold Full Cream Milk"
+ *                     type: string
+ *                     description: Recipient name
+ *                     example: "John Doe"
+ *                   display_address:
+ *                     type: string
+ *                     description: Full address display
+ *                     example: "123 Main St, New York, NY 10001"
+ *                   line1:
+ *                     type: string
+ *                     description: Primary address line
+ *                     example: "123 Main St"
+ *                   line2:
+ *                     type: string
+ *                     description: Secondary address line (optional)
+ *                     example: "Apartment 4B"
+ *                   latitude:
+ *                     type: number
+ *                     description: Latitude coordinate
+ *                     example: 40.7128
+ *                   longitude:
+ *                     type: number
+ *                     description: Longitude coordinate
+ *                     example: -74.0060
+ *                   landmark:
+ *                     type: string
+ *                     description: Nearby landmark (optional)
+ *                     example: "Near Central Park"
+ *                   label:
+ *                     type: string
+ *                     description: Address label
+ *                     example: "Home"
  *                 example: {
- *                   "identity": {
- *                     "id": "12872"
- *                   },
- *                   "product_id": "12872",
- *                   "name": {
- *                     "text": "Amul Gold Full Cream Milk"
- *                   }
+ *                   "name": "John Doe",
+ *                   "display_address": "123 Main St, New York, NY 10001",
+ *                   "line1": "123 Main St",
+ *                   "line2": "Apartment 4B",
+ *                   "latitude": 40.7128,
+ *                   "longitude": -74.0060,
+ *                   "landmark": "Near Central Park",
+ *                   "label": "Home"
  *                 }
+ *               receiverCountryCode:
+ *                 type: string
+ *                 description: Country code of receiver's address (e.g., US, IN, GB)
+ *                 example: "US"
+ *               itemsOrdered:
+ *                 type: array
+ *                 description: Array of simplified product items to add to cart
+ *                 minItems: 1
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - productId
+ *                     - identityId
+ *                     - name
+ *                     - quantity
+ *                   properties:
+ *                     productId:
+ *                       type: string
+ *                       description: Product ID
+ *                       example: "12872"
+ *                     identityId:
+ *                       type: string
+ *                       description: Identity ID (usually same as productId)
+ *                       example: "12872"
+ *                     name:
+ *                       type: string
+ *                       description: Product name
+ *                       example: "Amul Gold Full Cream Milk"
+ *                     quantity:
+ *                       type: number
+ *                       description: Quantity of this item
+ *                       minimum: 1
+ *                       example: 2
+ *                     price:
+ *                       type: object
+ *                       description: Product price in dual currencies
+ *                       properties:
+ *                         senderCurrencyValue:
+ *                           type: number
+ *                           description: Price in sender's local currency
+ *                           example: 10.50
+ *                         receiverCurrencyValue:
+ *                           type: number
+ *                           description: Price in receiver's local currency
+ *                           example: 8.99
+ *                 example: [
+ *                   {
+ *                     "productId": "12872",
+ *                     "identityId": "12872",
+ *                     "name": "Amul Gold Full Cream Milk",
+ *                     "quantity": 2,
+ *                     "price": {
+ *                       "senderCurrencyValue": 10.50,
+ *                       "receiverCurrencyValue": 8.99
+ *                     }
+ *                   }
+ *                 ]
  *               quantity:
  *                 type: number
- *                 description: Quantity of product to add
+ *                 description: Quantity for the items being added
  *                 minimum: 1
  *                 example: 2
+ *               totalAmount:
+ *                 type: object
+ *                 description: Total cart amount in dual currencies
+ *                 properties:
+ *                   senderCurrencyValue:
+ *                     type: number
+ *                     description: Total in sender's local currency
+ *                     example: 21.00
+ *                   receiverCurrencyValue:
+ *                     type: number
+ *                     description: Total in receiver's local currency
+ *                     example: 17.98
+ *               paymentMode:
+ *                 type: string
+ *                 description: Payment method for the order
+ *                 enum: ['cash', 'card', 'wallet', 'upi', 'bank_transfer']
+ *                 example: "card"
  *               orderNotes:
  *                 type: string
  *                 description: Optional order notes
@@ -125,29 +237,81 @@ const router: Router = Router();
  *                   properties:
  *                     cartId:
  *                       type: string
+ *                       description: Unique cart identifier
+ *                       example: "cart_1705314600000_abc123def"
  *                     senderUserId:
  *                       type: string
+ *                       description: User ID of the sender
+ *                       example: "507f1f77bcf86cd799439011"
  *                     receiverUserId:
  *                       type: string
+ *                       description: User ID of the receiver
+ *                       example: "507f1f77bcf86cd799439012"
  *                     totalItems:
  *                       type: number
+ *                       description: Total quantity of all items in cart
+ *                       example: 2
  *                     cartStatus:
  *                       type: string
- *                     product:
+ *                       description: Current cart status
+ *                       enum: ['open', 'in-progress', 'fulfilled', 'cancelled']
+ *                       example: "open"
+ *                     receiverCountryCode:
+ *                       type: string
+ *                       description: Country code of receiver's address
+ *                       example: "US"
+ *                     totalAmount:
  *                       type: object
+ *                       description: Total amount in dual currencies
  *                       properties:
- *                         productId:
- *                           type: string
- *                           example: "12872"
- *                         identityId:
- *                           type: string
- *                           example: "12872"
- *                         name:
- *                           type: string
- *                           example: "Amul Gold Full Cream Milk"
- *                         quantity:
+ *                         senderCurrencyValue:
  *                           type: number
- *                           example: 2
+ *                           example: 21.00
+ *                         receiverCurrencyValue:
+ *                           type: number
+ *                           example: 17.98
+ *                     paymentMode:
+ *                       type: string
+ *                       description: Selected payment mode
+ *                       enum: ['cash', 'card', 'wallet', 'upi', 'bank_transfer']
+ *                       example: "card"
+ *                     paymentStatus:
+ *                       type: string
+ *                       description: Payment status
+ *                       enum: ['pending', 'completed', 'failed']
+ *                       example: "pending"
+ *                     items:
+ *                       type: array
+ *                       description: Array of items in the cart
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           productId:
+ *                             type: string
+ *                             example: "12872"
+ *                           identityId:
+ *                             type: string
+ *                             example: "12872"
+ *                           name:
+ *                             type: string
+ *                             example: "Amul Gold Full Cream Milk"
+ *                           quantity:
+ *                             type: number
+ *                             example: 2
+ *                           price:
+ *                             type: object
+ *                             description: Product price in dual currencies
+ *                             properties:
+ *                               senderCurrencyValue:
+ *                                 type: number
+ *                                 example: 10.50
+ *                               receiverCurrencyValue:
+ *                                 type: number
+ *                                 example: 8.99
+ *                           addedAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-01-15T10:30:00.000Z"
  *                 timestamp:
  *                   type: string
  *                   format: date-time
@@ -160,11 +324,21 @@ const router: Router = Router();
  *                 receiverUserId: "507f1f77bcf86cd799439012"
  *                 totalItems: 2
  *                 cartStatus: "open"
- *                 product:
- *                   productId: "12872"
- *                   identityId: "12872"
- *                   name: "Amul Gold Full Cream Milk"
- *                   quantity: 2
+ *                 receiverCountryCode: "US"
+ *                 totalAmount:
+ *                   senderCurrencyValue: 21.00
+ *                   receiverCurrencyValue: 17.98
+ *                 paymentMode: "card"
+ *                 paymentStatus: "pending"
+ *                 items:
+ *                   - productId: "12872"
+ *                     identityId: "12872"
+ *                     name: "Amul Gold Full Cream Milk"
+ *                     quantity: 2
+ *                     price:
+ *                       senderCurrencyValue: 10.50
+ *                       receiverCurrencyValue: 8.99
+ *                     addedAt: "2024-01-15T10:30:00.000Z"
  *               timestamp: "2024-01-15T10:30:00.000Z"
  *       400:
  *         description: Bad request - missing required fields or invalid quantity

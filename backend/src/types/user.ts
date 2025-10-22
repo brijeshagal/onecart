@@ -15,7 +15,7 @@ export interface User {
   primaryWalletIndex: number; // Default -1 if no wallet selected
   created_at?: Date;
   updated_at?: Date;
-  activeCartId?: string;
+  activeCartIds?: string[];
   previousOrders?: string[];
   receiveOrders?: string[];
 }

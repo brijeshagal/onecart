@@ -18,17 +18,18 @@ Currently, the API does not require authentication. Future versions will impleme
 
 ### Location Search
 
-#### POST /api/search-location
+#### GET /api/location/search
 
 Search for location suggestions based on user's coordinates and query.
 
-**Request Body:**
-```json
-{
-  "lat": 28.4652382,
-  "lng": 77.0615957,
-  "query": "delhi"
-}
+**Query Parameters:**
+- `lat` (required): Latitude coordinate (number)
+- `lng` (required): Longitude coordinate (number)  
+- `query` (required): Search query string
+
+**Example Request:**
+```
+GET /api/location/search?lat=28.4652382&lng=77.0615957&query=delhi
 ```
 
 **Response:**

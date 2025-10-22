@@ -234,6 +234,31 @@ const options = {
               type: 'number',
               example: -1,
             },
+            activeCartIds: {
+              type: 'array',
+              description: 'Array of active cart IDs. Users can maintain multiple active carts with different receivers, preventing interference while waiting for receiver confirmation.',
+              items: {
+                type: 'string',
+                example: 'cart_1705314600000_abc123def',
+              },
+              example: ['cart_1705314600000_abc123def', 'cart_1705314600001_xyz789'],
+            },
+            previousOrders: {
+              type: 'array',
+              description: 'Array of cart IDs for orders previously placed by this user',
+              items: {
+                type: 'string',
+                example: 'cart_1705314600000_abc123def',
+              },
+            },
+            receiveOrders: {
+              type: 'array',
+              description: 'Array of cart IDs for orders received by this user',
+              items: {
+                type: 'string',
+                example: 'cart_1705314600000_abc123def',
+              },
+            },
             created_at: {
               type: 'string',
               format: 'date-time',

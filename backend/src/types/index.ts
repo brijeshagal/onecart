@@ -50,3 +50,23 @@ export interface ServerConfig {
   nodeEnv: string;
   corsOrigin?: string;
 }
+
+export interface TestCardPaymentData {
+  cardNumber: string;
+  expiryMonth: number;
+  expiryYear: number;
+  cvv: string;
+  amount: number;
+  currency: string;
+  description: string;
+}
+
+export const TestCardPaymentConstants = {
+  CARD_NUMBER: "4111111111111111",
+  EXPIRY_MONTH: 12,
+  EXPIRY_YEAR: 2025,
+  CVV: "123",
+  AMOUNT: 100.00,
+  CURRENCY: "USD",
+  DESCRIPTION: "Test payment",
+};

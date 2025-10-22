@@ -10,7 +10,7 @@ export const validateSearchLocation = (
   const { lat, lng, query } = req.query;
 
   // Check required fields
-  if (!lat || !lng || !query) {
+  if (!lat || !lng) {
     const error = new Error(
       'Missing required fields: lat, lng, and query are required'
     ) as AppError;
@@ -38,17 +38,8 @@ export const validateSearchLocation = (
     return next(error);
   }
 
-  // Validate query
-  if (typeof query !== 'string' || query.trim().length === 0) {
-    const error = new Error(
-      'Invalid query: must be a non-empty string'
-    ) as AppError;
-    error.statusCode = 400;
-    return next(error);
-  }
-
   // Validate query length
-  if (query.length > 100) {
+  if (typeof query === 'string' && query.length > 60) {
     const error = new Error(
       'Query too long: maximum 100 characters allowed'
     ) as AppError;
@@ -122,7 +113,6 @@ export const validateFeedRequest = (
 
   next();
 };
-
 
 // Validation middleware for search items request
 export const validateSearchItemsRequest = (

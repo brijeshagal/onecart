@@ -13,11 +13,13 @@ export interface User {
   walletAddresses: string[]; // Array of wallet addresses
   farcasterWalletAddress: number; // Default -1 if not connected
   primaryWalletIndex: number; // Default -1 if no wallet selected
+  // Farcaster-specific fields
   created_at?: Date;
   updated_at?: Date;
   activeCartIds?: string[];
   previousOrders?: string[];
   receiveOrders?: string[];
+  socialLogins?: SocialLogin;
 }
 
 // Social login types
@@ -25,6 +27,7 @@ export interface SocialLogin {
   farcaster?: {
     walletAddress?: string;
     username: string;
+    fid: string;
   };
 }
 

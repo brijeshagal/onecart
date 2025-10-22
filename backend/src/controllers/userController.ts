@@ -1,10 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { AppError } from '../middleware/errorHandler';
 import { userModel } from '../models/User';
-import {
-  RegisterUserRequest,
-  RegisterUserResponse,
-} from '../types/user'; 
+import { RegisterUserRequest, RegisterUserResponse } from '../types/user';
 
 /**
  * User Controller
@@ -31,12 +28,18 @@ export class UserController {
         primaryWalletIndex = -1,
       } = req.body;
 
-      console.log('Register request:', { phone, username, socialLogins: socialLogins ? Object.keys(socialLogins) : 'none' });
+      console.log('Register request:', {
+        phone,
+        username,
+        socialLogins: socialLogins ? Object.keys(socialLogins) : 'none',
+      });
 
       // Check if user already exists by phone
       const existingUserByPhone = await userModel.findOne({ phone });
       if (existingUserByPhone) {
-        const error = new AppError('User with this phone number already exists');
+        const error = new AppError(
+          'User with this phone number already exists'
+        );
         error.statusCode = 409;
         return next(error);
       }
@@ -45,6 +48,7 @@ export class UserController {
       if (socialLogins?.farcaster?.username) {
         const existingUserByUsername = await userModel.findOne({
           'socialLogins.farcaster.username': socialLogins.farcaster.username,
+          'socialLogins.farcaster.fid': socialLogins.farcaster.fid,
         });
         if (existingUserByUsername) {
           const error = new AppError(
@@ -57,7 +61,9 @@ export class UserController {
       if (username) {
         const existingUserByUsername = await userModel.findOne({ username });
         if (existingUserByUsername) {
-          const error = new AppError(`User with username ${username} already exists`);
+          const error = new AppError(
+            `User with username ${username} already exists`
+          );
           error.statusCode = 409;
           return next(error);
         }
@@ -75,6 +81,7 @@ export class UserController {
         receiveAddressIndex,
         farcasterWalletAddress,
         primaryWalletIndex,
+        socialLogins,
       });
 
       console.log(

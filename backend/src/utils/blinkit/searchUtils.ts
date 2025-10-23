@@ -122,9 +122,8 @@ export async function setAddressOnPage(
         queryText
       );
     }
-
     // Small wait for suggestions to populate
-    await new Promise(resolve => setTimeout(resolve, 900));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // 3) Pick the first suggestion from the list
     await page.waitForSelector('.address-container-v1');

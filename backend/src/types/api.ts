@@ -1,5 +1,6 @@
-import { UISuggestion } from './ui';
+import { ICart } from '../models/Cart';
 import { DataItem } from './cart';
+import { UISuggestion } from './ui';
 
 // API Request/Response types
 export interface SearchLocationRequest {
@@ -70,7 +71,7 @@ export interface CartAddRequest {
   receiverUserId: string;
   receiveAddress: any; // AddressData type - keeping flexible for complex object
   receiverCountryCode?: string;
-  itemsOrdered: Array<{
+  items: Array<{
     productId: string;
     identityId: string;
     name: string;
@@ -89,83 +90,13 @@ export interface CartAddRequest {
   orderNotes?: string;
 }
 
+/**
+ * OneCart internal cart API response
+ * Note: For Blinkit checkout cart response, use CheckoutCartResponse from './checkout'
+ */
 export interface CartResponse {
   success: boolean;
-  data?: {
-    cartId?: string;
-    senderUserId?: string;
-    receiverUserId?: string;
-    receiveAddress?: any;
-    receiverCountryCode?: string;
-    items?: Array<{
-      productId: string;
-      identityId: string;
-      name: string;
-      quantity: number;
-      price?: {
-        senderCurrencyValue: number;
-        receiverCurrencyValue: number;
-      };
-      addedAt: string;
-    }>;
-    totalItems?: number;
-    totalAmount?: {
-      senderCurrencyValue: number;
-      receiverCurrencyValue: number;
-    };
-    paymentMode?: string;
-    paymentStatus?: string;
-    cartStatus?: string;
-    orderTimestamp?: string;
-    fulfillmentTimestamp?: string;
-    orderNotes?: string;
-    product?: {
-      productId: string;
-      identityId: string;
-      name: string;
-      quantity: number;
-    };
-    removedProductId?: string;
-    userId?: string;
-    orders?: Array<{
-      cartId: string;
-      receiverUserId: string;
-      receiveAddress: any;
-      items: Array<{
-        productId: string;
-        identityId: string;
-        name: string;
-        quantity: number;
-        addedAt: string;
-      }>;
-      totalItems: number;
-      cartStatus: string;
-      orderTimestamp: string;
-      fulfillmentTimestamp?: string;
-      orderNotes?: string;
-      totalAmount?: number;
-    }>;
-    receivedOrders?: Array<{
-      cartId: string;
-      senderUserId: string;
-      receiveAddress: any;
-      items: Array<{
-        productId: string;
-        identityId: string;
-        name: string;
-        quantity: number;
-        addedAt: string;
-      }>;
-      totalItems: number;
-      cartStatus: string;
-      orderTimestamp: string;
-      fulfillmentTimestamp?: string;
-      orderNotes?: string;
-      totalAmount?: number;
-    }>;
-    createdAt?: string;
-    updatedAt?: string;
-  };
+  data?: ICart;
   error?: string;
   timestamp?: string;
 }

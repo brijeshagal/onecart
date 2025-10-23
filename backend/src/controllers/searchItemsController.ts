@@ -82,8 +82,12 @@ export class SearchItemsController {
         addressData = addressDetails.display_address;
       } else if (newAddress) {
         // Use the UISuggestion data to construct address (max 50 chars)
-        const fullAddress = `${newAddress.subtitle.text}`.trim();
-        addressData = fullAddress.substring(0, 30);
+        const fullAddress =
+          `${newAddress.title.text} ${newAddress.subtitle.text}`.replace(
+            ',',
+            ''
+          );
+        addressData = fullAddress.substring(0, 40);
       }
 
       if (!addressData) {
@@ -95,6 +99,7 @@ export class SearchItemsController {
       }
 
       await setAddressOnPage(addressData, page);
+      await new Promise(resolve => setTimeout(resolve, 1400));
       const blinkitSearchResponse = await performBlinkitSearch(page, query);
 
       await browser.close();

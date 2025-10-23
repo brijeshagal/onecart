@@ -14,7 +14,7 @@ const router: Router = Router();
  *     summary: Add item to sender's active cart
  *     description: |
  *       Add product(s) to the sender's active cart for delivery to a receiver.
- *       
+ *
  *       **Behavior:**
  *       - If an `activeCartId` is provided in the request, items are added to that specific cart.
  *       - If `activeCartId` is not provided but sender has active carts, items are added to the first active cart.
@@ -38,7 +38,7 @@ const router: Router = Router();
  *           "label": "Home"
  *         },
  *         "receiverCountryCode": "US",
- *         "itemsOrdered": [
+ *         "items": [
  *           {
  *             "productId": "12872",
  *             "identityId": "12872",
@@ -70,7 +70,7 @@ const router: Router = Router();
  *               - senderUserId
  *               - receiverUserId
  *               - receiveAddress
- *               - itemsOrdered
+ *               - items
  *               - quantity
  *             properties:
  *               senderUserId:
@@ -142,7 +142,7 @@ const router: Router = Router();
  *                 type: string
  *                 description: Country code of receiver's address (e.g., US, IN, GB)
  *                 example: "US"
- *               itemsOrdered:
+ *               items:
  *                 type: array
  *                 description: Array of simplified product items to add to cart
  *                 minItems: 1
@@ -721,5 +721,77 @@ router.delete('/:userId/:productId', CartController.removeFromCart);
  *         description: Internal server error
  */
 router.delete('/clear/:userId', CartController.clearCart);
+
+/**
+ * @swagger
+ * /api/cart/checkout/{userId}/{cartId}:
+ *   get:
+ *     summary: Get cart checkout details
+ *     description: |
+ *       Retrieve detailed checkout information for a specific cart including pricing, delivery details, and available payment options.
+ *       
+ *       **Returns:**
+ *       - Complete cart checkout data from Blinkit API
+ *       - Pricing breakdown with all charges
+ *       - Delivery time estimates
+ *       - Payment options and restrictions
+ *       
+ *       **Use Cases:**
+ *       - Display final pricing before checkout
+ *       - Show delivery time estimates
+ *       - Validate cart before payment
+ *       
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *         example: "68f74f252122160e209f4c89"
+ *       - in: path
+ *         name: cartId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Cart ID
+ *         example: "cart_1761209168596_ny90b33fy"
+ *         
+ *     responses:
+ *       200:
+ *         description: Cart checkout details retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   description: Complete checkout data from Blinkit API
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-10-23T11:56:03.630Z"
+ *       404:
+ *         description: Cart not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: "Cart not found"
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/checkout/:userId/:cartId', CartController.getCartCheckoutDetails);
+
 
 export { router as cartRoutes };

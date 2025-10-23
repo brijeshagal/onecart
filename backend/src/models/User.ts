@@ -124,8 +124,14 @@ export const userModel = {
   },
   findById: async (id: string) => {
     try {
+      // Validate if the ID is a valid MongoDB ObjectId
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        console.error('❌ Invalid ObjectId format:', id);
+        return null;
+      }
+      
       const Model = getUserModel();
-      return await Model.findById(id);
+      return await Model.findById(new mongoose.Types.ObjectId(id));
     } catch (error) {
       console.error('❌ Failed to find user by ID:', error);
       return null;
@@ -133,6 +139,15 @@ export const userModel = {
   },
   findOne: async (conditions: any) => {
     try {
+      // If conditions contains _id as string, validate and convert to ObjectId
+      if (conditions._id && typeof conditions._id === 'string') {
+        if (!mongoose.Types.ObjectId.isValid(conditions._id)) {
+          console.error('❌ Invalid ObjectId format in conditions:', conditions._id);
+          return null;
+        }
+        conditions._id = new mongoose.Types.ObjectId(conditions._id);
+      }
+      
       const Model = getUserModel();
       return await Model.findOne(conditions);
     } catch (error) {
@@ -142,6 +157,15 @@ export const userModel = {
   },
   updateOne: async (filter: any, update: any) => {
     try {
+      // If filter contains _id as string, validate and convert to ObjectId
+      if (filter._id && typeof filter._id === 'string') {
+        if (!mongoose.Types.ObjectId.isValid(filter._id)) {
+          console.error('❌ Invalid ObjectId format in filter:', filter._id);
+          throw new Error('Invalid ObjectId format');
+        }
+        filter._id = new mongoose.Types.ObjectId(filter._id);
+      }
+      
       const Model = getUserModel();
       return await Model.updateOne(filter, update);
     } catch (error) {
@@ -151,6 +175,15 @@ export const userModel = {
   },
   deleteOne: async (conditions: any) => {
     try {
+      // If conditions contains _id as string, validate and convert to ObjectId
+      if (conditions._id && typeof conditions._id === 'string') {
+        if (!mongoose.Types.ObjectId.isValid(conditions._id)) {
+          console.error('❌ Invalid ObjectId format in conditions:', conditions._id);
+          throw new Error('Invalid ObjectId format');
+        }
+        conditions._id = new mongoose.Types.ObjectId(conditions._id);
+      }
+      
       const Model = getUserModel();
       return await Model.deleteOne(conditions);
     } catch (error) {

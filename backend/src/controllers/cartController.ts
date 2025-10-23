@@ -4,6 +4,12 @@ import { userModel } from '../models/User';
 import { AddressData } from '../types/address';
 import { CartResponse } from '../types/api';
 import {
+  addProductToCart,
+  waitForCartResponse,
+} from '../utils/blinkit/cartUtils';
+import { loginUser } from '../utils/blinkit/loginUtils';
+import { setAddressOnPage } from '../utils/blinkit/searchUtils';
+import {
   clearCart,
   createNewCart,
   handleExistingCart,
@@ -39,7 +45,7 @@ export class CartController {
         senderUserId: string;
         receiverUserId: string;
         receiveAddress: AddressData;
-        itemsOrdered: ISimplifiedCartItem[];
+        items: ISimplifiedCartItem[];
         quantity: number;
         orderNotes?: string;
       }
@@ -53,7 +59,7 @@ export class CartController {
         senderUserId,
         receiverUserId,
         receiveAddress,
-        itemsOrdered,
+        items,
         quantity,
         orderNotes,
       } = req.body;
@@ -103,23 +109,21 @@ export class CartController {
           return;
         }
 
-        cart = await handleExistingCart(existingCart, itemsOrdered, quantity);
+        cart = await handleExistingCart(existingCart, items, quantity);
       } else {
         // Create new cart
         cart = await createNewCart(
           senderUserId,
           receiverUserId,
           receiveAddress,
-          itemsOrdered,
+          items,
           orderNotes
         );
       }
 
       res.status(200).json({
         success: true,
-        data: {
-          cartId: cart.cartId,
-        },
+        data: cart,
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
@@ -174,7 +178,7 @@ export class CartController {
           senderUserId: cart.senderUserId,
           receiverUserId: cart.receiverUserId,
           receiveAddress: cart.receiveAddress,
-          items: cart.itemsOrdered.map((item: ISimplifiedCartItem) => ({
+          items: cart.items.map((item: ISimplifiedCartItem) => ({
             productId: item.productId,
             identityId: item.identityId,
             name: item.name,
@@ -366,7 +370,7 @@ export class CartController {
             cartId: order.cartId,
             receiverUserId: order.receiverUserId,
             receiveAddress: order.receiveAddress,
-            items: order.itemsOrdered.map((item: ISimplifiedCartItem) => ({
+            items: order.items.map((item: ISimplifiedCartItem) => ({
               productId: item.productId,
               identityId: item.identityId,
               name: item.name,
@@ -385,6 +389,86 @@ export class CartController {
       });
     } catch (error) {
       console.error('❌ Get order history error:', error);
+      next(error);
+    }
+  }
+
+  static async getCartCheckoutDetails(
+    req: Request<{ userId: string; cartId: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { userId, cartId } = req.params;
+      const cart = await cartModel.findByCartId(cartId);
+      if (!cart) {
+        res.status(400).json({
+          success: false,
+          error: 'Cart not found',
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      if (cart.senderUserId !== userId) {
+        res.status(400).json({
+          success: false,
+          error: 'Cart not found',
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      const { page } = await loginUser(cart.receiveAddress);
+
+      await setAddressOnPage(cart.receiveAddress, page);
+      // Add all cart items to the cart
+      for (const cartItemData of cart.items) {
+        if (!cartItemData) {
+          console.warn(
+            `No product data found for cart item ${cartItemData.productId}`
+          );
+          continue;
+        }
+
+        try {
+          await addProductToCart(
+            page,
+            cartItemData.productId,
+            cartItemData.quantity
+          );
+        } catch (error) {
+          console.error(
+            `❌ Failed to process item ${cartItemData.productId}:`,
+            error
+          );
+          throw new Error(
+            `Order processing failed: Could not add item "${cartItemData.productId}" to cart. ${error instanceof Error ? error.message : String(error)}`
+          );
+        }
+      }
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      await page.waitForSelector('.CartButton__Button-sc-1fuy2nj-5');
+      // Set up cart response listener before clicking
+      const cartResponsePromise = waitForCartResponse(page, 4000);
+
+      const cartSelector = await page.$('.CartButton__Button-sc-1fuy2nj-5');
+      if (cartSelector) {
+        await cartSelector.click();
+        console.log('Cart button clicked, waiting for cart response...');
+      } else {
+        throw new Error('Cart selector not found');
+      }
+
+      // Wait for the cart API response to get pricing details
+      const cartData = await cartResponsePromise;
+      res.status(200).json({
+        success: true,
+        data: cartData,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('❌ Get cart checkout details error:', error);
       next(error);
     }
   }
@@ -422,7 +506,7 @@ export class CartController {
             cartId: order.cartId,
             senderUserId: order.senderUserId,
             receiveAddress: order.receiveAddress,
-            items: order.itemsOrdered.map((item: ISimplifiedCartItem) => ({
+            items: order.items.map((item: ISimplifiedCartItem) => ({
               productId: item.productId,
               identityId: item.identityId,
               name: item.name,

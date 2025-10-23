@@ -17,7 +17,7 @@ export const validateAddToCartRequest = (
     senderUserId,
     receiverUserId,
     receiveAddress,
-    itemsOrdered,
+    items,
     quantity,
   } = reqBody;
 
@@ -25,7 +25,7 @@ export const validateAddToCartRequest = (
     !senderUserId ||
     !receiverUserId ||
     !receiveAddress ||
-    !itemsOrdered?.length
+    !items?.length
   ) {
     return {
       isValid: false,
@@ -111,22 +111,22 @@ export const updateUserActiveCart = async (
  */
 export const handleExistingCart = async (
   existingCart: ICart,
-  itemsOrdered: ISimplifiedCartItem[],
+  items: ISimplifiedCartItem[],
   quantity: number
 ): Promise<ICart> => {
-  existingCart.itemsOrdered = itemsOrdered.map((item: ISimplifiedCartItem) => {
-    const itemIndex = existingCart.itemsOrdered.findIndex(
+  existingCart.items = items.map((item: ISimplifiedCartItem) => {
+    const itemIndex = existingCart.items.findIndex(
       (i: ISimplifiedCartItem) => i.productId === item.productId
     );
     return itemIndex !== -1
       ? {
-          ...existingCart.itemsOrdered[itemIndex]!,
-          quantity: existingCart.itemsOrdered[itemIndex]!.quantity! + quantity,
+          ...existingCart.items[itemIndex]!,
+          quantity: existingCart.items[itemIndex]!.quantity! + quantity,
         }
       : { ...item, quantity: quantity };
   });
 
-  existingCart.totalItems = existingCart.itemsOrdered.reduce(
+  existingCart.totalItems = existingCart.items.reduce(
     (total: number, item: ISimplifiedCartItem) => total + item.quantity!,
     0
   );
@@ -142,7 +142,7 @@ export const createNewCart = async (
   senderUserId: string,
   receiverUserId: string,
   receiveAddress: AddressData,
-  itemsOrdered: ISimplifiedCartItem[],
+  items: ISimplifiedCartItem[],
   orderNotes?: string
 ): Promise<ICart> => {
   const newCart: ICart = {
@@ -150,8 +150,8 @@ export const createNewCart = async (
     senderUserId,
     receiverUserId,
     receiveAddress,
-    itemsOrdered,
-    totalItems: itemsOrdered.reduce(
+    items,
+    totalItems: items.reduce(
       (total: number, item: ISimplifiedCartItem) => total + item.quantity!,
       0
     ),
@@ -172,7 +172,7 @@ export const removeCartItem = async (
   cart: ICart,
   productId: string
 ): Promise<{ success: boolean; error?: string }> => {
-  const productIndex = cart.itemsOrdered.findIndex(
+  const productIndex = cart.items.findIndex(
     (item: ISimplifiedCartItem) => item.productId === productId
   );
 
@@ -180,8 +180,8 @@ export const removeCartItem = async (
     return { success: false, error: 'Product not found in cart' };
   }
 
-  cart.itemsOrdered.splice(productIndex, 1);
-  cart.totalItems = cart.itemsOrdered.reduce(
+  cart.items.splice(productIndex, 1);
+  cart.totalItems = cart.items.reduce(
     (total: number, item: ISimplifiedCartItem) => total + item.quantity!,
     0
   );
@@ -194,7 +194,7 @@ export const removeCartItem = async (
  * Clears all items from cart and sets status to cancelled
  */
 export const clearCart = async (cart: ICart): Promise<void> => {
-  cart.itemsOrdered = [];
+  cart.items = [];
   cart.totalItems = 0;
   cart.cartStatus = 'cancelled';
 

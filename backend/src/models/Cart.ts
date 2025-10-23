@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Model, Schema } from 'mongoose';
 import { AddressData } from '../types/address';
 
 // Simplified Cart Item schema - only essential product data + quantity
@@ -65,7 +65,7 @@ export interface ICart {
   receiverCountryCode?: string; // Country code of receiver's address
 
   // Cart contents and metadata (simplified)
-  itemsOrdered: ISimplifiedCartItem[];
+  items: ISimplifiedCartItem[];
   totalItems: number;
 
   // Pricing information (dual currency)
@@ -116,7 +116,7 @@ const CartSchema = new Schema<ICart>(
       type: String,
       default: null,
     },
-    itemsOrdered: [SimplifiedCartItemSchema],
+    items: [SimplifiedCartItemSchema],
     totalItems: {
       type: Number,
       default: 0,
@@ -190,8 +190,9 @@ export const cartModel = {
   },
   findById: async (id: string) => {
     try {
-      const Model = getCartModel();
-      return await Model.findById(id);
+      // Validate if the ID is a valid MongoDB ObjectId
+
+      return await Model.findById(new mongoose.Types.ObjectId(id));
     } catch (error) {
       console.error('❌ Failed to find cart by ID:', error);
       return null;
@@ -199,6 +200,18 @@ export const cartModel = {
   },
   findOne: async (conditions: any) => {
     try {
+      // If conditions contains _id as string, validate and convert to ObjectId
+      if (conditions._id && typeof conditions._id === 'string') {
+        if (!mongoose.Types.ObjectId.isValid(conditions._id)) {
+          console.error(
+            '❌ Invalid ObjectId format in conditions:',
+            conditions._id
+          );
+          return null;
+        }
+        conditions._id = new mongoose.Types.ObjectId(conditions._id);
+      }
+
       const Model = getCartModel();
       return await Model.findOne(conditions);
     } catch (error) {
@@ -208,6 +221,15 @@ export const cartModel = {
   },
   updateOne: async (filter: any, update: any) => {
     try {
+      // If filter contains _id as string, validate and convert to ObjectId
+      if (filter._id && typeof filter._id === 'string') {
+        if (!mongoose.Types.ObjectId.isValid(filter._id)) {
+          console.error('❌ Invalid ObjectId format in filter:', filter._id);
+          throw new Error('Invalid ObjectId format');
+        }
+        filter._id = new mongoose.Types.ObjectId(filter._id);
+      }
+
       const Model = getCartModel();
       return await Model.updateOne(filter, update);
     } catch (error) {
@@ -217,6 +239,18 @@ export const cartModel = {
   },
   deleteOne: async (conditions: any) => {
     try {
+      // If conditions contains _id as string, validate and convert to ObjectId
+      if (conditions._id && typeof conditions._id === 'string') {
+        if (!mongoose.Types.ObjectId.isValid(conditions._id)) {
+          console.error(
+            '❌ Invalid ObjectId format in conditions:',
+            conditions._id
+          );
+          throw new Error('Invalid ObjectId format');
+        }
+        conditions._id = new mongoose.Types.ObjectId(conditions._id);
+      }
+
       const Model = getCartModel();
       return await Model.deleteOne(conditions);
     } catch (error) {

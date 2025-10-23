@@ -17,6 +17,7 @@ interface Environment {
   API_PREFIX?: string | undefined;
   RZPAY_TEST_KEY_ID?: string | undefined;
   RZPAY_TEST_KEY_SECRET?: string | undefined;
+  BLINKIT_PHONE?: string | undefined;
 }
 
 // Type-safe environment variable getter
@@ -56,6 +57,7 @@ const parseEnv = (): Environment => {
     API_PREFIX: process.env['API_PREFIX'] || undefined,
     RZPAY_TEST_KEY_ID: process.env['RZPAY_TEST_KEY_ID'] || undefined,
     RZPAY_TEST_KEY_SECRET: process.env['RZPAY_TEST_KEY_SECRET'] || undefined,
+    BLINKIT_PHONE: process.env['BLINKIT_PHONE'] || undefined,
   };
 };
 

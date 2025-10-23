@@ -1,6 +1,7 @@
 "use client";
 
 import { useAppStore } from "@/lib/store";
+import { useCart } from "@/lib/cartStore";
 import Link from "next/link";
 
 interface NavbarProps {
@@ -8,6 +9,7 @@ interface NavbarProps {
   selectedAddress?: string;
   addressLabel?: string;
   onAddressClick?: () => void;
+  showCart?: boolean;
 }
 
 export function Navbar({
@@ -15,8 +17,10 @@ export function Navbar({
   selectedAddress,
   addressLabel,
   onAddressClick,
+  showCart = false,
 }: NavbarProps) {
   const { user } = useAppStore();
+  const cart = useCart();
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white z-50">
@@ -33,14 +37,33 @@ export function Navbar({
             </span>
           </Link>
 
-          {/* User Avatar */}
-          {user && (
-            <div className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center shrink-0">
-              <span className="text-xs font-bold text-gray-700">
-                {user.username?.charAt(0).toUpperCase() || "U"}
-              </span>
-            </div>
-          )}
+          {/* Right side: Cart + User Avatar */}
+          <div className="flex items-center gap-2">
+            {/* Cart Icon with Badge */}
+            {showCart && (
+              <Link href="/cart" className="relative shrink-0">
+                <div className="w-7 h-7 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                  {cart && cart.totalItems > 0 && (
+                    <div className="absolute -top-1 -right-1 bg-black text-white rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold">
+                      {cart.totalItems > 9 ? '9+' : cart.totalItems}
+                    </div>
+                  )}
+                </div>
+              </Link>
+            )}
+
+            {/* User Avatar */}
+            {user && (
+              <div className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center shrink-0">
+                <span className="text-xs font-bold text-gray-700">
+                  {user.username?.charAt(0).toUpperCase() || "U"}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Address bar - Mobile design centered on desktop */}

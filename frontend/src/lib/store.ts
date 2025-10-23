@@ -27,7 +27,7 @@ const addressDataToUISuggestion = (address: AddressData): UISuggestion => {
 
 // Default user data based on backend User type and API documentation
 const defaultUser: User = {
-  id: "1",
+  id: "68f74f252122160e209f4c89",
   username: "testuser123",
   email: "test@example.com",
   phone: "+1234567890",

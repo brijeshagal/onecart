@@ -230,6 +230,155 @@ export interface ProductBadge {
   padding: string;
 }
 
+export interface StepperDataV2 {
+  size: string;
+  max_count: number;
+  zero_layout_config: {
+    style: string;
+  };
+  non_zero_layout_config: {
+    style: string;
+  };
+  increment_actions: {
+    default: StepperAction[];
+    count_map: Record<string, StepperAction[]>;
+  };
+  decrement_actions: {
+    default: StepperAction[];
+  };
+}
+
+export interface StepperAction {
+  type: string;
+  add_to_cart?: {
+    cart_item: CartItem;
+  };
+  remove_from_cart?: {
+    cart_item: CartItem;
+    count_type?: string;
+  };
+  recommendation_action?: RecommendationAction;
+}
+
+export interface RecommendationAction {
+  snippet_id: {
+    id: string;
+  };
+  actions: RecommendationSubAction[];
+}
+
+export type RecommendationSubAction =
+  | RemoveRecommendationAction
+  | AddRecommendationAction
+  | FetchApiAction;
+
+export interface RemoveRecommendationAction {
+  interaction_id: string;
+  max_trigger_count: number;
+  remove_recommendation: {
+    snippet_prefix_id_to_remove: string;
+    triggered_by_snippet_id?: string;
+  };
+  type: 'remove_recommendation';
+}
+
+export interface AddRecommendationAction {
+  interaction_id: string;
+  max_trigger_count: number;
+  add_recommendation: {
+    snippets_to_add: Snippet[];
+    snippet_id_to_attach: string;
+    conflict_policy: {
+      match_config: Record<string, any>;
+    };
+    prefix_id: string;
+  };
+  type: 'add_recommendation';
+}
+
+export interface FetchApiAction {
+  interaction_id: string;
+  max_trigger_count: number;
+  fetch_api: {
+    url: string;
+    type: string;
+    extra_params: {
+      product_id: string;
+      product_position: number;
+      recipe_keyterms: any[];
+      recommendation_type: string;
+      send_cart_items: boolean;
+    };
+    failure_actions: {
+      remove_recommendation: {
+        snippet_prefix_id_to_remove: string;
+      };
+      type: 'remove_recommendation';
+    }[];
+  };
+  type: 'fetch_api';
+}
+
+export interface Snippet {
+  data: {
+    items: any;
+    bg_color_hex: string;
+    bg_color: {
+      type: string;
+      tint: string;
+    };
+    identity: {
+      id: string;
+    };
+    container_layout_config: {
+      corner_radius: number;
+      stroke_color: {
+        type: string;
+        tint: string;
+      };
+      stroke_width: number;
+    };
+    layout_bg_color: string;
+    loading_overlay_data: {
+      api_request_type: string;
+      screen_type: string;
+      loading_error_state: string;
+      loading_error_overlay_size_type: string;
+      bg_color_data: {
+        type: string;
+        tint: string;
+      };
+      shimmer_res_id: string;
+      corner_radius: number;
+    };
+  };
+  tracking: {
+    widget_meta: {
+      widget_id: string;
+      widget_name: string;
+      widget_title: string;
+      widget_tracking_id: string;
+    };
+    impression_map: {
+      event_name: string;
+    };
+    click_map: {
+      event_name: string;
+    };
+    entry_source_map: {
+      entry_source_id: string;
+      entry_source_name: string;
+      entry_source_title: string;
+      entry_source_tracking_id: string;
+    };
+  };
+  widget_type: string;
+  layout_config: {
+    bg_color: string;
+    spacing: string;
+  };
+}
+
 // DataItem (individual product)
 export interface SearchItem {
   identity: {
@@ -252,7 +401,7 @@ export interface SearchItem {
   inventory: number;
   merchant_type: string;
   eta_identifier: string;
-  stepper_data: {
+  stepper_data?: {
     size: string;
     state: {
       title: {
@@ -260,6 +409,7 @@ export interface SearchItem {
       };
     };
   };
+  stepper_data_v2: StepperDataV2;
   eta_tag: {
     title: {
       text: string;
@@ -439,6 +589,43 @@ export interface SearchItemsResponse {
   timestamp?: string;
 }
 
+// Cart types
+export interface SimplifiedCartItem {
+  productId: string;
+  identityId: string;
+  name: string;
+  quantity: number;
+  price?: {
+    senderCurrencyValue: number;
+    receiverCurrencyValue: number;
+  };
+  addedAt?: Date;
+}
+
+export interface AddToCartRequest {
+  activeCartId?: string;
+  senderUserId: string;
+  receiverUserId: string;
+  receiveAddress: AddressData;
+  items: SimplifiedCartItem[];
+  quantity: number;
+  totalAmount?: {
+    senderCurrencyValue: number;
+    receiverCurrencyValue: number;
+  };
+  paymentMode?: 'cash' | 'card' | 'wallet' | 'upi' | 'bank_transfer';
+  orderNotes?: string;
+}
+
+export interface AddToCartResponse {
+  success: boolean;
+  data?: {
+    cartId: string;
+  };
+  error?: string;
+  timestamp?: string;
+}
+
 // Store types for Zustand
 export interface AppState {
   // User state
@@ -480,3 +667,6 @@ export interface FormField {
     max?: number;
   };
 }
+
+// Export checkout/cart response types
+export * from './checkout';

@@ -48,8 +48,9 @@ interface CartState {
   fetchCart: (userId: string) => Promise<void>;
   removeFromCart: (
     userId: string,
-    productId: string
-  ) => Promise<{ success: boolean; error?: string }>;
+    productId: string,
+    cartId: string
+  ) => Promise<{ success: boolean; error?: string; cart?: Cart }>;
   clearCart: (userId: string) => Promise<{ success: boolean; error?: string }>;
   setCart: (cart: Cart | null) => void;
   clearError: () => void;
@@ -83,8 +84,8 @@ export const useCartStore = create<CartState>()(
             set({
               isLoading: false,
               cart: response.data as Cart,
-            } as CartState);
-            return { success: true };
+            });
+            return { success: true, cart: response.data as Cart };
           } else {
             throw new Error(response.error || "Failed to add to cart");
           }
@@ -129,7 +130,10 @@ export const useCartStore = create<CartState>()(
         }
       },
 
-      fetchCartCheckoutDetails: async (userId: string) => {
+      fetchCartCheckoutDetails: async (
+        userId: string,
+        addressData?: AddressData
+      ) => {
         set({ isLoading: true, error: null });
 
         try {
@@ -139,9 +143,10 @@ export const useCartStore = create<CartState>()(
           }
           const response = await apiService.getCartCheckoutDetails(
             userId,
-            cart.cartId
+            cart.cartId,
+            addressData ? addressData : cart.receiveAddress
           );
-          
+
           if (response.success && response.data) {
             set({
               checkoutCart: response.data as CheckoutCartResponse,
@@ -156,7 +161,10 @@ export const useCartStore = create<CartState>()(
                   "Failed to fetch cart checkout details"
             );
           }
-          return { success: true, checkoutCart: response.data as CheckoutCartResponse };
+          return {
+            success: true,
+            checkoutCart: response.data as CheckoutCartResponse,
+          };
         } catch (err) {
           const errorMessage =
             err instanceof Error
@@ -168,17 +176,23 @@ export const useCartStore = create<CartState>()(
       },
 
       // Remove item from cart
-      removeFromCart: async (userId: string, productId: string) => {
+      removeFromCart: async (
+        userId: string,
+        productId: string,
+        cartId: string
+      ) => {
         set({ isLoading: true, error: null });
 
         try {
-          const response = await apiService.removeFromCart(userId, productId);
+          const response = await apiService.removeFromCart(
+            userId,
+            productId,
+            cartId
+          );
 
           if (response.success) {
-            // Fetch the updated cart from backend
-            await get().fetchCart(userId);
-            set({ isLoading: false });
-            return { success: true };
+            set({ isLoading: false, cart: response.data as Cart });
+            return { success: true, cart: response.data as Cart };
           } else {
             const errorMsg =
               typeof response.error === "string"
@@ -202,7 +216,7 @@ export const useCartStore = create<CartState>()(
           const response = await apiService.clearCart(userId);
 
           if (response.success) {
-            set({ cart: null, isLoading: false });
+            set({ cart: response.data as Cart, isLoading: false });
             return { success: true };
           } else {
             const errorMsg =
@@ -236,7 +250,8 @@ export const useCartStore = create<CartState>()(
 
 // Convenience hooks
 export const useCart = () => useCartStore((state) => state.cart);
-export const useCheckoutCart = () => useCartStore((state) => state.checkoutCart);
+export const useCheckoutCart = () =>
+  useCartStore((state) => state.checkoutCart);
 export const useCartLoading = () => useCartStore((state) => state.isLoading);
 export const useCartError = () => useCartStore((state) => state.error);
 

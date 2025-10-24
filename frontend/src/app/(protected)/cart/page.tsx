@@ -1,5 +1,6 @@
 "use client";
 
+import { AddressModal } from "@/components/AddressModal";
 import { Navbar } from "@/components/Navbar";
 import {
   useCart,
@@ -7,22 +8,44 @@ import {
   useCartLoading,
   useCheckoutCart,
 } from "@/lib/cartStore";
+import { getCurrentLocation } from "@/lib/location";
 import { useAppStore } from "@/lib/store";
 import { BillDetailsWidget } from "@/types";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 export default function CartPage() {
-  const { user } = useAppStore();
+  const { user, selectedAddress, setSelectedAddress } = useAppStore();
   const cart = useCart();
   const checkoutCart = useCheckoutCart();
   console.log(checkoutCart);
-  const { removeFromCart, clearCart, fetchCartCheckoutDetails } =
+  const { removeFromCart, clearCart, fetchCartCheckoutDetails, addToCart } =
     useCartActions();
   const isLoading = useCartLoading();
 
-  const [removingItems, setRemovingItems] = useState<Set<string>>(new Set());
+  const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set());
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+
+  // Get current location on mount
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        const result = await getCurrentLocation();
+        if (result.coordinates.lat && result.coordinates.lng) {
+          setCurrentLocation(result.coordinates);
+        }
+      } catch (error) {
+        console.error("Failed to get current location:", error);
+      }
+    };
+
+    initialize();
+  }, []);
 
   // Fetch cart checkout details on mount and when cart changes
   useEffect(() => {
@@ -146,47 +169,122 @@ export default function CartPage() {
       );
     }
 
-    // Use checkout cart items for accurate data
+    // Use checkout cart items for accurate data, but merge with cart quantities for real-time updates
     const shipmentItems = checkoutCart.cart_data.shipments[0].items;
-    return shipmentItems.map((item) => ({
-      productId: item.product_id.toString(),
-      name: item.name,
-      quantity: item.quantity,
-      price: item.price,
-      mrp: item.mrp,
-      imageUrl: item.image_url || item.png_image_url || "",
-      brand: item.brand,
-      unit: item.unit,
-      totalPrice: typeof item.total_price === "number" ? item.total_price : 0,
-      isFromCheckout: true,
-    }));
+    const cartItemsMap = new Map(
+      cart?.items?.map((item) => [item.productId, item.quantity]) || []
+    );
+
+    return shipmentItems
+      .map((item) => {
+        const productId = item.product_id.toString();
+        const cartQuantity = cartItemsMap.get(productId);
+        
+        // If item was removed from cart, don't display it
+        if (cartQuantity === undefined) {
+          return null;
+        }
+
+        return {
+          productId,
+          name: item.name,
+          quantity: cartQuantity, // Use cart quantity for real-time updates
+          price: item.price,
+          mrp: item.mrp,
+          imageUrl: item.image_url || item.png_image_url || "",
+          brand: item.brand,
+          unit: item.unit,
+          totalPrice: typeof item.total_price === "number" ? item.total_price : item.price * cartQuantity,
+          isFromCheckout: true,
+        };
+      })
+      .filter((item) => item !== null);
   }, [checkoutCart, cart?.items]);
 
-  // Get total items count
+  // Get total items count - prioritize cart for real-time updates
   const totalItemsCount = useMemo(() => {
+    if (cart?.totalItems) {
+      return cart.totalItems;
+    }
     if (checkoutCart?.cart_data?.bill_details?.total_items) {
       return checkoutCart.cart_data.bill_details.total_items;
     }
-    return cart?.totalItems || 0;
-  }, [checkoutCart, cart]);
+    return 0;
+  }, [cart, checkoutCart]);
 
-  // Handle remove item
-  const handleRemoveItem = async (productId: string) => {
+  // Handle increment quantity
+  const handleIncrementQuantity = async (item: any) => {
+    if (!user?.id || !selectedAddress) return;
+
+    setUpdatingItems((prev) => new Set(prev).add(item.productId));
+
+    try {
+      const cartRequest = {
+        senderUserId: user.id,
+        receiverUserId: user.id,
+        receiveAddress: selectedAddress,
+        items: [
+          {
+            productId: item.productId,
+            identityId: item.productId,
+            name: item.name,
+            quantity: 1,
+            price: {
+              senderCurrencyValue: item.price,
+              receiverCurrencyValue: item.price,
+            },
+          },
+        ],
+        quantity: 1,
+        totalAmount: {
+          senderCurrencyValue: item.price,
+          receiverCurrencyValue: item.price,
+        },
+      };
+
+      await addToCart(cartRequest);
+      setUpdatingItems((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(item.productId);
+        return newSet;
+      });
+    } catch (error) {
+      console.error("Error incrementing quantity:", error);
+    }
+  };
+
+  // Handle decrement quantity
+  const handleDecrementQuantity = async (productId: string, cartId: string) => {
     if (!user?.id) return;
 
-    setRemovingItems((prev) => new Set(prev).add(productId));
+    setUpdatingItems((prev) => new Set(prev).add(productId));
 
-    const result = await removeFromCart(user.id, productId);
-
-    if (!result.success) {
-      alert(result.error || "Failed to remove item");
+    try {
+      await removeFromCart(user.id, productId, cartId);
+      
+      setUpdatingItems((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(productId);
+        return newSet;
+      });
+    } catch (error) {
+      console.error("Error decrementing quantity:", error);
+      setUpdatingItems((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(productId);
+        return newSet;
+      });
     }
+  };
 
-    setRemovingItems((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(productId);
-      return newSet;
-    });
+  // Handle remove item completely
+  const handleRemoveItem = async (productId: string, cartId: string) => {
+    if (!user?.id) return;
+
+    if (!window.confirm("Remove this item from cart?")) {
+      return;
+    }
+    await removeFromCart(user.id, productId, cartId);
   };
 
   // Handle clear cart
@@ -289,6 +387,17 @@ export default function CartPage() {
     <div className="min-h-screen bg-gray-50">
       <Navbar showCart={false} />
 
+      {/* Address Modal */}
+      <AddressModal
+        isOpen={isAddressModalOpen}
+        onClose={() => setIsAddressModalOpen(false)}
+        onSelect={(address) => {
+          setSelectedAddress(address);
+        }}
+        savedAddresses={user?.addresses || []}
+        currentLocation={currentLocation || undefined}
+      />
+
       <div className="pt-16 max-w-md mx-auto pb-32">
         <div className="px-4 py-6">
           {/* Header */}
@@ -303,7 +412,7 @@ export default function CartPage() {
               <button
                 onClick={handleClearCart}
                 disabled={isLoading}
-                className="text-sm text-red-600 hover:text-red-700 font-medium disabled:opacity-50"
+                className="cursor-pointer text-sm text-red-600 hover:text-red-700 font-medium disabled:opacity-50"
               >
                 Clear Cart
               </button>
@@ -358,8 +467,8 @@ export default function CartPage() {
           {/* Cart Items */}
           {cart && totalItemsCount > 0 && (
             <div className="space-y-4">
-              {/* Delivery Address */}
-              {cart.receiveAddress && (
+              {/* Delivery Address - Use selectedAddress from global state */}
+              {selectedAddress ? (
                 <div className="bg-white rounded-lg shadow-sm p-4">
                   <div className="flex items-start gap-3">
                     <span className="text-lg mt-0.5">📍</span>
@@ -368,15 +477,41 @@ export default function CartPage() {
                         Delivery Address
                       </h3>
                       <p className="text-sm text-gray-600 mb-0.5">
-                        {cart.receiveAddress.label && (
+                        {selectedAddress.label && (
                           <span className="font-medium text-gray-900">
-                            {cart.receiveAddress.label}
+                            {selectedAddress.label}
                           </span>
                         )}
                       </p>
                       <p className="text-sm text-gray-600">
-                        {cart.receiveAddress.display_address}
+                        {selectedAddress.display_address}
                       </p>
+                    </div>
+                    <button
+                      onClick={() => setIsAddressModalOpen(true)}
+                      className="cursor-pointer text-sm text-blue-600 hover:text-blue-700 font-medium shrink-0"
+                    >
+                      Change
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg mt-0.5">⚠️</span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                        No Delivery Address Selected
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Please select a delivery address to continue
+                      </p>
+                      <button
+                        onClick={() => setIsAddressModalOpen(true)}
+                        className="cursor-pointer text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        Select Address
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -384,122 +519,203 @@ export default function CartPage() {
 
               {/* Items List */}
               <div className="bg-white rounded-lg shadow-sm divide-y divide-gray-100">
-                {displayItems.map((item) => {
-                  const isRemoving = removingItems.has(item.productId);
-                  const itemTotal =
-                    item.totalPrice || item.price * item.quantity;
-                  const itemCheckoutDetails =
-                    checkoutCart?.cart_data?.shipments?.[0]?.items.find(
-                      (i) => i.product_id.toString() === item.productId
-                    );
-                  const itemPrice = itemCheckoutDetails?.price || item.price;
-                  const itemMrp = itemCheckoutDetails?.mrp || item.mrp;
-                  const itemBrand = itemCheckoutDetails?.brand || item.brand;
-                  const itemUnit = itemCheckoutDetails?.unit || item.unit;
-                  const itemQuantity =
-                    itemCheckoutDetails?.quantity || item.quantity;
-                  const itemTotalPrice =
-                    itemCheckoutDetails?.total_price || item.totalPrice;
-                  const itemIsFromCheckout = itemCheckoutDetails ? true : false;
-                  return (
-                    <div
-                      key={item.productId}
-                      className={`p-4 transition-opacity ${
-                        isRemoving ? "opacity-50" : ""
-                      }`}
-                    >
-                      <div className="flex gap-3">
-                        {/* Product Image */}
-                        {item.imageUrl && (
-                          <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-gray-100">
-                            <img
-                              src={item.imageUrl}
-                              alt={item.name}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).style.display =
-                                  "none";
-                              }}
-                            />
+                {/* Loading skeleton for items */}
+                {isLoading &&
+                  !checkoutCart &&
+                  cart?.items &&
+                  cart.items.length > 0 && (
+                    <>
+                      {cart.items.map((_, index) => (
+                        <div
+                          key={`skeleton-${index}`}
+                          className="p-4 animate-pulse"
+                        >
+                          <div className="flex gap-3">
+                            {/* Image skeleton */}
+                            <div className="w-16 h-16 rounded-lg bg-gray-200 shrink-0"></div>
+                            {/* Content skeleton */}
+                            <div className="flex-1 min-w-0 space-y-2">
+                              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                              <div className="flex gap-2">
+                                <div className="h-3 bg-gray-200 rounded w-16"></div>
+                                <div className="h-3 bg-gray-200 rounded w-20"></div>
+                              </div>
+                            </div>
                           </div>
-                        )}
+                        </div>
+                      ))}
+                    </>
+                  )}
 
-                        {/* Product Info */}
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
-                            {item.name}
-                          </h3>
-
-                          {/* Brand and Unit */}
-                          {(item.brand || item.unit) && (
-                            <p className="text-xs text-gray-500 mb-2">
-                              {item.brand && <span>{item.brand}</span>}
-                              {item.brand && item.unit && <span> • </span>}
-                              {item.unit && <span>{item.unit}</span>}
-                            </p>
+                {/* Actual items */}
+                {(!isLoading || checkoutCart) &&
+                  displayItems.map((item) => {
+                    const isUpdating = updatingItems.has(item.productId);
+                    const itemTotal =
+                      item.totalPrice || item.price * item.quantity;
+                    const itemCheckoutDetails =
+                      checkoutCart?.cart_data?.shipments?.[0]?.items.find(
+                        (i) => i.product_id.toString() === item.productId
+                      );
+                    const itemPrice = itemCheckoutDetails?.price || item.price;
+                    const itemMrp = itemCheckoutDetails?.mrp || item.mrp;
+                    const itemBrand = itemCheckoutDetails?.brand || item.brand;
+                    const itemUnit = itemCheckoutDetails?.unit || item.unit;
+                    const itemQuantity =
+                      itemCheckoutDetails?.quantity || item.quantity;
+                    const itemTotalPrice =
+                      itemCheckoutDetails?.total_price || item.totalPrice;
+                    const itemIsFromCheckout = itemCheckoutDetails
+                      ? true
+                      : false;
+                    return (
+                      <div
+                        key={item.productId}
+                        className={`p-4 transition-opacity ${
+                          isUpdating ? "opacity-50" : ""
+                        }`}
+                      >
+                        <div className="flex gap-3">
+                          {/* Product Image */}
+                          {item.imageUrl && (
+                            <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-gray-100">
+                              <img
+                                src={item.imageUrl}
+                                alt={item.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display =
+                                    "none";
+                                }}
+                              />
+                            </div>
                           )}
 
-                          {/* Quantity and Price */}
-                          <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                            <span>Qty: {item.quantity}</span>
-                            <span>×</span>
-                            <span>₹{itemPrice.toFixed(2)}</span>
-                            {itemMrp > itemPrice && (
-                              <span className="text-xs line-through text-gray-400">
-                                ₹{itemMrp.toFixed(2)}
-                              </span>
-                            )}
-                          </div>
+                          {/* Product Info */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
+                              {item.name}
+                            </h3>
 
-                          {/* Item Total */}
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <span className="text-sm font-semibold text-gray-900">
-                                ₹{itemTotal.toFixed(2)}
-                              </span>
+                            {/* Brand and Unit */}
+                            {(item.brand || item.unit) && (
+                              <p className="text-xs text-gray-500 mb-2">
+                                {item.brand && <span>{item.brand}</span>}
+                                {item.brand && item.unit && <span> • </span>}
+                                {item.unit && <span>{item.unit}</span>}
+                              </p>
+                            )}
+
+                            {/* Quantity and Price */}
+                            <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                              <span>Qty: {item.quantity}</span>
+                              <span>×</span>
+                              <span>₹{itemPrice.toFixed(2)}</span>
                               {itemMrp > itemPrice && (
-                                <span className="ml-2 text-xs text-green-600">
-                                  Save ₹
-                                  {(
-                                    (itemMrp - itemPrice) *
-                                    itemQuantity
-                                  ).toFixed(2)}
+                                <span className="text-xs line-through text-gray-400">
+                                  ₹{itemMrp.toFixed(2)}
                                 </span>
                               )}
                             </div>
 
-                            {/* Remove Button */}
-                            <button
-                              onClick={() => handleRemoveItem(item.productId)}
-                              disabled={isRemoving}
-                              className="text-sm text-red-600 hover:text-red-700 font-medium disabled:opacity-50 transition-colors"
-                            >
-                              {isRemoving ? "Removing..." : "Remove"}
-                            </button>
-                          </div>
+                            {/* Item Total and Quantity Controls */}
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <span className="text-sm font-semibold text-gray-900">
+                                  ₹{itemTotal.toFixed(2)}
+                                </span>
+                                {itemMrp > itemPrice && (
+                                  <span className="ml-2 text-xs text-green-600">
+                                    Save ₹
+                                    {(
+                                      (itemMrp - itemPrice) *
+                                      itemQuantity
+                                    ).toFixed(2)}
+                                  </span>
+                                )}
+                              </div>
 
-                          {/* Checkout indicator */}
-                          {item.isFromCheckout && (
-                            <div className="mt-2 flex items-center gap-1 text-xs text-blue-600">
-                              <svg
-                                className="w-3 h-3"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                              <span>Live pricing</span>
+                              {/* Quantity Stepper */}
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1 bg-black text-white rounded px-2 py-1">
+                                  <button
+                                    onClick={() =>
+                                      handleDecrementQuantity(
+                                        item.productId,
+                                        cart.cartId
+                                      )
+                                    }
+                                    disabled={isUpdating}
+                                    className="cursor-pointer w-6 h-6 flex items-center justify-center hover:bg-gray-700 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    <span className="text-sm font-bold">−</span>
+                                  </button>
+                                  <span className="min-w-[24px] text-center text-sm font-semibold">
+                                    {item.quantity}
+                                  </span>
+                                  <button
+                                    onClick={() =>
+                                      handleIncrementQuantity(item)
+                                    }
+                                    disabled={isUpdating}
+                                    className="cursor-pointer w-6 h-6 flex items-center justify-center hover:bg-gray-700 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    <span className="text-sm font-bold">+</span>
+                                  </button>
+                                </div>
+
+                                {/* Remove Button (Trash Icon) */}
+                                <button
+                                  onClick={() =>
+                                    handleRemoveItem(
+                                      item.productId,
+                                      cart.cartId
+                                    )
+                                  }
+                                  disabled={isUpdating}
+                                  className="text-red-600 hover:text-red-700 disabled:opacity-50 transition-colors p-1"
+                                  title="Remove from cart"
+                                >
+                                  <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
                             </div>
-                          )}
+
+                            {/* Checkout indicator */}
+                            {item.isFromCheckout && (
+                              <div className="mt-2 flex items-center gap-1 text-xs text-blue-600">
+                                <svg
+                                  className="w-3 h-3"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                                <span>Live pricing</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
 
               {/* Order Summary */}
@@ -516,150 +732,185 @@ export default function CartPage() {
                   )}
                 </div>
 
-                <div className="space-y-2 mb-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="text-gray-900">
-                      ₹{pricingInfo.subtotal.toFixed(2)}
-                    </span>
+                {/* Loading skeleton for order summary */}
+                {isLoading && !checkoutCart && (
+                  <div className="space-y-2 mb-3 animate-pulse">
+                    <div className="flex items-center justify-between">
+                      <div className="h-4 bg-gray-200 rounded w-20"></div>
+                      <div className="h-4 bg-gray-200 rounded w-16"></div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="h-4 bg-gray-200 rounded w-24"></div>
+                      <div className="h-4 bg-gray-200 rounded w-16"></div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="h-4 bg-gray-200 rounded w-28"></div>
+                      <div className="h-4 bg-gray-200 rounded w-16"></div>
+                    </div>
+                    <div className="pt-3 border-t border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div className="h-5 bg-gray-200 rounded w-16"></div>
+                        <div className="h-6 bg-gray-200 rounded w-20"></div>
+                      </div>
+                    </div>
                   </div>
+                )}
 
-                  {pricingInfo.discount > 0 && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Discount</span>
-                      <span className="text-green-600">
-                        -₹{pricingInfo.discount.toFixed(2)}
-                      </span>
-                    </div>
-                  )}
+                {/* Actual order summary */}
+                {(!isLoading || checkoutCart) && (
+                  <>
+                    <div className="space-y-2 mb-3">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Subtotal</span>
+                        <span className="text-gray-900">
+                          ₹{pricingInfo.subtotal.toFixed(2)}
+                        </span>
+                      </div>
 
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Delivery Fee</span>
-                    <span className="text-gray-900">
-                      {pricingInfo.deliveryFee === 0 ? (
-                        <span className="text-green-600 font-medium">FREE</span>
-                      ) : (
-                        `₹${pricingInfo.deliveryFee.toFixed(2)}`
-                      )}
-                    </span>
-                  </div>
-
-                  {pricingInfo.surgeCharge > 0 && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Rain Surge Charge</span>
-                      <span className="text-gray-900">
-                        ₹{pricingInfo.surgeCharge.toFixed(2)}
-                      </span>
-                    </div>
-                  )}
-
-                  {pricingInfo.slotCharge > 0 && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Slot Charge</span>
-                      <span className="text-gray-900">
-                        ₹{pricingInfo.slotCharge.toFixed(2)}
-                      </span>
-                    </div>
-                  )}
-
-                  {pricingInfo.handlingCharge > 0 && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Handling Charge</span>
-                      <span className="text-gray-900">
-                        ₹{pricingInfo.handlingCharge.toFixed(2)}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Additional charges from checkout data */}
-                  {checkoutCart?.cart_data?.bill_details && (
-                    <>
-                      {checkoutCart.cart_data.bill_details
-                        .gifting_services_charge &&
-                        checkoutCart.cart_data.bill_details
-                          .gifting_services_charge > 0 && (
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">
-                              Gifting Services
-                            </span>
-                            <span className="text-gray-900">
-                              ₹
-                              {checkoutCart.cart_data.bill_details.gifting_services_charge.toFixed(
-                                2
-                              )}
-                            </span>
-                          </div>
-                        )}
-
-                      {checkoutCart.cart_data.bill_details.payable_amount &&
-                        checkoutCart.cart_data.bill_details.payable_amount !==
-                          checkoutCart.cart_data.bill_details.bill_total && (
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">
-                              Payable Amount
-                            </span>
-                            <span className="text-gray-900">
-                              ₹
-                              {checkoutCart.cart_data.bill_details.payable_amount.toFixed(
-                                2
-                              )}
-                            </span>
-                          </div>
-                        )}
-                    </>
-                  )}
-                </div>
-
-                <div className="pt-3 border-t border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <span className="text-base font-semibold text-gray-900">
-                      {pricingInfo.payableAmount !== pricingInfo.total
-                        ? "Payable Amount"
-                        : "Total"}
-                    </span>
-                    <span className="text-lg font-bold text-gray-900">
-                      ₹{pricingInfo.payableAmount.toFixed(2)}
-                    </span>
-                  </div>
-
-                  {/* Show breakdown if payable amount differs from bill total */}
-                  {checkoutCart?.cart_data?.bill_details?.payable_amount &&
-                    checkoutCart.cart_data.bill_details.payable_amount !==
-                      checkoutCart.cart_data.bill_details.bill_total && (
-                      <div className="mt-2 pt-2 border-t border-gray-100">
+                      {pricingInfo.discount > 0 && (
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">
-                            Final Amount to Pay
-                          </span>
-                          <span className="text-base font-semibold text-gray-900">
-                            ₹
-                            {checkoutCart.cart_data.bill_details.payable_amount.toFixed(
-                              2
-                            )}
+                          <span className="text-gray-600">Discount</span>
+                          <span className="text-green-600">
+                            -₹{pricingInfo.discount.toFixed(2)}
                           </span>
                         </div>
+                      )}
+
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Delivery Fee</span>
+                        <span className="text-gray-900">
+                          {pricingInfo.deliveryFee === 0 ? (
+                            <span className="text-green-600 font-medium">
+                              FREE
+                            </span>
+                          ) : (
+                            `₹${pricingInfo.deliveryFee.toFixed(2)}`
+                          )}
+                        </span>
+                      </div>
+
+                      {pricingInfo.surgeCharge > 0 && (
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">
+                            Rain Surge Charge
+                          </span>
+                          <span className="text-gray-900">
+                            ₹{pricingInfo.surgeCharge.toFixed(2)}
+                          </span>
+                        </div>
+                      )}
+
+                      {pricingInfo.slotCharge > 0 && (
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Slot Charge</span>
+                          <span className="text-gray-900">
+                            ₹{pricingInfo.slotCharge.toFixed(2)}
+                          </span>
+                        </div>
+                      )}
+
+                      {pricingInfo.handlingCharge > 0 && (
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Handling Charge</span>
+                          <span className="text-gray-900">
+                            ₹{pricingInfo.handlingCharge.toFixed(2)}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Additional charges from checkout data */}
+                      {checkoutCart?.cart_data?.bill_details && (
+                        <>
+                          {checkoutCart.cart_data.bill_details
+                            .gifting_services_charge &&
+                            checkoutCart.cart_data.bill_details
+                              .gifting_services_charge > 0 && (
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-gray-600">
+                                  Gifting Services
+                                </span>
+                                <span className="text-gray-900">
+                                  ₹
+                                  {checkoutCart.cart_data.bill_details.gifting_services_charge.toFixed(
+                                    2
+                                  )}
+                                </span>
+                              </div>
+                            )}
+
+                          {checkoutCart.cart_data.bill_details.payable_amount &&
+                            checkoutCart.cart_data.bill_details
+                              .payable_amount !==
+                              checkoutCart.cart_data.bill_details
+                                .bill_total && (
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-gray-600">
+                                  Payable Amount
+                                </span>
+                                <span className="text-gray-900">
+                                  ₹
+                                  {checkoutCart.cart_data.bill_details.payable_amount.toFixed(
+                                    2
+                                  )}
+                                </span>
+                              </div>
+                            )}
+                        </>
+                      )}
+                    </div>
+
+                    <div className="pt-3 border-t border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <span className="text-base font-semibold text-gray-900">
+                          {pricingInfo.payableAmount !== pricingInfo.total
+                            ? "Payable Amount"
+                            : "Total"}
+                        </span>
+                        <span className="text-lg font-bold text-gray-900">
+                          ₹{pricingInfo.payableAmount.toFixed(2)}
+                        </span>
+                      </div>
+
+                      {/* Show breakdown if payable amount differs from bill total */}
+                      {checkoutCart?.cart_data?.bill_details?.payable_amount &&
+                        checkoutCart.cart_data.bill_details.payable_amount !==
+                          checkoutCart.cart_data.bill_details.bill_total && (
+                          <div className="mt-2 pt-2 border-t border-gray-100">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600">
+                                Final Amount to Pay
+                              </span>
+                              <span className="text-base font-semibold text-gray-900">
+                                ₹
+                                {checkoutCart.cart_data.bill_details.payable_amount.toFixed(
+                                  2
+                                )}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                    </div>
+
+                    {/* Pricing source indicator */}
+                    {pricingInfo.isFromCheckout && (
+                      <div className="mt-2 pt-2 border-t border-gray-100">
+                        <p className="text-xs text-green-600 flex items-center gap-1">
+                          <svg
+                            className="w-3 h-3"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Final pricing confirmed
+                        </p>
                       </div>
                     )}
-                </div>
-
-                {/* Pricing source indicator */}
-                {pricingInfo.isFromCheckout && (
-                  <div className="mt-2 pt-2 border-t border-gray-100">
-                    <p className="text-xs text-green-600 flex items-center gap-1">
-                      <svg
-                        className="w-3 h-3"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Final pricing confirmed
-                    </p>
-                  </div>
+                  </>
                 )}
               </div>
 
@@ -705,13 +956,20 @@ export default function CartPage() {
                 <button
                   onClick={handleCheckout}
                   className="px-8 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={isLoading || isCheckingOut || !checkoutCart}
+                  disabled={
+                    isLoading ||
+                    isCheckingOut ||
+                    !checkoutCart ||
+                    !selectedAddress
+                  }
                 >
                   {isCheckingOut ? (
                     <span className="flex items-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b border-white"></div>
                       Processing...
                     </span>
+                  ) : !selectedAddress ? (
+                    "Select Address"
                   ) : !checkoutCart ? (
                     "Loading..."
                   ) : (
@@ -722,6 +980,14 @@ export default function CartPage() {
               <p className="text-xs text-gray-500 text-center">
                 Estimated delivery in {estimatedDelivery}
               </p>
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <p className="text-xs text-gray-600 text-center">
+                  <span className="font-semibold">Cancellation Policy:</span>{" "}
+                  Orders cannot be cancelled once packed for delivery. In case
+                  of unexpected delays, a refund will be provided, if
+                  applicable.
+                </p>
+              </div>
             </div>
           </div>
         )}

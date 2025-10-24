@@ -10,7 +10,7 @@ import { apiService } from "@/lib/api";
  * This component should be mounted in the root layout
  */
 export function AppInitializer({ children }: { children: React.ReactNode }) {
-  const { user, setUser, setLoading } = useAppStore();
+  const { user, setUser, setLoading, selectedAddress, setSelectedAddress } = useAppStore();
   const { fetchCart } = useCartStore();
   const hasInitialized = useRef(false);
 
@@ -55,6 +55,14 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
     // Run initialization
     initializeApp();
   }, [user?.id]); // Only re-run if user ID changes
+
+  // Ensure selectedAddress is always set to user's default address if not already set
+  useEffect(() => {
+    if (user?.addresses && user.addresses.length > 0 && !selectedAddress) {
+      console.log("📍 Setting selectedAddress to user's default address");
+      setSelectedAddress(user.addresses[user.defaultAddressIndex || 0]);
+    }
+  }, [user, selectedAddress, setSelectedAddress]);
 
   return <>{children}</>;
 }

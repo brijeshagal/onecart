@@ -1,29 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { User, AppState, AddressData, UISuggestion } from '@/types';
-
-// Helper function to convert AddressData to UISuggestion
-const addressDataToUISuggestion = (address: AddressData): UISuggestion => {
-  return {
-    title: {
-      text: address.name || address.label || "Address",
-      color: { type: "black", tint: "900" },
-      font: { size: "400", weight: "medium" },
-    },
-    subtitle: {
-      text: address.display_address,
-      color: { type: "grey", tint: "700" },
-      font: { size: "300", weight: "regular" },
-    },
-    left_image: {
-      url: "https://cdn.grofers.com/layout-engine/v2/2025-01/address_other_icon_v4_1/light.png",
-    },
-    meta: {
-      place_id: `address-${address.id}`,
-      session_token: `session-${Date.now()}`,
-    },
-  };
-};
+import { User, AppState, AddressData } from '@/types';
 
 // Default user data based on backend User type and API documentation
 const defaultUser: User = {
@@ -114,25 +91,25 @@ export const useAppStore = create<AppState>()(
         lat: 28.4652382,
         lng: 77.0615957,
       },
-      // Initialize deliveryAddress from default user's first address
-      deliveryAddress: defaultUser.addresses && defaultUser.addresses.length > 0
-        ? addressDataToUISuggestion(defaultUser.addresses[defaultUser.defaultAddressIndex || 0])
+      // Initialize selectedAddress from default user's first address
+      selectedAddress: defaultUser.addresses && defaultUser.addresses.length > 0
+        ? defaultUser.addresses[defaultUser.defaultAddressIndex || 0]
         : null,
       searchResults: [],
 
       // Actions
       setUser: (user: User | null) => {
-        // When user is set, also update delivery address from their default address
-        const deliveryAddress = user?.addresses && user.addresses.length > 0
-          ? addressDataToUISuggestion(user.addresses[user.defaultAddressIndex || 0])
+        // When user is set, also update selected address from their default address
+        const selectedAddress = user?.addresses && user.addresses.length > 0
+          ? user.addresses[user.defaultAddressIndex || 0]
           : null;
-        set({ user, isAuthenticated: !!user, deliveryAddress });
+        set({ user, isAuthenticated: !!user, selectedAddress });
       },
       setAuthenticated: (authenticated: boolean) => set({ isAuthenticated: authenticated }),
       setLoading: (loading: boolean) => set({ isLoading: loading }),
       setError: (error: string | null) => set({ error }),
       setCurrentLocation: (location) => set({ currentLocation: location }),
-      setDeliveryAddress: (address: UISuggestion | null) => set({ deliveryAddress: address }),
+      setSelectedAddress: (address: AddressData | null) => set({ selectedAddress: address }),
       setSearchResults: (results) => set({ searchResults: results }),
 
       clearState: () => set({
@@ -144,8 +121,8 @@ export const useAppStore = create<AppState>()(
           lat: 28.4652382,
           lng: 77.0615957,
         },
-        deliveryAddress: defaultUser.addresses && defaultUser.addresses.length > 0
-          ? addressDataToUISuggestion(defaultUser.addresses[defaultUser.defaultAddressIndex || 0])
+        selectedAddress: defaultUser.addresses && defaultUser.addresses.length > 0
+          ? defaultUser.addresses[defaultUser.defaultAddressIndex || 0]
           : null,
         searchResults: [],
       }),
@@ -156,7 +133,7 @@ export const useAppStore = create<AppState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
         currentLocation: state.currentLocation,
-        deliveryAddress: state.deliveryAddress,
+        selectedAddress: state.selectedAddress,
       }),
     }
   )
@@ -168,5 +145,5 @@ export const useIsAuthenticated = () => useAppStore((state) => state.isAuthentic
 export const useIsLoading = () => useAppStore((state) => state.isLoading);
 export const useError = () => useAppStore((state) => state.error);
 export const useCurrentLocation = () => useAppStore((state) => state.currentLocation);
-export const useDeliveryAddress = () => useAppStore((state) => state.deliveryAddress);
+export const useSelectedAddress = () => useAppStore((state) => state.selectedAddress);
 export const useSearchResults = () => useAppStore((state) => state.searchResults);

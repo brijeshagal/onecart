@@ -59,7 +59,7 @@ export function AddressModal({
         }
       };
 
-      const timeoutId = setTimeout(searchLocations, 400); // Debounce
+      const timeoutId = setTimeout(searchLocations, 800); // Debounce
       return () => clearTimeout(timeoutId);
     } else {
       setSuggestions([]);
@@ -73,8 +73,8 @@ export function AddressModal({
     const address: AddressData = {
       id: Date.now(),
       name: suggestion.title.text,
-      label: "Home",
-      label_id: "home",
+      label: "",
+      label_id: "",
       line1: suggestion.title.text,
       line2: suggestion.subtitle?.text || "",
       display_address: `${suggestion.title.text}${
@@ -115,10 +115,10 @@ export function AddressModal({
         floor: "",
         phone: "",
         landmark: "",
-        tags: "home",
+        tags: "",
         template_id: 1,
         alias_id: 0,
-        name: "Home",
+        name: "",
       },
     };
 
@@ -174,7 +174,7 @@ export function AddressModal({
             <div className="mt-2 border border-gray-200 rounded-lg max-h-48 overflow-y-auto bg-white">
               {suggestions.map((suggestion, index) => (
                 <button
-                  key={index}
+                  key={index.toString()}
                   type="button"
                   onClick={() => handleSuggestionSelect(suggestion)}
                   className="cursor-pointer w-full text-left p-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors"
@@ -209,9 +209,9 @@ export function AddressModal({
               Saved Addresses
             </p>
             <div className="space-y-2">
-              {savedAddresses.map((addr) => (
+              {savedAddresses.map((addr, index) => (
                 <button
-                  key={addr.id}
+                  key={addr.id + index.toString()}
                   onClick={() => handleSavedAddressSelect(addr)}
                   className="w-full text-left p-3 border border-gray-200 rounded-lg hover:border-black hover:bg-gray-50 transition text-sm"
                 >

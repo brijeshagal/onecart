@@ -64,7 +64,7 @@ export const AddressSearch: React.FC<AddressSearchProps> = ({
         }
       };
 
-      const timeoutId = setTimeout(searchLocations, 400); // Debounce
+      const timeoutId = setTimeout(searchLocations, 800); // Debounce
       return () => clearTimeout(timeoutId);
     } else {
       setSuggestions([]);

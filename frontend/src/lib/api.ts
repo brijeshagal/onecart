@@ -1,4 +1,5 @@
 import {
+  AddressData,
   AddToCartRequest,
   AddToCartResponse,
   ApiResponse,
@@ -121,11 +122,12 @@ class ApiService {
 
   async removeFromCart(
     userId: string,
-    productId: string
+    productId: string,
+    cartId: string
   ): Promise<ApiResponse<any>> {
     try {
-      const response = await this.client.delete<ApiResponse<any>>(
-        `/cart/${userId}/${productId}`
+      const response = await this.client.get<ApiResponse<any>>(
+        `/cart/remove/${userId}/${cartId}/${productId}`
       );
       return this.handleResponse(response);
     } catch (error) {
@@ -146,12 +148,15 @@ class ApiService {
 
   async getCartCheckoutDetails(
     userId: string,
-    cartId: string
+    cartId: string,
+    receiveAddress: AddressData
   ): Promise<ApiResponse<CheckoutCartResponse>> {
     try {
-      const response = await this.client.get<ApiResponse<CheckoutCartResponse>>(
-        `/cart/checkout/${userId}/${cartId}`
-      );
+      const response = await this.client.post<
+        ApiResponse<CheckoutCartResponse>
+      >(`/cart/checkout/${userId}/${cartId}`, {
+        receiveAddress,
+      });
       return this.handleResponse(response);
     } catch (error) {
       return this.handleError(error);

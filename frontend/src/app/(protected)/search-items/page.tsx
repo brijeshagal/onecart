@@ -12,13 +12,14 @@ import {
   BlinkitProductResponse,
   SearchItem,
   SimplifiedCartItem,
+  UISuggestion,
 } from "@/types";
 import { useCallback, useEffect, useState } from "react";
 
 export default function SearchItemsPage() {
-  const { user, deliveryAddress, setDeliveryAddress } = useAppStore();
+  const { user, selectedAddress, setSelectedAddress } = useAppStore();
   const { cart, addToCart: addToCartStore } = useCartStore();
-  const { removeFromCart, fetchCart } = useCartActions();
+  const { removeFromCart } = useCartActions();
 
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,9 +32,6 @@ export default function SearchItemsPage() {
     lat: number;
     lng: number;
   } | null>(null);
-  const [selectedAddress, setSelectedAddress] = useState<AddressData | null>(
-    null
-  );
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
   // Pagination state
@@ -55,10 +53,9 @@ export default function SearchItemsPage() {
     [cart?.items]
   );
 
-  // Get current location on mount and set default address from store
+  // Get current location on mount
   useEffect(() => {
     const initialize = async () => {
-      // Get current location
       try {
         const result = await getCurrentLocation();
         if (result.coordinates.lat && result.coordinates.lng) {
@@ -67,15 +64,36 @@ export default function SearchItemsPage() {
       } catch (error) {
         console.error("Failed to get current location:", error);
       }
-
-      // Set default address from user's first saved address (from Zustand store)
-      if (user?.addresses && user.addresses.length > 0 && !selectedAddress) {
-        setSelectedAddress(user.addresses[0]);
-      }
     };
 
     initialize();
-  }, [user, selectedAddress]);
+  }, []);
+
+  // Helper function to convert AddressData to UISuggestion
+  const addressToUISuggestion = useCallback(
+    (address: AddressData): UISuggestion => {
+      return {
+        title: {
+          text: address.name || address.label || "Address",
+          color: { type: "black", tint: "900" },
+          font: { size: "400", weight: "medium" },
+        },
+        subtitle: {
+          text: address.display_address,
+          color: { type: "grey", tint: "700" },
+          font: { size: "300", weight: "regular" },
+        },
+        left_image: {
+          url: "https://cdn.grofers.com/layout-engine/v2/2025-01/address_other_icon_v4_1/light.png",
+        },
+        meta: {
+          place_id: `address-${address.id}`,
+          session_token: `session-${Date.now()}`,
+        },
+      };
+    },
+    []
+  );
 
   // Perform search
   const handleSearch = useCallback(async () => {
@@ -84,7 +102,7 @@ export default function SearchItemsPage() {
       return;
     }
 
-    if (!deliveryAddress) {
+    if (!selectedAddress) {
       setError("Please select a delivery address");
       return;
     }
@@ -94,12 +112,15 @@ export default function SearchItemsPage() {
     setOffset(0);
 
     try {
+      // Convert selectedAddress to UISuggestion for API call
+      const deliveryAddressForAPI = addressToUISuggestion(selectedAddress);
+
       // Make API request
       const response = await apiService.searchItems({
         query: searchQuery,
         offset: 0,
         limit,
-        newAddress: deliveryAddress,
+        newAddress: deliveryAddressForAPI,
       });
 
       if (response.success && response.data) {
@@ -118,22 +139,25 @@ export default function SearchItemsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, selectedAddress, currentLocation, limit]);
+  }, [searchQuery, selectedAddress, limit, addressToUISuggestion]);
 
   // Load more items
   const handleLoadMore = useCallback(async () => {
-    if (!deliveryAddress) return;
+    if (!selectedAddress) return;
 
     const nextOffset = offset + limit;
     setIsLoading(true);
     setError(null);
 
     try {
+      // Convert selectedAddress to UISuggestion for API call
+      const deliveryAddressForAPI = addressToUISuggestion(selectedAddress);
+
       const response = await apiService.searchItems({
         query: searchQuery,
         offset: nextOffset,
         limit,
-        newAddress: deliveryAddress,
+        newAddress: deliveryAddressForAPI,
       });
       if (response.success && response.data) {
         const responseData = response.data || [];
@@ -151,7 +175,7 @@ export default function SearchItemsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [offset, limit, searchQuery, deliveryAddress]);
+  }, [offset, limit, searchQuery, selectedAddress, addressToUISuggestion]);
 
   // Add to cart handler
   const handleAddToCart = async (item: SearchItem) => {
@@ -163,10 +187,9 @@ export default function SearchItemsPage() {
       const priceText = item.normal_price?.text || "0";
       const price = parseFloat(priceText.replace(/[^\d.]/g, "")) || 0;
 
-      // Get current address from deliveryAddress
-      const currentAddress = user?.addresses?.[user?.defaultAddressIndex || 0];
-      if (!currentAddress) {
-        setError("No delivery address found. Please add an address.");
+      // Use selectedAddress for cart
+      if (!selectedAddress) {
+        setError("No delivery address found. Please select an address.");
         return;
       }
 
@@ -178,7 +201,7 @@ export default function SearchItemsPage() {
       const cartRequest: AddToCartRequest = {
         senderUserId: user.id,
         receiverUserId: user.id, // For now, sender = receiver
-        receiveAddress: currentAddress,
+        receiveAddress: selectedAddress,
         items: [
           {
             productId: item.product_id,
@@ -222,14 +245,14 @@ export default function SearchItemsPage() {
   };
 
   // Decrement item quantity in cart
-  const handleDecrementQuantity = async (productId: string) => {
-    if (!user?.id) {
+  const handleDecrementQuantity = async (productId: string, cartId: string) => {
+    if (!user?.id || !cart?.cartId) {
       setError("User not found. Please log in.");
       return;
     }
 
     try {
-      const result = await removeFromCart(user.id, productId);
+      const result = await removeFromCart(user.id, productId, cartId);
 
       if (!result.success) {
         throw new Error(result.error || "Failed to remove from cart");
@@ -258,18 +281,15 @@ export default function SearchItemsPage() {
       <AddressModal
         isOpen={isAddressModalOpen}
         onClose={() => setIsAddressModalOpen(false)}
-        onSelect={(address, suggestion) => {
+        onSelect={(address) => {
           setSelectedAddress(address);
-          if (suggestion) {
-            setDeliveryAddress(suggestion);
-          }
         }}
         savedAddresses={user?.addresses || []}
         currentLocation={currentLocation || undefined}
       />
 
       {/* Main Content - Mobile design centered on desktop with white space */}
-      <main className="max-w-md mx-auto px-4 py-6 pt-24 border-x border-gray-200 min-h-screen bg-white">
+      <main className="max-w-md mx-auto px-4 py-6 pt-24 pb-24 border-x border-gray-200 min-h-screen bg-white">
         {/* Search Bar */}
         <div className="mb-8 flex gap-2">
           <input
@@ -282,7 +302,7 @@ export default function SearchItemsPage() {
           />
           <button
             onClick={handleSearch}
-            disabled={isLoading || !deliveryAddress}
+            disabled={isLoading || !selectedAddress}
             className="cursor-pointer px-6 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Searching..." : "Search"}
@@ -384,94 +404,99 @@ export default function SearchItemsPage() {
                                 {item.data.normal_price?.text || "—"}
                               </p>
                               {/* Add to Cart Button or Quantity Stepper */}
-                              {(() => {
-                                const quantityInCart = getItemQuantityInCart(
-                                  item.data.product_id
-                                );
+                              {cart &&
+                                (() => {
+                                  const quantityInCart = getItemQuantityInCart(
+                                    item.data.product_id
+                                  );
 
-                                if (quantityInCart > 0) {
-                                  // Show quantity stepper
-                                  return (
-                                    <div className="flex items-center gap-2 bg-black text-white rounded px-2 py-1">
-                                      <button
-                                        onClick={() =>
-                                          handleDecrementQuantity(
-                                            item.data.product_id
-                                          )
-                                        }
-                                        className="w-5 h-5 flex items-center justify-center hover:bg-gray-700 rounded transition-colors"
-                                      >
-                                        <span className="text-sm font-bold">
-                                          −
-                                        </span>
-                                      </button>
-                                      <span className="min-w-[20px] text-center text-xs font-semibold">
-                                        {quantityInCart}
-                                      </span>
-                                      <button
-                                        onClick={() =>
-                                          handleIncrementQuantity(item.data)
-                                        }
-                                        disabled={item.data.is_sold_out}
-                                        className="w-5 h-5 flex items-center justify-center hover:bg-gray-700 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                      >
-                                        <span className="text-sm font-bold">
-                                          +
-                                        </span>
-                                      </button>
-                                    </div>
-                                  );
-                                } else {
-                                  // Show Add button
-                                  return (
-                                    <div className="flex items-center justify-center gap-1">
-                                      {item.data.is_sold_out ? (
+                                  if (quantityInCart > 0) {
+                                    // Show quantity stepper
+                                    return (
+                                      <div className="flex items-center gap-2 bg-black text-white rounded px-2 py-1">
                                         <button
                                           onClick={() =>
-                                            handleAddToCart(item.data)
+                                            handleDecrementQuantity(
+                                              item.data.product_id,
+                                              cart.cartId
+                                            )
+                                          }
+                                          className="w-5 h-5 flex items-center justify-center hover:bg-gray-700 rounded transition-colors"
+                                        >
+                                          <span className="text-sm font-bold">
+                                            −
+                                          </span>
+                                        </button>
+                                        <span className="min-w-[20px] text-center text-xs font-semibold">
+                                          {quantityInCart}
+                                        </span>
+                                        <button
+                                          onClick={() =>
+                                            handleIncrementQuantity(item.data)
                                           }
                                           disabled={item.data.is_sold_out}
-                                          className="cursor-pointer px-3 py-1.5 bg-black text-white text-xs font-medium rounded hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                                          className="w-5 h-5 flex items-center justify-center hover:bg-gray-700 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                          Out of Stock
-                                        </button>
-                                      ) : cartQuantity > 0 ? (
-                                        <div className="flex items-center gap-2">
-                                          <button
-                                            onClick={() =>
-                                              handleDecrementQuantity(
-                                                item.data.product_id
-                                              )
-                                            }
-                                            className="cursor-pointer"
-                                          >
-                                            -
-                                          </button>
-                                          <span>{cartQuantity}</span>
-                                          <button
-                                            onClick={() =>
-                                              handleIncrementQuantity(item.data)
-                                            }
-                                            className="cursor-pointer"
-                                          >
+                                          <span className="text-sm font-bold">
                                             +
-                                          </button>
-                                        </div>
-                                      ) : (
-                                        <button
-                                          onClick={() =>
-                                            handleAddToCart(item.data)
-                                          }
-                                          disabled={item.data.is_sold_out}
-                                          className="cursor-pointer px-3 py-1.5 bg-black text-white text-xs font-medium rounded hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
-                                        >
-                                          Add
+                                          </span>
                                         </button>
-                                      )}
-                                    </div>
-                                  );
-                                }
-                              })()}
+                                      </div>
+                                    );
+                                  } else {
+                                    // Show Add button
+                                    return (
+                                      <div className="flex items-center justify-center gap-1">
+                                        {item.data.is_sold_out ? (
+                                          <button
+                                            onClick={() =>
+                                              handleAddToCart(item.data)
+                                            }
+                                            disabled={item.data.is_sold_out}
+                                            className="cursor-pointer px-3 py-1.5 bg-black text-white text-xs font-medium rounded hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                                          >
+                                            Out of Stock
+                                          </button>
+                                        ) : cartQuantity > 0 && cart ? (
+                                          <div className="flex items-center gap-2">
+                                            <button
+                                              onClick={() =>
+                                                handleDecrementQuantity(
+                                                  item.data.product_id,
+                                                  cart.cartId
+                                                )
+                                              }
+                                              className="cursor-pointer"
+                                            >
+                                              -
+                                            </button>
+                                            <span>{cartQuantity}</span>
+                                            <button
+                                              onClick={() =>
+                                                handleIncrementQuantity(
+                                                  item.data
+                                                )
+                                              }
+                                              className="cursor-pointer"
+                                            >
+                                              +
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <button
+                                            onClick={() =>
+                                              handleAddToCart(item.data)
+                                            }
+                                            disabled={item.data.is_sold_out}
+                                            className="cursor-pointer px-3 py-1.5 bg-black text-white text-xs font-medium rounded hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                                          >
+                                            Add
+                                          </button>
+                                        )}
+                                      </div>
+                                    );
+                                  }
+                                })()}
                             </div>
                           </div>
                         </div>

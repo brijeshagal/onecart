@@ -7,11 +7,15 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
+// Force dynamic rendering since this page uses search params
+export const dynamic = "force-dynamic";
+
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
-  const txHash = searchParams?.get("txHash") || null;
-  const orderId = searchParams?.get("orderId") || null;
-  const paymentId = searchParams?.get("paymentId") || null;
+  // Handle null searchParams during build
+  const txHash = (searchParams && searchParams.get("txHash")) || null;
+  const orderId = (searchParams && searchParams.get("orderId")) || null;
+  const paymentId = (searchParams && searchParams.get("paymentId")) || null;
 
   const { selectedAddress } = useAppStore();
   const checkoutCart = useCheckoutCart();

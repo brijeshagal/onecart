@@ -5,14 +5,17 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 
+// Force dynamic rendering since this page uses search params
+export const dynamic = "force-dynamic";
+
 function PaymentFailedContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [countdown, setCountdown] = useState(5);
 
-  // Get error details from URL params
-  const errorMessage = searchParams?.get("error") || "Payment failed. Please try again.";
-  const paymentMethod = searchParams?.get("method") || "payment";
+  // Get error details from URL params - handle null searchParams during build
+  const errorMessage = (searchParams && searchParams.get("error")) || "Payment failed. Please try again.";
+  const paymentMethod = (searchParams && searchParams.get("method")) || "payment";
 
   // Countdown and auto-redirect
   useEffect(() => {

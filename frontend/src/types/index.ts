@@ -638,7 +638,7 @@ export interface AppState {
 
   // Location state
   currentLocation: { lat: number; lng: number } | null;
-  selectedAddress: AddressData | null; // User-selected address (can differ from default)
+  selectedAddress: AddressData; // User-selected address (can differ from default)
   searchResults: UISuggestion[];
 
   // Actions
@@ -647,7 +647,7 @@ export interface AppState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setCurrentLocation: (location: { lat: number; lng: number } | null) => void;
-  setSelectedAddress: (address: AddressData | null) => void;
+  setSelectedAddress: (address: AddressData) => void;
   setSearchResults: (results: UISuggestion[]) => void;
   clearState: () => void;
 }

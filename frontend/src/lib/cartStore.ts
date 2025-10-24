@@ -117,6 +117,7 @@ export const useCartStore = create<CartState>()(
 
           if (response.success && response.data) {
             // If cart exists, set it
+            console.log("Fetched cart: ", response.data);
             if (response.data.cartId) {
               set({
                 cart: response.data as Cart,
@@ -320,6 +321,7 @@ export const useCartStore = create<CartState>()(
       name: "cart-store",
       partialize: (state) => ({
         cart: state.cart,
+        checkoutCart: state.checkoutCart,
       }),
     }
   )

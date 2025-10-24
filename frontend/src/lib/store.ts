@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { User, AppState, AddressData } from '@/types';
+import { AddressData, AppState, User } from "@/types";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 // Default user data based on backend User type and API documentation
 const defaultUser: User = {
@@ -92,43 +92,45 @@ export const useAppStore = create<AppState>()(
         lng: 77.0615957,
       },
       // Initialize selectedAddress from default user's first address
-      selectedAddress: defaultUser.addresses && defaultUser.addresses.length > 0
-        ? defaultUser.addresses[defaultUser.defaultAddressIndex || 0]
-        : null,
+      selectedAddress:
+        defaultUser.addresses[defaultUser.defaultAddressIndex || 0],
       searchResults: [],
 
       // Actions
       setUser: (user: User | null) => {
         // When user is set, also update selected address from their default address
-        const selectedAddress = user?.addresses && user.addresses.length > 0
-          ? user.addresses[user.defaultAddressIndex || 0]
-          : null;
+        const selectedAddress =
+          user?.addresses && user.addresses.length > 0
+            ? user.addresses[user.defaultAddressIndex || 0]
+            : defaultUser.addresses[defaultUser.defaultAddressIndex || 0];
         set({ user, isAuthenticated: !!user, selectedAddress });
       },
-      setAuthenticated: (authenticated: boolean) => set({ isAuthenticated: authenticated }),
+      setAuthenticated: (authenticated: boolean) =>
+        set({ isAuthenticated: authenticated }),
       setLoading: (loading: boolean) => set({ isLoading: loading }),
       setError: (error: string | null) => set({ error }),
       setCurrentLocation: (location) => set({ currentLocation: location }),
-      setSelectedAddress: (address: AddressData | null) => set({ selectedAddress: address }),
+      setSelectedAddress: (address: AddressData) =>
+        set({ selectedAddress: address }),
       setSearchResults: (results) => set({ searchResults: results }),
 
-      clearState: () => set({
-        user: defaultUser,
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-        currentLocation: {
-          lat: 28.4652382,
-          lng: 77.0615957,
-        },
-        selectedAddress: defaultUser.addresses && defaultUser.addresses.length > 0
-          ? defaultUser.addresses[defaultUser.defaultAddressIndex || 0]
-          : null,
-        searchResults: [],
-      }),
+      clearState: () =>
+        set({
+          user: defaultUser,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+          currentLocation: {
+            lat: 28.4652382,
+            lng: 77.0615957,
+          },
+          selectedAddress:
+            defaultUser.addresses[defaultUser.defaultAddressIndex || 0],
+          searchResults: [],
+        }),
     }),
     {
-      name: 'onecart-store',
+      name: "onecart-store",
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
@@ -141,9 +143,13 @@ export const useAppStore = create<AppState>()(
 
 // Convenience hooks
 export const useUser = () => useAppStore((state) => state.user);
-export const useIsAuthenticated = () => useAppStore((state) => state.isAuthenticated);
+export const useIsAuthenticated = () =>
+  useAppStore((state) => state.isAuthenticated);
 export const useIsLoading = () => useAppStore((state) => state.isLoading);
 export const useError = () => useAppStore((state) => state.error);
-export const useCurrentLocation = () => useAppStore((state) => state.currentLocation);
-export const useSelectedAddress = () => useAppStore((state) => state.selectedAddress);
-export const useSearchResults = () => useAppStore((state) => state.searchResults);
+export const useCurrentLocation = () =>
+  useAppStore((state) => state.currentLocation);
+export const useSelectedAddress = () =>
+  useAppStore((state) => state.selectedAddress);
+export const useSearchResults = () =>
+  useAppStore((state) => state.searchResults);

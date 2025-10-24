@@ -18,7 +18,6 @@ export default function CartPage() {
   const { user, selectedAddress, setSelectedAddress } = useAppStore();
   const cart = useCart();
   const checkoutCart = useCheckoutCart();
-  console.log(checkoutCart);
   const {
     decrementProductQuantity,
     incrementProductQuantity,
@@ -35,10 +34,9 @@ export default function CartPage() {
     lat: number;
     lng: number;
   } | null>(null);
-  
+
   // Local mutable copy of checkoutCart for UI updates
   const [localCheckoutCart, setLocalCheckoutCart] = useState<any>(null);
-  
   // Sync localCheckoutCart with global checkoutCart
   useEffect(() => {
     if (checkoutCart) {
@@ -99,9 +97,9 @@ export default function CartPage() {
     }
 
     // Fallback to BillDetailsWidget parsing
-    const billWidget = localCheckoutCart.objects.find((obj) => obj.type === 118) as
-      | BillDetailsWidget
-      | undefined;
+    const billWidget = localCheckoutCart.objects.find(
+      (obj) => obj.type === 118
+    ) as BillDetailsWidget | undefined;
 
     if (!billWidget) {
       return null;
@@ -194,7 +192,7 @@ export default function CartPage() {
       .map((item) => {
         const productId = item.product_id.toString();
         const cartQuantity = cartItemsMap.get(productId);
-        
+
         // If item was removed from cart, don't display it
         if (cartQuantity === undefined) {
           return null;
@@ -209,7 +207,10 @@ export default function CartPage() {
           imageUrl: item.image_url || item.png_image_url || "",
           brand: item.brand,
           unit: item.unit,
-          totalPrice: typeof item.total_price === "number" ? item.total_price : item.price * cartQuantity,
+          totalPrice:
+            typeof item.total_price === "number"
+              ? item.total_price
+              : item.price * cartQuantity,
           isFromCheckout: true,
         };
       })
@@ -235,25 +236,27 @@ export default function CartPage() {
 
     try {
       await incrementProductQuantity(user.id, item.productId, cart.cartId);
-      
+
       // Update localCheckoutCart totals
       if (localCheckoutCart?.cart_data?.bill_details) {
         setLocalCheckoutCart((prev: any) => {
           if (!prev) return prev;
           const updated = JSON.parse(JSON.stringify(prev));
           const billDetails = updated.cart_data.bill_details;
-          
+
           // Add item price to totals
           const itemPrice = item.price || 0;
           billDetails.total_cost = (billDetails.total_cost || 0) + itemPrice;
           billDetails.bill_total = (billDetails.bill_total || 0) + itemPrice;
-          billDetails.payable_amount = (billDetails.payable_amount || billDetails.bill_total || 0) + itemPrice;
+          billDetails.payable_amount =
+            (billDetails.payable_amount || billDetails.bill_total || 0) +
+            itemPrice;
           billDetails.total_items = (billDetails.total_items || 0) + 1;
-          
+
           return updated;
         });
       }
-      
+
       setUpdatingItems((prev) => {
         const newSet = new Set(prev);
         newSet.delete(item.productId);
@@ -281,24 +284,37 @@ export default function CartPage() {
 
     try {
       await decrementProductQuantity(user.id, productId, cartId);
-      
+
       // Update localCheckoutCart totals
       if (localCheckoutCart?.cart_data?.bill_details) {
         setLocalCheckoutCart((prev: any) => {
           if (!prev) return prev;
           const updated = JSON.parse(JSON.stringify(prev));
           const billDetails = updated.cart_data.bill_details;
-          
+
           // Subtract item price from totals
-          billDetails.total_cost = Math.max(0, (billDetails.total_cost || 0) - itemPrice);
-          billDetails.bill_total = Math.max(0, (billDetails.bill_total || 0) - itemPrice);
-          billDetails.payable_amount = Math.max(0, (billDetails.payable_amount || billDetails.bill_total || 0) - itemPrice);
-          billDetails.total_items = Math.max(0, (billDetails.total_items || 0) - 1);
-          
+          billDetails.total_cost = Math.max(
+            0,
+            (billDetails.total_cost || 0) - itemPrice
+          );
+          billDetails.bill_total = Math.max(
+            0,
+            (billDetails.bill_total || 0) - itemPrice
+          );
+          billDetails.payable_amount = Math.max(
+            0,
+            (billDetails.payable_amount || billDetails.bill_total || 0) -
+              itemPrice
+          );
+          billDetails.total_items = Math.max(
+            0,
+            (billDetails.total_items || 0) - 1
+          );
+
           return updated;
         });
       }
-      
+
       setUpdatingItems((prev) => {
         const newSet = new Set(prev);
         newSet.delete(productId);
@@ -321,29 +337,42 @@ export default function CartPage() {
     if (!window.confirm("Remove this item from cart?")) {
       return;
     }
-    
+
     // Find the item to get its price and quantity
     const item = displayItems.find((i) => i.productId === productId);
     const itemPrice = item?.price || 0;
     const itemQuantity = item?.quantity || 0;
     const totalItemPrice = itemPrice * itemQuantity;
-    
+
     try {
       await removeProductFromCart(user.id, productId, cartId);
-      
+
       // Update localCheckoutCart totals
       if (localCheckoutCart?.cart_data?.bill_details && item) {
         setLocalCheckoutCart((prev: any) => {
           if (!prev) return prev;
           const updated = JSON.parse(JSON.stringify(prev));
           const billDetails = updated.cart_data.bill_details;
-          
+
           // Subtract total item price from totals
-          billDetails.total_cost = Math.max(0, (billDetails.total_cost || 0) - totalItemPrice);
-          billDetails.bill_total = Math.max(0, (billDetails.bill_total || 0) - totalItemPrice);
-          billDetails.payable_amount = Math.max(0, (billDetails.payable_amount || billDetails.bill_total || 0) - totalItemPrice);
-          billDetails.total_items = Math.max(0, (billDetails.total_items || 0) - itemQuantity);
-          
+          billDetails.total_cost = Math.max(
+            0,
+            (billDetails.total_cost || 0) - totalItemPrice
+          );
+          billDetails.bill_total = Math.max(
+            0,
+            (billDetails.bill_total || 0) - totalItemPrice
+          );
+          billDetails.payable_amount = Math.max(
+            0,
+            (billDetails.payable_amount || billDetails.bill_total || 0) -
+              totalItemPrice
+          );
+          billDetails.total_items = Math.max(
+            0,
+            (billDetails.total_items || 0) - itemQuantity
+          );
+
           return updated;
         });
       }
@@ -405,22 +434,15 @@ export default function CartPage() {
     };
   }, [billDetails, cart?.items]);
 
-  // Handle checkout
-  const handleCheckout = async () => {
-    if (!user?.id || !cart?.cartId) return;
-
-    setIsCheckingOut(true);
-
-    try {
-      // TODO: Implement actual checkout flow
-      // This will involve creating an order, initiating payment, etc.
-      alert("Checkout functionality coming soon!");
-    } catch (error) {
-      console.error("Checkout error:", error);
-      alert("Failed to proceed with checkout");
-    } finally {
-      setIsCheckingOut(false);
+  // Handle checkout - Navigate to payment page
+  const handleCheckout = () => {
+    if (!user?.id || !cart?.cartId || !selectedAddress) {
+      alert("Please ensure all details are filled");
+      return;
     }
+
+    // Navigate to checkout page
+    window.location.href = "/checkout";
   };
 
   // If no user, redirect to register
@@ -459,10 +481,12 @@ export default function CartPage() {
         onSelect={async (address) => {
           setSelectedAddress(address);
           setIsAddressModalOpen(false);
-          
+
           // Refetch checkout details with new address since prices vary by location
           if (user?.id && cart?.cartId) {
-            console.log("📍 Address changed, refetching checkout details with new location...");
+            console.log(
+              "📍 Address changed, refetching checkout details with new location..."
+            );
             await fetchCartCheckoutDetails(user.id, address);
           }
         }}
@@ -910,7 +934,8 @@ export default function CartPage() {
                               </div>
                             )}
 
-                          {localCheckoutCart.cart_data.bill_details.payable_amount &&
+                          {localCheckoutCart.cart_data.bill_details
+                            .payable_amount &&
                             localCheckoutCart.cart_data.bill_details
                               .payable_amount !==
                               localCheckoutCart.cart_data.bill_details
@@ -944,9 +969,12 @@ export default function CartPage() {
                       </div>
 
                       {/* Show breakdown if payable amount differs from bill total */}
-                      {localCheckoutCart?.cart_data?.bill_details?.payable_amount &&
-                        localCheckoutCart.cart_data.bill_details.payable_amount !==
-                          localCheckoutCart.cart_data.bill_details.bill_total && (
+                      {localCheckoutCart?.cart_data?.bill_details
+                        ?.payable_amount &&
+                        localCheckoutCart.cart_data.bill_details
+                          .payable_amount !==
+                          localCheckoutCart.cart_data.bill_details
+                            .bill_total && (
                           <div className="mt-2 pt-2 border-t border-gray-100">
                             <div className="flex items-center justify-between text-sm">
                               <span className="text-gray-600">
@@ -1027,7 +1055,7 @@ export default function CartPage() {
                 </div>
                 <button
                   onClick={handleCheckout}
-                  className="px-8 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="cursor-pointer px-8 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={
                     isLoading ||
                     isCheckingOut ||

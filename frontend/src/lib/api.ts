@@ -13,6 +13,7 @@ import {
   User,
 } from "@/types";
 import axios, { AxiosResponse } from "axios";
+import { Cart } from "./cartStore";
 
 const API_BASE_URL = "http://localhost:4000/api";
 
@@ -56,11 +57,29 @@ class ApiService {
     }
   }
 
-  async getUserProfile(userId: string): Promise<ApiResponse<User>> {
+  async getUserProfile(
+    userId: string
+  ): Promise<ApiResponse<{ user: User; activeCart?: Cart }>> {
     try {
-      const response = await this.client.get<ApiResponse<User>>(
-        `/user/${userId}`
-      );
+      const response = await this.client.get<
+        ApiResponse<{ user: User; activeCart?: Cart }>
+      >(`/user/${userId}`);
+      return this.handleResponse(response);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  async addWalletAddress(
+    userId: string,
+    walletAddress: string
+  ): Promise<ApiResponse<{ walletAddress: string; isNew: boolean; walletAddresses: string[]; primaryWalletIndex: number }>> {
+    try {
+      const response = await this.client.post<
+        ApiResponse<{ walletAddress: string; isNew: boolean; walletAddresses: string[]; primaryWalletIndex: number }>
+      >(`/user/${userId}/wallet-address`, {
+        walletAddress,
+      });
       return this.handleResponse(response);
     } catch (error) {
       return this.handleError(error);
@@ -186,6 +205,77 @@ class ApiService {
         ApiResponse<CheckoutCartResponse>
       >(`/cart/checkout/${userId}/${cartId}`, {
         receiveAddress,
+      });
+      return this.handleResponse(response);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  // Payment APIs
+  async createRazorpayOrder(
+    amount: number,
+    cartId: string,
+    currency: string = "INR"
+  ): Promise<ApiResponse<any>> {
+    try {
+      const response = await this.client.post<ApiResponse<any>>(
+        "/payment/create-order",
+        {
+          amount,
+          cartId,
+          currency,
+        }
+      );
+      return this.handleResponse(response);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  async verifyPayment(
+    razorpay_order_id: string,
+    razorpay_payment_id: string,
+    razorpay_signature: string
+  ): Promise<ApiResponse<any>> {
+    try {
+      const response = await this.client.post<ApiResponse<any>>(
+        "/payment/verify",
+        {
+          razorpay_order_id,
+          razorpay_payment_id,
+          razorpay_signature,
+        }
+      );
+      return this.handleResponse(response);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  async getPaymentDetails(paymentId: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await this.client.get<ApiResponse<any>>(
+        `/payment/${paymentId}`
+      );
+      return this.handleResponse(response);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  async verifyCryptoPayment(
+    userId: string,
+    txHash: string,
+    expectedAmount: number
+  ): Promise<ApiResponse<{ txHash: string; sender: string; status: string; blockNumber: string }>> {
+    try {
+      const response = await this.client.post<
+        ApiResponse<{ txHash: string; sender: string; status: string; blockNumber: string }>
+      >("/payment/verify-crypto", {
+        userId,
+        txHash,
+        expectedAmount,
       });
       return this.handleResponse(response);
     } catch (error) {

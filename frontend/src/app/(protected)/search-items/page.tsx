@@ -19,7 +19,7 @@ import { useCallback, useEffect, useState } from "react";
 export default function SearchItemsPage() {
   const { user, selectedAddress, setSelectedAddress } = useAppStore();
   const { cart, addToCart: addToCartStore } = useCartStore();
-  const { removeFromCart } = useCartActions();
+  const { decrementProductQuantity } = useCartActions();
 
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -252,10 +252,10 @@ export default function SearchItemsPage() {
     }
 
     try {
-      const result = await removeFromCart(user.id, productId, cartId);
+      const result = await decrementProductQuantity(user.id, productId, cartId);
 
       if (!result.success) {
-        throw new Error(result.error || "Failed to remove from cart");
+        throw new Error(result.error || "Failed to decrement quantity");
       }
     } catch (err) {
       const errorMessage =

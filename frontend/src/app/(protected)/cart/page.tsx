@@ -19,8 +19,13 @@ export default function CartPage() {
   const cart = useCart();
   const checkoutCart = useCheckoutCart();
   console.log(checkoutCart);
-  const { removeFromCart, clearCart, fetchCartCheckoutDetails, addToCart } =
-    useCartActions();
+  const {
+    decrementProductQuantity,
+    incrementProductQuantity,
+    removeProductFromCart,
+    clearCart,
+    fetchCartCheckoutDetails,
+  } = useCartActions();
   const isLoading = useCartLoading();
 
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set());
@@ -30,6 +35,16 @@ export default function CartPage() {
     lat: number;
     lng: number;
   } | null>(null);
+  
+  // Local mutable copy of checkoutCart for UI updates
+  const [localCheckoutCart, setLocalCheckoutCart] = useState<any>(null);
+  
+  // Sync localCheckoutCart with global checkoutCart
+  useEffect(() => {
+    if (checkoutCart) {
+      setLocalCheckoutCart(JSON.parse(JSON.stringify(checkoutCart)));
+    }
+  }, [checkoutCart]);
 
   // Get current location on mount
   useEffect(() => {
@@ -65,10 +80,10 @@ export default function CartPage() {
     total: number;
     payableAmount: number;
   } | null => {
-    if (!checkoutCart) return null;
+    if (!localCheckoutCart) return null;
 
     // Use cart_data.bill_details as primary source
-    const cartBillDetails = checkoutCart.cart_data?.bill_details;
+    const cartBillDetails = localCheckoutCart.cart_data?.bill_details;
     if (cartBillDetails) {
       return {
         subtotal: cartBillDetails.total_cost || 0,
@@ -84,7 +99,7 @@ export default function CartPage() {
     }
 
     // Fallback to BillDetailsWidget parsing
-    const billWidget = checkoutCart.objects.find((obj) => obj.type === 118) as
+    const billWidget = localCheckoutCart.objects.find((obj) => obj.type === 118) as
       | BillDetailsWidget
       | undefined;
 
@@ -130,13 +145,13 @@ export default function CartPage() {
     });
 
     return billData;
-  }, [checkoutCart]);
+  }, [localCheckoutCart]);
 
   // Calculate ETA from checkout data
   const estimatedDelivery = useMemo(() => {
-    if (!checkoutCart?.cart_data?.shipments?.[0]) return "10-15 minutes";
+    if (!localCheckoutCart?.cart_data?.shipments?.[0]) return "10-15 minutes";
 
-    const shipment = checkoutCart.cart_data.shipments[0];
+    const shipment = localCheckoutCart.cart_data.shipments[0];
     const eta = shipment.slot_details?.serviceability?.eta || 0;
 
     if (eta > 0) {
@@ -144,11 +159,11 @@ export default function CartPage() {
     }
 
     return "10-15 minutes";
-  }, [checkoutCart]);
+  }, [localCheckoutCart]);
 
   // Get display items from checkout cart if available, otherwise use cart items
   const displayItems = useMemo(() => {
-    if (!checkoutCart?.cart_data?.shipments?.[0]?.items) {
+    if (!localCheckoutCart?.cart_data?.shipments?.[0]?.items) {
       // Fallback to cart items
       return (
         cart?.items?.map((item) => {
@@ -170,7 +185,7 @@ export default function CartPage() {
     }
 
     // Use checkout cart items for accurate data, but merge with cart quantities for real-time updates
-    const shipmentItems = checkoutCart.cart_data.shipments[0].items;
+    const shipmentItems = localCheckoutCart.cart_data.shipments[0].items;
     const cartItemsMap = new Map(
       cart?.items?.map((item) => [item.productId, item.quantity]) || []
     );
@@ -199,50 +214,46 @@ export default function CartPage() {
         };
       })
       .filter((item) => item !== null);
-  }, [checkoutCart, cart?.items]);
+  }, [localCheckoutCart, cart?.items]);
 
   // Get total items count - prioritize cart for real-time updates
   const totalItemsCount = useMemo(() => {
     if (cart?.totalItems) {
       return cart.totalItems;
     }
-    if (checkoutCart?.cart_data?.bill_details?.total_items) {
-      return checkoutCart.cart_data.bill_details.total_items;
+    if (localCheckoutCart?.cart_data?.bill_details?.total_items) {
+      return localCheckoutCart.cart_data.bill_details.total_items;
     }
     return 0;
-  }, [cart, checkoutCart]);
+  }, [cart, localCheckoutCart]);
 
   // Handle increment quantity
   const handleIncrementQuantity = async (item: any) => {
-    if (!user?.id || !selectedAddress) return;
+    if (!user?.id || !cart?.cartId) return;
 
     setUpdatingItems((prev) => new Set(prev).add(item.productId));
 
     try {
-      const cartRequest = {
-        senderUserId: user.id,
-        receiverUserId: user.id,
-        receiveAddress: selectedAddress,
-        items: [
-          {
-            productId: item.productId,
-            identityId: item.productId,
-            name: item.name,
-            quantity: 1,
-            price: {
-              senderCurrencyValue: item.price,
-              receiverCurrencyValue: item.price,
-            },
-          },
-        ],
-        quantity: 1,
-        totalAmount: {
-          senderCurrencyValue: item.price,
-          receiverCurrencyValue: item.price,
-        },
-      };
-
-      await addToCart(cartRequest);
+      await incrementProductQuantity(user.id, item.productId, cart.cartId);
+      
+      // Update localCheckoutCart totals
+      if (localCheckoutCart?.cart_data?.bill_details) {
+        setLocalCheckoutCart((prev: any) => {
+          if (!prev) return prev;
+          const updated = JSON.parse(JSON.stringify(prev));
+          const billDetails = updated.cart_data.bill_details;
+          
+          // Add item price to totals
+          const itemPrice = item.price || 0;
+          billDetails.total_cost = (billDetails.total_cost || 0) + itemPrice;
+          billDetails.bill_total = (billDetails.bill_total || 0) + itemPrice;
+          billDetails.payable_amount = (billDetails.payable_amount || billDetails.bill_total || 0) + itemPrice;
+          billDetails.total_items = (billDetails.total_items || 0) + 1;
+          
+          return updated;
+        });
+      }
+      
       setUpdatingItems((prev) => {
         const newSet = new Set(prev);
         newSet.delete(item.productId);
@@ -250,6 +261,11 @@ export default function CartPage() {
       });
     } catch (error) {
       console.error("Error incrementing quantity:", error);
+      setUpdatingItems((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(item.productId);
+        return newSet;
+      });
     }
   };
 
@@ -259,8 +275,29 @@ export default function CartPage() {
 
     setUpdatingItems((prev) => new Set(prev).add(productId));
 
+    // Find the item to get its price
+    const item = displayItems.find((i) => i.productId === productId);
+    const itemPrice = item?.price || 0;
+
     try {
-      await removeFromCart(user.id, productId, cartId);
+      await decrementProductQuantity(user.id, productId, cartId);
+      
+      // Update localCheckoutCart totals
+      if (localCheckoutCart?.cart_data?.bill_details) {
+        setLocalCheckoutCart((prev: any) => {
+          if (!prev) return prev;
+          const updated = JSON.parse(JSON.stringify(prev));
+          const billDetails = updated.cart_data.bill_details;
+          
+          // Subtract item price from totals
+          billDetails.total_cost = Math.max(0, (billDetails.total_cost || 0) - itemPrice);
+          billDetails.bill_total = Math.max(0, (billDetails.bill_total || 0) - itemPrice);
+          billDetails.payable_amount = Math.max(0, (billDetails.payable_amount || billDetails.bill_total || 0) - itemPrice);
+          billDetails.total_items = Math.max(0, (billDetails.total_items || 0) - 1);
+          
+          return updated;
+        });
+      }
       
       setUpdatingItems((prev) => {
         const newSet = new Set(prev);
@@ -284,7 +321,35 @@ export default function CartPage() {
     if (!window.confirm("Remove this item from cart?")) {
       return;
     }
-    await removeFromCart(user.id, productId, cartId);
+    
+    // Find the item to get its price and quantity
+    const item = displayItems.find((i) => i.productId === productId);
+    const itemPrice = item?.price || 0;
+    const itemQuantity = item?.quantity || 0;
+    const totalItemPrice = itemPrice * itemQuantity;
+    
+    try {
+      await removeProductFromCart(user.id, productId, cartId);
+      
+      // Update localCheckoutCart totals
+      if (localCheckoutCart?.cart_data?.bill_details && item) {
+        setLocalCheckoutCart((prev: any) => {
+          if (!prev) return prev;
+          const updated = JSON.parse(JSON.stringify(prev));
+          const billDetails = updated.cart_data.bill_details;
+          
+          // Subtract total item price from totals
+          billDetails.total_cost = Math.max(0, (billDetails.total_cost || 0) - totalItemPrice);
+          billDetails.bill_total = Math.max(0, (billDetails.bill_total || 0) - totalItemPrice);
+          billDetails.payable_amount = Math.max(0, (billDetails.payable_amount || billDetails.bill_total || 0) - totalItemPrice);
+          billDetails.total_items = Math.max(0, (billDetails.total_items || 0) - itemQuantity);
+          
+          return updated;
+        });
+      }
+    } catch (error) {
+      console.error("Error removing item:", error);
+    }
   };
 
   // Handle clear cart
@@ -391,8 +456,15 @@ export default function CartPage() {
       <AddressModal
         isOpen={isAddressModalOpen}
         onClose={() => setIsAddressModalOpen(false)}
-        onSelect={(address) => {
+        onSelect={async (address) => {
           setSelectedAddress(address);
+          setIsAddressModalOpen(false);
+          
+          // Refetch checkout details with new address since prices vary by location
+          if (user?.id && cart?.cartId) {
+            console.log("📍 Address changed, refetching checkout details with new location...");
+            await fetchCartCheckoutDetails(user.id, address);
+          }
         }}
         savedAddresses={user?.addresses || []}
         currentLocation={currentLocation || undefined}
@@ -555,7 +627,7 @@ export default function CartPage() {
                     const itemTotal =
                       item.totalPrice || item.price * item.quantity;
                     const itemCheckoutDetails =
-                      checkoutCart?.cart_data?.shipments?.[0]?.items.find(
+                      localCheckoutCart?.cart_data?.shipments?.[0]?.items.find(
                         (i) => i.product_id.toString() === item.productId
                       );
                     const itemPrice = itemCheckoutDetails?.price || item.price;
@@ -819,11 +891,11 @@ export default function CartPage() {
                       )}
 
                       {/* Additional charges from checkout data */}
-                      {checkoutCart?.cart_data?.bill_details && (
+                      {localCheckoutCart?.cart_data?.bill_details && (
                         <>
-                          {checkoutCart.cart_data.bill_details
+                          {localCheckoutCart.cart_data.bill_details
                             .gifting_services_charge &&
-                            checkoutCart.cart_data.bill_details
+                            localCheckoutCart.cart_data.bill_details
                               .gifting_services_charge > 0 && (
                               <div className="flex items-center justify-between text-sm">
                                 <span className="text-gray-600">
@@ -831,17 +903,17 @@ export default function CartPage() {
                                 </span>
                                 <span className="text-gray-900">
                                   ₹
-                                  {checkoutCart.cart_data.bill_details.gifting_services_charge.toFixed(
+                                  {localCheckoutCart.cart_data.bill_details.gifting_services_charge.toFixed(
                                     2
                                   )}
                                 </span>
                               </div>
                             )}
 
-                          {checkoutCart.cart_data.bill_details.payable_amount &&
-                            checkoutCart.cart_data.bill_details
+                          {localCheckoutCart.cart_data.bill_details.payable_amount &&
+                            localCheckoutCart.cart_data.bill_details
                               .payable_amount !==
-                              checkoutCart.cart_data.bill_details
+                              localCheckoutCart.cart_data.bill_details
                                 .bill_total && (
                               <div className="flex items-center justify-between text-sm">
                                 <span className="text-gray-600">
@@ -849,7 +921,7 @@ export default function CartPage() {
                                 </span>
                                 <span className="text-gray-900">
                                   ₹
-                                  {checkoutCart.cart_data.bill_details.payable_amount.toFixed(
+                                  {localCheckoutCart.cart_data.bill_details.payable_amount.toFixed(
                                     2
                                   )}
                                 </span>
@@ -872,9 +944,9 @@ export default function CartPage() {
                       </div>
 
                       {/* Show breakdown if payable amount differs from bill total */}
-                      {checkoutCart?.cart_data?.bill_details?.payable_amount &&
-                        checkoutCart.cart_data.bill_details.payable_amount !==
-                          checkoutCart.cart_data.bill_details.bill_total && (
+                      {localCheckoutCart?.cart_data?.bill_details?.payable_amount &&
+                        localCheckoutCart.cart_data.bill_details.payable_amount !==
+                          localCheckoutCart.cart_data.bill_details.bill_total && (
                           <div className="mt-2 pt-2 border-t border-gray-100">
                             <div className="flex items-center justify-between text-sm">
                               <span className="text-gray-600">
@@ -882,7 +954,7 @@ export default function CartPage() {
                               </span>
                               <span className="text-base font-semibold text-gray-900">
                                 ₹
-                                {checkoutCart.cart_data.bill_details.payable_amount.toFixed(
+                                {localCheckoutCart.cart_data.bill_details.payable_amount.toFixed(
                                   2
                                 )}
                               </span>
@@ -942,12 +1014,12 @@ export default function CartPage() {
                       (Final price may vary)
                     </p>
                   )}
-                  {checkoutCart?.cart_data?.bill_details?.payable_amount &&
-                    checkoutCart.cart_data.bill_details.payable_amount !==
-                      checkoutCart.cart_data.bill_details.bill_total && (
+                  {localCheckoutCart?.cart_data?.bill_details?.payable_amount &&
+                    localCheckoutCart.cart_data.bill_details.payable_amount !==
+                      localCheckoutCart.cart_data.bill_details.bill_total && (
                       <p className="text-xs text-blue-600">
                         Payable: ₹
-                        {checkoutCart.cart_data.bill_details.payable_amount.toFixed(
+                        {localCheckoutCart.cart_data.bill_details.payable_amount.toFixed(
                           2
                         )}
                       </p>

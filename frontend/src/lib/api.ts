@@ -100,7 +100,7 @@ class ApiService {
   async addToCart(request: AddToCartRequest): Promise<AddToCartResponse> {
     try {
       const response = await this.client.post<AddToCartResponse>(
-        "/cart/add",
+        "/cart/create",
         request
       );
       return this.handleResponse(response);
@@ -120,14 +120,44 @@ class ApiService {
     }
   }
 
-  async removeFromCart(
+  async decrementProductQuantity(
+    userId: string,
+    productId: string,
+    cartId: string
+  ): Promise<ApiResponse<any>> {
+    try {
+      const response = await this.client.delete<ApiResponse<any>>(
+        `/cart/product/decrement/${userId}/${cartId}/${productId}`
+      );
+      return this.handleResponse(response);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  async incrementProductQuantity(
+    userId: string,
+    productId: string,
+    cartId: string
+  ): Promise<ApiResponse<any>> {
+    try {
+      const response = await this.client.post<ApiResponse<any>>(
+        `/cart/product/increment/${userId}/${cartId}/${productId}`
+      );
+      return this.handleResponse(response);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  async removeProductFromCart(
     userId: string,
     productId: string,
     cartId: string
   ): Promise<ApiResponse<any>> {
     try {
       const response = await this.client.get<ApiResponse<any>>(
-        `/cart/remove/${userId}/${cartId}/${productId}`
+        `/cart/product/remove/${userId}/${cartId}/${productId}`
       );
       return this.handleResponse(response);
     } catch (error) {

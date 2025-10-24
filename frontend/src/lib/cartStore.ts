@@ -33,7 +33,8 @@ export interface Cart {
 
 interface CartState {
   fetchCartCheckoutDetails: (
-    userId: string
+    userId: string,
+    addressData?: AddressData
   ) => Promise<{ success: boolean; error?: string }>;
   // State
   cart: Cart | null;
@@ -46,7 +47,17 @@ interface CartState {
     request: Omit<AddToCartRequest, "activeCartId">
   ) => Promise<{ success: boolean; error?: string }>;
   fetchCart: (userId: string) => Promise<void>;
-  removeFromCart: (
+  decrementProductQuantity: (
+    userId: string,
+    productId: string,
+    cartId: string
+  ) => Promise<{ success: boolean; error?: string; cart?: Cart }>;
+  incrementProductQuantity: (
+    userId: string,
+    productId: string,
+    cartId: string
+  ) => Promise<{ success: boolean; error?: string; cart?: Cart }>;
+  removeProductFromCart: (
     userId: string,
     productId: string,
     cartId: string
@@ -175,8 +186,8 @@ export const useCartStore = create<CartState>()(
         }
       },
 
-      // Remove item from cart
-      removeFromCart: async (
+      // Decrement product quantity (removes 1 unit)
+      decrementProductQuantity: async (
         userId: string,
         productId: string,
         cartId: string
@@ -184,7 +195,7 @@ export const useCartStore = create<CartState>()(
         set({ isLoading: true, error: null });
 
         try {
-          const response = await apiService.removeFromCart(
+          const response = await apiService.decrementProductQuantity(
             userId,
             productId,
             cartId
@@ -197,12 +208,78 @@ export const useCartStore = create<CartState>()(
             const errorMsg =
               typeof response.error === "string"
                 ? response.error
-                : response.error?.message || "Failed to remove from cart";
+                : response.error?.message || "Failed to decrement quantity";
             throw new Error(errorMsg);
           }
         } catch (err) {
           const errorMessage =
-            err instanceof Error ? err.message : "Failed to remove from cart";
+            err instanceof Error ? err.message : "Failed to decrement quantity";
+          set({ error: errorMessage, isLoading: false });
+          return { success: false, error: errorMessage };
+        }
+      },
+
+      // Increment product quantity (adds 1 unit)
+      incrementProductQuantity: async (
+        userId: string,
+        productId: string,
+        cartId: string
+      ) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const response = await apiService.incrementProductQuantity(
+            userId,
+            productId,
+            cartId
+          );
+
+          if (response.success) {
+            set({ isLoading: false, cart: response.data as Cart });
+            return { success: true, cart: response.data as Cart };
+          } else {
+            const errorMsg =
+              typeof response.error === "string"
+                ? response.error
+                : response.error?.message || "Failed to increment quantity";
+            throw new Error(errorMsg);
+          }
+        } catch (err) {
+          const errorMessage =
+            err instanceof Error ? err.message : "Failed to increment quantity";
+          set({ error: errorMessage, isLoading: false });
+          return { success: false, error: errorMessage };
+        }
+      },
+
+      // Completely remove product from cart
+      removeProductFromCart: async (
+        userId: string,
+        productId: string,
+        cartId: string
+      ) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const response = await apiService.removeProductFromCart(
+            userId,
+            productId,
+            cartId
+          );
+
+          if (response.success) {
+            set({ isLoading: false, cart: response.data as Cart });
+            return { success: true, cart: response.data as Cart };
+          } else {
+            const errorMsg =
+              typeof response.error === "string"
+                ? response.error
+                : response.error?.message || "Failed to remove product";
+            throw new Error(errorMsg);
+          }
+        } catch (err) {
+          const errorMessage =
+            err instanceof Error ? err.message : "Failed to remove product";
           set({ error: errorMessage, isLoading: false });
           return { success: false, error: errorMessage };
         }
@@ -262,7 +339,9 @@ export const useCartActions = () =>
       addToCart: state.addToCart,
       fetchCart: state.fetchCart,
       fetchCartCheckoutDetails: state.fetchCartCheckoutDetails,
-      removeFromCart: state.removeFromCart,
+      decrementProductQuantity: state.decrementProductQuantity,
+      incrementProductQuantity: state.incrementProductQuantity,
+      removeProductFromCart: state.removeProductFromCart,
       clearCart: state.clearCart,
       clearError: state.clearError,
     }))

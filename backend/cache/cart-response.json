@@ -565,7 +565,7 @@
           "slot_date": "24 Oct 2025",
           "shipment_type": "GROCERY",
           "is_earliest_slot": true,
-          "slot_time": "6 PM - 6:30 PM",
+          "slot_time": "7:30 PM - 8 PM",
           "shipment_id": "177"
         }
       ],
@@ -769,7 +769,7 @@
         "merchant_id": 41217,
         "slot_details": {
           "cashback_amount": 0,
-          "end": 1761310800,
+          "end": 1761316200,
           "are_all_products_deliverable": null,
           "serviceability": {
             "new_user_priority_score": null,
@@ -781,7 +781,7 @@
               "is_override": false,
               "tags": null
             },
-            "session_id": "18be1d1c-ae1c-438b-bb4d-30e1a21ff93b",
+            "session_id": "74b2ead5-cb70-47a2-9f3c-40948152664d",
             "surge_charge_v2": {
               "is_cached": false,
               "surge_amount": 0,
@@ -814,9 +814,9 @@
             },
             "customer_lat": 28.6276781,
             "disruption_index": {
-              "picker": 0,
-              "fe_di_with_busy_picker": 0.2941176471,
-              "fe": 0.1176470588
+              "picker": 0.2,
+              "fe_di_with_busy_picker": 0.0714285714,
+              "fe": 0
             },
             "batching": {
               "is_batching_enabled": false,
@@ -838,7 +838,7 @@
             "is_new_user": true,
             "components": [
               {
-                "duration": 4.176407814,
+                "duration": 4.2779459953,
                 "type": "activity",
                 "payload": {
                   "computation_method": "model",
@@ -849,15 +849,15 @@
                       "value": 1.0396
                     }
                   ],
-                  "computed_duration": 4.176407814,
+                  "computed_duration": 4.2779459953,
                   "model_version": "se_travel_time_estimation_less_than_4km_v1.0_202509301155",
                   "buffer_duration": 0,
                   "google_maps_data": null,
-                  "speed": 14.9353230761,
+                  "speed": 14.5808292269,
                   "model_name": "se_travel_time_estimation_less_than_4km"
                 },
                 "name": "travel",
-                "display_duration": 4.1707080593
+                "display_duration": 5.7807910612
               },
               {
                 "duration": 0.4306117334,
@@ -878,17 +878,17 @@
                   "min_wait_time": 0
                 },
                 "name": "picking",
-                "display_duration": 0.4345979736
+                "display_duration": 0.4372674461
               },
               {
                 "duration": 0.167,
                 "type": "activity",
                 "payload": {},
                 "name": "billing",
-                "display_duration": 0.1685459451
+                "display_duration": 0.1695812209
               },
               {
-                "duration": -0.0439545214,
+                "duration": 1.4148547869,
                 "type": "buffer",
                 "payload": {
                   "dispatch_buffer": 0,
@@ -897,73 +897,73 @@
                   "overall_eta_buffer": 0,
                   "drop_handshake_time": 0,
                   "picker_eta_buffer": 0,
-                  "fe_eta_buffer": 4,
-                  "model_buffer": -0.0439545214,
+                  "fe_eta_buffer": 0,
+                  "model_buffer": 1.4148547869,
                   "store_buffer": 0.1,
                   "rain_buffer": 0,
                   "model_version": "se_buffer_time_estimation_v1.0_20240612084404",
-                  "duration": -0.0439545214,
+                  "duration": 1.4148547869,
                   "model_name": "se_buffer_time_estimation"
                 },
                 "name": "buffer",
                 "display_duration": 0
               },
               {
-                "duration": 0,
+                "duration": 0.1793939797,
                 "type": "buffer",
                 "payload": {
                   "additional_buffer": 0,
-                  "pickers_order_backlog": 0,
-                  "busy_pickers": 3,
-                  "mec_eta": 0,
-                  "manpower_availability_updated_at": "2025-10-24T12:39:38.345256+00:00",
+                  "pickers_order_backlog": 1,
+                  "busy_pickers": 2,
+                  "mec_eta": 0.1793939797,
+                  "manpower_availability_updated_at": "2025-10-24T14:14:07.464952+00:00",
                   "picker_turnaround_time": 5,
-                  "available_pickers": 4,
+                  "available_pickers": 3,
                   "buffer_duration": 0,
-                  "duration": 0,
+                  "duration": 0.1793939797,
                   "formula_eta": 0,
-                  "mec_eta_updated_at": "2025-10-24T12:39:26.660193",
+                  "mec_eta_updated_at": "2025-10-24T14:13:28.191247",
                   "selected_source": "manpower_eta_computed"
                 },
                 "name": "picker_eta",
-                "display_duration": 0
+                "display_duration": 0.1821667671
               },
               {
-                "duration": 2.0723882666,
+                "duration": 0,
                 "type": "buffer",
                 "payload": {
                   "busy_field_executives": 17,
                   "additional_buffer": 0,
                   "fe_turnaround_time": 20,
                   "buffer_duration": 0,
-                  "duration_after_pre_enroute_subtraction": 2.0723882666,
-                  "field_executives_order_backlog": 2,
-                  "mec_eta": 2.67,
-                  "available_field_executives": 0,
-                  "manpower_availability_updated_at": "2025-10-24T12:39:38.345256+00:00",
-                  "mec_after_buffer_addition": 2.67,
+                  "duration_after_pre_enroute_subtraction": 0,
+                  "field_executives_order_backlog": 0,
+                  "mec_eta": 0.5,
+                  "available_field_executives": 11,
+                  "manpower_availability_updated_at": "2025-10-24T14:14:07.464952+00:00",
+                  "mec_after_buffer_addition": 0.5,
                   "formula_eta": 0,
                   "mec_eta_v1": 0.4572565474,
                   "apply_fe_mec_buffer_flag": false,
-                  "duration": 2.67,
-                  "mec_eta_v2": 2.67,
+                  "duration": 0.5,
+                  "mec_eta_v2": 0.5,
                   "selected_source": "manpower_eta_computedV2",
-                  "mec_eta_updated_at": "2025-10-24T12:39:22.628660+00:00"
+                  "mec_eta_updated_at": "2025-10-24T14:13:58.959077+00:00"
                 },
                 "name": "field_executive_eta",
-                "display_duration": 6.1286013147
+                "display_duration": 0
               }
             ],
             "fleet_serviceability": [
               {
-                "reopen_time": "19:30",
+                "reopen_time": "09:00",
                 "reason_code": "NO_FLEET_AT_STORE",
                 "carrier_property": {
                   "available": 0,
                   "name": "three_wheeler"
                 },
                 "serviceable": false,
-                "eta": 9.9276117334,
+                "eta": 12,
                 "type": "large_order"
               }
             ],
@@ -988,7 +988,7 @@
               "express"
             ],
             "distance": 1.0396,
-            "store_handshake_time": -0.0439545214,
+            "store_handshake_time": 1.4148547869,
             "serviceability_reason": null,
             "user_dependency_score": null,
             "overlapping_merchants": {
@@ -1055,7 +1055,7 @@
             "union_assortment_tags": null
           },
           "is_default": true,
-          "start": 1761309000,
+          "start": 1761314400,
           "slot_type": "normal",
           "is_closed": false,
           "surge_charge_v2": {
@@ -1092,7 +1092,7 @@
             "weight": 42,
             "type_id": 3598,
             "additional_charges": null,
-            "updated_at": 1761309580,
+            "updated_at": 1761315247,
             "is_digital_item": false,
             "service_tag": "",
             "mapping_id": 304232236,
@@ -1296,7 +1296,7 @@
               }
             ],
             "item_attributes": [],
-            "created_at": 1761309580,
+            "created_at": 1761315247,
             "mrp": 35,
             "storage_type": "fridge",
             "inventory_limit": 50,
@@ -1392,7 +1392,7 @@
       }
     ],
     "is_all_pharmacy_item": false,
-    "device_id": "d17b8b73b3ee4c90",
+    "device_id": "58809786a12106b6",
     "pharmacy_cart_prescription": null,
     "is_gift": false,
     "prioritised_oos_recommendations": null,
@@ -1477,7 +1477,7 @@
         "is_forced_oos": false,
         "type_id": 3598,
         "mrp": 35,
-        "updated_at": 1761309580,
+        "updated_at": 1761315247,
         "membership_price": null,
         "service_tag": "",
         "mapping_id": 304232236,
@@ -1529,7 +1529,7 @@
         "total_price": 81,
         "product_id": 212722,
         "item_attributes": [],
-        "created_at": 1761309580,
+        "created_at": 1761315247,
         "is_digital_item": false,
         "inventory_limit": 50,
         "image_url": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.jpg",
@@ -1662,7 +1662,7 @@
       "meta": {
         "slot": {
           "cashback_amount": 0,
-          "end": 1761310800,
+          "end": 1761316200,
           "are_all_products_deliverable": null,
           "serviceability": {
             "assortment_tags": [
@@ -1722,9 +1722,9 @@
             },
             "customer_lat": 28.6276781,
             "disruption_index": {
-              "picker": 0,
-              "fe_di_with_busy_picker": 0.2941176471,
-              "fe": 0.1176470588
+              "picker": 0.2,
+              "fe_di_with_busy_picker": 0.0714285714,
+              "fe": 0
             },
             "serviceable": true,
             "batching": {
@@ -1748,14 +1748,14 @@
             "total_eta": 8.5,
             "fleet_serviceability": [
               {
-                "reopen_time": "19:30",
+                "reopen_time": "09:00",
                 "reason_code": "NO_FLEET_AT_STORE",
                 "carrier_property": {
                   "available": 0,
                   "name": "three_wheeler"
                 },
                 "serviceable": false,
-                "eta": 9.9276117334,
+                "eta": 12,
                 "type": "large_order"
               }
             ],
@@ -1778,10 +1778,10 @@
             "computed_eta": 7,
             "new_user_priority_score": null,
             "distance": 1.0396,
-            "store_handshake_time": -0.0439545214,
+            "store_handshake_time": 1.4148547869,
             "serviceability_reason": null,
             "user_dependency_score": null,
-            "session_id": "18be1d1c-ae1c-438b-bb4d-30e1a21ff93b",
+            "session_id": "74b2ead5-cb70-47a2-9f3c-40948152664d",
             "is_batching_enabled": false,
             "eta": 8,
             "entity_serviceability": [
@@ -1829,8 +1829,8 @@
             ],
             "components": [
               {
-                "duration": 4.176407814,
-                "display_duration": 4.1707080593,
+                "duration": 4.2779459953,
+                "display_duration": 5.7807910612,
                 "type": "activity",
                 "payload": {
                   "computation_method": "model",
@@ -1841,18 +1841,18 @@
                       "value": 1.0396
                     }
                   ],
-                  "computed_duration": 4.176407814,
+                  "computed_duration": 4.2779459953,
                   "model_version": "se_travel_time_estimation_less_than_4km_v1.0_202509301155",
                   "buffer_duration": 0,
                   "google_maps_data": null,
-                  "speed": 14.9353230761,
+                  "speed": 14.5808292269,
                   "model_name": "se_travel_time_estimation_less_than_4km"
                 },
                 "name": "travel"
               },
               {
                 "duration": 0.4306117334,
-                "display_duration": 0.4345979736,
+                "display_duration": 0.4372674461,
                 "type": "activity",
                 "payload": {
                   "assembly_time_model_id": "",
@@ -1873,13 +1873,13 @@
               },
               {
                 "duration": 0.167,
-                "display_duration": 0.1685459451,
+                "display_duration": 0.1695812209,
                 "type": "activity",
                 "payload": {},
                 "name": "billing"
               },
               {
-                "duration": -0.0439545214,
+                "duration": 1.4148547869,
                 "display_duration": 0,
                 "type": "buffer",
                 "payload": {
@@ -1889,57 +1889,57 @@
                   "overall_eta_buffer": 0,
                   "drop_handshake_time": 0,
                   "picker_eta_buffer": 0,
-                  "fe_eta_buffer": 4,
-                  "model_buffer": -0.0439545214,
+                  "fe_eta_buffer": 0,
+                  "model_buffer": 1.4148547869,
                   "store_buffer": 0.1,
                   "rain_buffer": 0,
                   "model_version": "se_buffer_time_estimation_v1.0_20240612084404",
-                  "duration": -0.0439545214,
+                  "duration": 1.4148547869,
                   "model_name": "se_buffer_time_estimation"
                 },
                 "name": "buffer"
+              },
+              {
+                "duration": 0.1793939797,
+                "display_duration": 0.1821667671,
+                "type": "buffer",
+                "payload": {
+                  "additional_buffer": 0,
+                  "mec_eta": 0.1793939797,
+                  "pickers_order_backlog": 1,
+                  "busy_pickers": 2,
+                  "manpower_availability_updated_at": "2025-10-24T14:14:07.464952+00:00",
+                  "picker_turnaround_time": 5,
+                  "available_pickers": 3,
+                  "buffer_duration": 0,
+                  "duration": 0.1793939797,
+                  "formula_eta": 0,
+                  "mec_eta_updated_at": "2025-10-24T14:13:28.191247",
+                  "selected_source": "manpower_eta_computed"
+                },
+                "name": "picker_eta"
               },
               {
                 "duration": 0,
                 "display_duration": 0,
                 "type": "buffer",
                 "payload": {
-                  "additional_buffer": 0,
-                  "mec_eta": 0,
-                  "pickers_order_backlog": 0,
-                  "busy_pickers": 3,
-                  "manpower_availability_updated_at": "2025-10-24T12:39:38.345256+00:00",
-                  "picker_turnaround_time": 5,
-                  "available_pickers": 4,
-                  "buffer_duration": 0,
-                  "duration": 0,
-                  "formula_eta": 0,
-                  "mec_eta_updated_at": "2025-10-24T12:39:26.660193",
-                  "selected_source": "manpower_eta_computed"
-                },
-                "name": "picker_eta"
-              },
-              {
-                "duration": 2.0723882666,
-                "display_duration": 6.1286013147,
-                "type": "buffer",
-                "payload": {
-                  "duration_after_pre_enroute_subtraction": 2.0723882666,
+                  "duration_after_pre_enroute_subtraction": 0,
                   "fe_turnaround_time": 20,
                   "apply_fe_mec_buffer_flag": false,
                   "additional_buffer": 0,
-                  "field_executives_order_backlog": 2,
-                  "mec_eta": 2.67,
-                  "manpower_availability_updated_at": "2025-10-24T12:39:38.345256+00:00",
-                  "available_field_executives": 0,
+                  "field_executives_order_backlog": 0,
+                  "mec_eta": 0.5,
+                  "manpower_availability_updated_at": "2025-10-24T14:14:07.464952+00:00",
+                  "available_field_executives": 11,
                   "busy_field_executives": 17,
-                  "mec_after_buffer_addition": 2.67,
+                  "mec_after_buffer_addition": 0.5,
                   "formula_eta": 0,
                   "buffer_duration": 0,
-                  "duration": 2.67,
-                  "mec_eta_v2": 2.67,
+                  "duration": 0.5,
+                  "mec_eta_v2": 0.5,
                   "mec_eta_v1": 0.4572565474,
-                  "mec_eta_updated_at": "2025-10-24T12:39:22.628660+00:00",
+                  "mec_eta_updated_at": "2025-10-24T14:13:58.959077+00:00",
                   "selected_source": "manpower_eta_computedV2"
                 },
                 "name": "field_executive_eta"
@@ -1948,7 +1948,7 @@
             "union_assortment_tags": null
           },
           "is_default": true,
-          "start": 1761309000,
+          "start": 1761314400,
           "slot_type": "normal",
           "capacity_type": "default",
           "surge_charge_v2": {
@@ -2033,7 +2033,7 @@
           "is_forced_oos": false,
           "type_id": 3598,
           "mrp": 35,
-          "updated_at": 1761309580,
+          "updated_at": 1761315247,
           "membership_price": null,
           "service_tag": "",
           "mapping_id": 304232236,
@@ -2084,7 +2084,7 @@
           "name": "Nestle KitKat 4 Fingers Choco Coated Wafer Chocolate",
           "total_mrp_text": "~~₹105~~",
           "item_attributes": [],
-          "created_at": 1761309580,
+          "created_at": 1761315247,
           "is_digital_item": false,
           "inventory_limit": 50,
           "allow_wishlist": true,
@@ -2122,7 +2122,7 @@
           "is_forced_oos": false,
           "type_id": 3598,
           "mrp": 35,
-          "updated_at": 1761309580,
+          "updated_at": 1761315247,
           "membership_price": null,
           "service_tag": "",
           "mapping_id": 304232236,
@@ -2173,7 +2173,7 @@
           "name": "Nestle KitKat 4 Fingers Choco Coated Wafer Chocolate",
           "total_mrp_text": "~~₹105~~",
           "item_attributes": [],
-          "created_at": 1761309580,
+          "created_at": 1761315247,
           "is_digital_item": false,
           "inventory_limit": 50,
           "allow_wishlist": true,

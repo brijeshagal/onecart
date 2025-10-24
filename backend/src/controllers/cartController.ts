@@ -437,9 +437,6 @@ export class CartController {
             `❌ Failed to process item ${cartItemData.productId}:`,
             error
           );
-          throw new Error(
-            `Order processing failed: Could not add item "${cartItemData.productId}" to cart. ${error instanceof Error ? error.message : String(error)}`
-          );
         }
       }
       await new Promise(resolve => setTimeout(resolve, 500));

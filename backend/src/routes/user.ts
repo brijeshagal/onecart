@@ -118,4 +118,78 @@ router.post('/register', UserController.registerUser);
  */
 router.get('/:id', UserController.getUserProfile);
 
+/**
+ * @swagger
+ * /api/user/{id}/wallet-address:
+ *   post:
+ *     summary: Add or verify wallet address for user
+ *     description: |
+ *       Add a new wallet address to the user's account or verify that it already exists.
+ *       This is used before crypto payments to ensure the connected wallet is registered.
+ *       All addresses are stored in lowercase for consistent comparison.
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID (MongoDB ObjectId)
+ *         example: "507f1f77bcf86cd799439011"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - walletAddress
+ *             properties:
+ *               walletAddress:
+ *                 type: string
+ *                 description: Ethereum wallet address (will be normalized to lowercase)
+ *                 example: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb"
+ *     responses:
+ *       200:
+ *         description: Wallet address added or verified successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Wallet address added successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     walletAddress:
+ *                       type: string
+ *                       description: The normalized wallet address
+ *                     isNew:
+ *                       type: boolean
+ *                       description: Whether this is a new address or already existed
+ *                     walletAddresses:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       description: All wallet addresses for the user
+ *                     primaryWalletIndex:
+ *                       type: number
+ *                       description: Index of the primary wallet
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: Invalid wallet address
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/:id/wallet-address', UserController.addWalletAddress);
+
 export { router as userRoutes };

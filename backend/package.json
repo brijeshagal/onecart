@@ -36,7 +36,8 @@
     "puppeteer": "^24.0.0",
     "razorpay": "^2.9.6",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "viem": "^2.38.4"
   },
   "devDependencies": {
     "@types/compression": "^1.7.5",

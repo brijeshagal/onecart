@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { AppError } from '../middleware/errorHandler';
+import { cartModel, ICart } from '../models/Cart';
 import { userModel } from '../models/User';
 import { RegisterUserRequest, RegisterUserResponse } from '../types/user';
+import { Address } from 'viem';
 
 /**
  * User Controller
@@ -138,26 +140,120 @@ export class UserController {
         error.statusCode = 404;
         return next(error);
       }
+      let activeCartData: ICart | null = null;
+      if (user.activeCartIds && user.activeCartIds.length > 0) {
+        const activeCart = await cartModel.findByCartId(user.activeCartIds[0]);
+        if (activeCart) {
+          activeCartData = activeCart;
+        }
+      }
 
       res.status(200).json({
         success: true,
         data: {
-          id: user._id.toString(),
-          username: user.username,
-          email: user.email,
-          phone: user.phone,
-          addresses: user.addresses,
-          defaultAddressIndex: user.defaultAddressIndex,
-          receiveAddressIndex: user.receiveAddressIndex,
-          askBeforeReceiving: user.askBeforeReceiving,
-          walletAddresses: user.walletAddresses,
-          farcasterWalletAddress: user.farcasterWalletAddress,
-          primaryWalletIndex: user.primaryWalletIndex,
+          activeCart: activeCartData,
+          user: {
+            id: user._id.toString(),
+            username: user.username,
+            email: user.email,
+            phone: user.phone,
+            addresses: user.addresses,
+            defaultAddressIndex: user.defaultAddressIndex,
+            receiveAddressIndex: user.receiveAddressIndex,
+            askBeforeReceiving: user.askBeforeReceiving,
+            walletAddresses: user.walletAddresses,
+            farcasterWalletAddress: user.farcasterWalletAddress,
+            primaryWalletIndex: user.primaryWalletIndex,
+          },
         },
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
       console.error('❌ Get user profile error:', error);
+      next(error);
+    }
+  }
+
+  /**
+   * Add or verify wallet address for user
+   * @route POST /api/user/:id/wallet-address
+   * @param {string} req.params.id - User ID
+   * @param {string} req.body.walletAddress - Wallet address to add/verify
+   * @returns {Promise<void>}
+   */
+  static async addWalletAddress(
+    req: Request<{ id: string }, {}, { walletAddress: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { walletAddress } = req.body;
+
+      console.log(`👛 Add wallet address request: UserID=${id}, Address=${walletAddress}`);
+
+      if (!walletAddress || typeof walletAddress !== 'string') {
+        const error = new AppError('Invalid wallet address');
+        error.statusCode = 400;
+        return next(error);
+      }
+
+      // Normalize wallet address to lowercase
+      const normalizedAddress = walletAddress.toLowerCase();
+
+      // Find user
+      const user = await userModel.findById(id);
+      if (!user) {
+        const error = new AppError('User not found');
+        error.statusCode = 404;
+        return next(error);
+      }
+
+      // Check if wallet address already exists (case-insensitive)
+      const addressExists = user.walletAddresses.some(
+        (addr: Address) => addr.toLowerCase() === normalizedAddress
+      );
+
+      if (addressExists) {
+        // Wallet address already exists, return success
+        console.log(`✅ Wallet address already exists for user: ${normalizedAddress}`);
+        res.status(200).json({
+          success: true,
+          message: 'Wallet address already verified',
+          data: {
+            walletAddress: normalizedAddress,
+            isNew: false,
+          },
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      // Add new wallet address
+      user.walletAddresses.push(normalizedAddress);
+      
+      // If this is the first wallet, set it as primary
+      if (user.walletAddresses.length === 1) {
+        user.primaryWalletIndex = 0;
+      }
+
+      await user.save();
+
+      console.log(`✅ Wallet address added successfully: ${normalizedAddress}`);
+
+      res.status(200).json({
+        success: true,
+        message: 'Wallet address added successfully',
+        data: {
+          walletAddress: normalizedAddress,
+          isNew: true,
+          walletAddresses: user.walletAddresses,
+          primaryWalletIndex: user.primaryWalletIndex,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('❌ Add wallet address error:', error);
       next(error);
     }
   }

@@ -7,6 +7,7 @@ import { locationRoutes } from './location';
 import { searchItemsRoutes } from './searchItems';
 import { userRoutes } from './user';
 import { initRouter } from './init';
+import { paymentRoutes } from './payment';
 
 const mainRouter: Router = Router();
 
@@ -15,6 +16,7 @@ mainRouter.use('/location', locationRoutes);
 mainRouter.use('/user', userRoutes);
 mainRouter.use('/feed', feedRoutes);
 mainRouter.use('/search-items', searchItemsRoutes);
+mainRouter.use('/payment', paymentRoutes);
 mainRouter.use('/health', healthRoutes);
 mainRouter.use('/init', initRouter);
 mainRouter.use('/', apiRoutes);

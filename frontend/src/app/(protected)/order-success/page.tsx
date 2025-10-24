@@ -5,20 +5,28 @@ import { useCheckoutCart } from "@/lib/cartStore";
 import { useAppStore } from "@/lib/store";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 // Force dynamic rendering since this page uses search params
 export const dynamic = "force-dynamic";
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
-  // Handle null searchParams during build
-  const txHash = (searchParams && searchParams.get("txHash")) || null;
-  const orderId = (searchParams && searchParams.get("orderId")) || null;
-  const paymentId = (searchParams && searchParams.get("paymentId")) || null;
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
 
   const { selectedAddress } = useAppStore();
   const checkoutCart = useCheckoutCart();
+
+  // Get payment details from URL params only on client side after mount
+  useEffect(() => {
+    if (searchParams) {
+      setTxHash(searchParams.get("txHash"));
+      setOrderId(searchParams.get("orderId"));
+      setPaymentId(searchParams.get("paymentId"));
+    }
+  }, [searchParams]);
 
   // Get ETA from checkout cart
   const eta = checkoutCart?.cart_data?.shipments?.[0]?.slot_details?.serviceability?.eta;

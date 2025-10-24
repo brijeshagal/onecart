@@ -12,10 +12,16 @@ function PaymentFailedContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [countdown, setCountdown] = useState(5);
+  const [errorMessage, setErrorMessage] = useState("Payment failed. Please try again.");
+  const [paymentMethod, setPaymentMethod] = useState("payment");
 
-  // Get error details from URL params - handle null searchParams during build
-  const errorMessage = (searchParams && searchParams.get("error")) || "Payment failed. Please try again.";
-  const paymentMethod = (searchParams && searchParams.get("method")) || "payment";
+  // Get error details from URL params only on client side after mount
+  useEffect(() => {
+    if (searchParams) {
+      setErrorMessage(searchParams.get("error") || "Payment failed. Please try again.");
+      setPaymentMethod(searchParams.get("method") || "payment");
+    }
+  }, [searchParams]);
 
   // Countdown and auto-redirect
   useEffect(() => {

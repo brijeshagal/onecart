@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
-import { Page } from 'puppeteer';
+import { Browser, Page } from 'puppeteer';
 import readline from 'readline';
 import { env } from '../../config/env';
 import BrowserManager from '../BrowserManager';
@@ -66,9 +66,9 @@ async function loadSession(page: Page) {
   return true;
 }
 
-export async function loginUser(receiverAddress: string) {
-  const browser = await BrowserManager.getBrowser();
-  const page = await browser.newPage();
+export async function loginUser(receiverAddress: string): Promise<{ page: Page; browser: Browser }> {
+  const browser = await BrowserManager.initialize();
+  const [page] = (await browser.pages()) as [Page];
 
   // Try loading session
   const sessionLoaded = await loadSession(page);

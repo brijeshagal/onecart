@@ -1,11 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
+import { Page } from 'puppeteer';
 import { userModel } from '../models/User';
 import { AddressData } from '../types/address';
 import { SearchItemsRequest, SearchItemsResponse } from '../types/api';
-import {
-  createIncognitoPage,
-  launchBrowser,
-} from '../utils/blinkit/browserUtils';
+import { launchBrowser } from '../utils/blinkit/browserUtils';
 import {
   performBlinkitSearch,
   setAddressOnPage,
@@ -42,7 +40,7 @@ export class SearchItemsController {
       );
 
       const browser = await launchBrowser();
-      const { page } = await createIncognitoPage(browser);
+      const [page] = (await browser.pages()) as [Page];
       await page.goto('https://www.blinkit.com', {
         waitUntil: 'domcontentloaded',
       });

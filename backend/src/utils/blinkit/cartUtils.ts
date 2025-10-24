@@ -1,29 +1,26 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Page } from 'puppeteer';
-import { DataItem } from '../../types/cart';
+import { ISimplifiedCartItem } from '../../models/Cart';
 import { CheckoutCartResponse } from '../../types/checkout';
 import { waitForSearchResults } from './searchUtils';
 
 export async function addProductToCart(
   page: Page,
-  cartItemData: DataItem,
+  cartItemData: ISimplifiedCartItem,
   quantity: number
 ): Promise<void> {
-  const searchResultsPromise = waitForSearchResults(
-    page,
-    cartItemData.name.text
-  );
+  const searchResultsPromise = waitForSearchResults(page, cartItemData.name);
 
   const searchUrl = new URL('https://blinkit.com/s/');
-  searchUrl.searchParams.set('q', cartItemData.name.text);
+  searchUrl.searchParams.set('q', cartItemData.name);
 
   await page.goto(searchUrl.toString(), { waitUntil: 'networkidle2' });
 
   const searchResults = await searchResultsPromise;
 
   // Get the product ID from cart item
-  const cartItemProductId = cartItemData.identity.id;
+  const cartItemProductId = cartItemData.identityId;
 
   // Loop through search results to find matching product
   let matchingProduct = searchResults.some(searchResult => {
@@ -35,7 +32,7 @@ export async function addProductToCart(
   });
   if (!matchingProduct) {
     throw new Error(
-      `Product not found in search results: "${cartItemData.name.text}" (ID: ${cartItemData.identity.id}). Product may be discontinued or unavailable.`
+      `Product not found in search results: "${cartItemData.name}" (ID: ${cartItemData.identityId}). Product may be discontinued or unavailable.`
     );
   }
 
@@ -50,7 +47,9 @@ export async function addProductToCart(
   console.log(`Found product element with ID: ${cartItemProductId}`);
 
   // Scroll the element into view
-  await productElement.evaluate(el => el.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+  await productElement.evaluate(el =>
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  );
   await new Promise(resolve => setTimeout(resolve, 500));
 
   const addButton = await productElement.$('div.tw-rounded-md.tw-bg-green-050');

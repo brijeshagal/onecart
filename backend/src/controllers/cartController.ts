@@ -1,13 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
+import { Page } from 'puppeteer';
 import { cartModel, ICart, ISimplifiedCartItem } from '../models/Cart';
 import { userModel } from '../models/User';
 import { AddressData } from '../types/address';
 import { CartResponse } from '../types/api';
+import { launchBrowser } from '../utils/blinkit/browserUtils';
 import {
   addProductToCart,
   waitForCartResponse,
 } from '../utils/blinkit/cartUtils';
-import { loginUser } from '../utils/blinkit/loginUtils';
 import { setAddressOnPage } from '../utils/blinkit/searchUtils';
 import {
   clearCart,
@@ -208,28 +209,28 @@ export class CartController {
    * @returns {Promise<void>}
    */
   static async removeFromCart(
-    req: Request<{ userId: string; productId: string }>,
-    res: Response,
+    req: Request<{ userId: string; productId: string; cartId: string }>,
+    res: Response<CartResponse>,
     next: NextFunction
   ): Promise<void> {
     try {
-      const { userId, productId } = req.params;
+      const { userId, productId, cartId } = req.params;
 
-      if (!userId || !productId) {
+      if (!userId || !productId || !cartId) {
         res.status(400).json({
           success: false,
-          error: 'User ID and Product ID are required',
+          error: 'User ID, Cart ID and Product ID are required',
           timestamp: new Date().toISOString(),
         });
         return;
       }
 
       // Validate cart ownership
-      const cartValidation = await validateCartOwnership(userId);
+      const cartValidation = await validateCartOwnership(userId, cartId);
       if (!cartValidation.isValid) {
         res.status(404).json({
           success: false,
-          error: cartValidation.error,
+          error: cartValidation.error || '',
           timestamp: new Date().toISOString(),
         });
         return;
@@ -242,7 +243,7 @@ export class CartController {
       if (!removeResult.success) {
         res.status(404).json({
           success: false,
-          error: removeResult.error,
+          error: removeResult.error || '',
           timestamp: new Date().toISOString(),
         });
         return;
@@ -254,11 +255,7 @@ export class CartController {
 
       res.status(200).json({
         success: true,
-        data: {
-          cartId: cart.cartId,
-          totalItems: cart.totalItems,
-          removedProductId: productId,
-        },
+        data: cart,
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
@@ -394,13 +391,19 @@ export class CartController {
   }
 
   static async getCartCheckoutDetails(
-    req: Request<{ userId: string; cartId: string }>,
+    req: Request<
+      { userId: string; cartId: string },
+      {},
+      { receiveAddress: AddressData }
+    >,
     res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
       const { userId, cartId } = req.params;
-      const cart = await cartModel.findByCartId(cartId);
+      const { receiveAddress } = req.body;
+
+      const cart = (await cartModel.findByCartId(cartId)) as ICart | null;
       if (!cart) {
         res.status(400).json({
           success: false,
@@ -418,24 +421,16 @@ export class CartController {
         return;
       }
 
-      const { page } = await loginUser(cart.receiveAddress);
+      const browser = await launchBrowser();
+      const [page] = (await browser.pages()) as [Page];
 
-      await setAddressOnPage(cart.receiveAddress, page);
+      await page.goto('https://blinkit.com', { waitUntil: 'networkidle2' });
+
+      await setAddressOnPage(receiveAddress, page);
       // Add all cart items to the cart
-      for (const cartItemData of cart.items) {
-        if (!cartItemData) {
-          console.warn(
-            `No product data found for cart item ${cartItemData.productId}`
-          );
-          continue;
-        }
-
+      for (const cartItemData of cart.items as ISimplifiedCartItem[]) {
         try {
-          await addProductToCart(
-            page,
-            cartItemData.productId,
-            cartItemData.quantity
-          );
+          await addProductToCart(page, cartItemData, cartItemData.quantity);
         } catch (error) {
           console.error(
             `❌ Failed to process item ${cartItemData.productId}:`,
@@ -462,6 +457,7 @@ export class CartController {
 
       // Wait for the cart API response to get pricing details
       const cartData = await cartResponsePromise;
+      await browser.close();
       res.status(200).json({
         success: true,
         data: cartData,

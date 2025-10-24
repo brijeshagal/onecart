@@ -128,16 +128,15 @@ const router: Router = Router();
  *                     type: string
  *                     description: Address label
  *                     example: "Home"
- *                 example: {
- *                   "name": "John Doe",
- *                   "display_address": "123 Main St, New York, NY 10001",
- *                   "line1": "123 Main St",
- *                   "line2": "Apartment 4B",
- *                   "latitude": 40.7128,
- *                   "longitude": -74.0060,
- *                   "landmark": "Near Central Park",
- *                   "label": "Home"
- *                 }
+ *                 example:
+ *                   name: "John Doe"
+ *                   display_address: "123 Main St, New York, NY 10001"
+ *                   line1: "123 Main St"
+ *                   line2: "Apartment 4B"
+ *                   latitude: 40.7128
+ *                   longitude: -74.0060
+ *                   landmark: "Near Central Park"
+ *                   label: "Home"
  *               receiverCountryCode:
  *                 type: string
  *                 description: Country code of receiver's address (e.g., US, IN, GB)
@@ -625,7 +624,7 @@ router.get('/received/:userId', CartController.getReceivedOrders);
 
 /**
  * @swagger
- * /api/cart/{userId}/{productId}:
+ * /api/cart/{userId}/{cartId}/{productId}:
  *   delete:
  *     summary: Remove item from user's active cart
  *     description: Remove a specific product from the user's active cart
@@ -638,6 +637,13 @@ router.get('/received/:userId', CartController.getReceivedOrders);
  *           type: string
  *         description: User ID (as sender)
  *         example: "507f1f77bcf86cd799439011"
+ *       - in: path
+ *         name: cartId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Cart ID
+ *         example: "cart_1761209168596_ny90b33fy"
  *       - in: path
  *         name: productId
  *         required: true
@@ -673,7 +679,7 @@ router.get('/received/:userId', CartController.getReceivedOrders);
  *       500:
  *         description: Internal server error
  */
-router.delete('/:userId/:productId', CartController.removeFromCart);
+router.get('/remove/:userId/:cartId/:productId', CartController.removeFromCart);
 
 /**
  * @swagger
@@ -725,7 +731,7 @@ router.delete('/clear/:userId', CartController.clearCart);
 /**
  * @swagger
  * /api/cart/checkout/{userId}/{cartId}:
- *   get:
+ *   post:
  *     summary: Get cart checkout details
  *     description: |
  *       Retrieve detailed checkout information for a specific cart including pricing, delivery details, and available payment options.
@@ -756,7 +762,21 @@ router.delete('/clear/:userId', CartController.clearCart);
  *           type: string
  *         description: Cart ID
  *         example: "cart_1761209168596_ny90b33fy"
- *         
+ *       - in: body
+ *         name: receiveAddress
+ *         required: true
+ *         schema:
+ *           type: object
+ *         description: Receive address
+ *         example:
+ *           name: "John Doe"
+ *           display_address: "123 Main St, New York, NY 10001"
+ *           line1: "123 Main St"
+ *           line2: "Apartment 4B"
+ *           latitude: 40.7128
+ *           longitude: -74.0060
+ *           landmark: "Near Central Park"
+ *           label: "Home"
  *     responses:
  *       200:
  *         description: Cart checkout details retrieved successfully
@@ -791,7 +811,7 @@ router.delete('/clear/:userId', CartController.clearCart);
  *       500:
  *         description: Internal server error
  */
-router.get('/checkout/:userId/:cartId', CartController.getCartCheckoutDetails);
+router.post('/checkout/:userId/:cartId', CartController.getCartCheckoutDetails);
 
 
 export { router as cartRoutes };

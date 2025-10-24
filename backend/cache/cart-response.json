@@ -1,0 +1,2681 @@
+{
+  "cart_type": "product",
+  "subscribers": {
+    "ON_PROMO_APPLY": {},
+    "CONFLICTING_OFFER_APPLIED": {},
+    "GST_DETAILS_SAVED": {
+      "common_actions": [
+        {
+          "remove_page_cache": {},
+          "type": "remove_page_cache"
+        },
+        {
+          "update_cart": {
+            "cart_request_body": {
+              "is_gst_opted": true
+            }
+          },
+          "type": "update_cart"
+        }
+      ]
+    },
+    "ITEM_COUNT_MODIFY": {
+      "common_actions": [
+        {
+          "type": "refresh_page"
+        }
+      ]
+    },
+    "GST_DETAILS_REMOVED": {
+      "common_actions": [
+        {
+          "remove_page_cache": {},
+          "type": "remove_page_cache"
+        },
+        {
+          "update_cart": {
+            "cart_request_body": {}
+          },
+          "type": "update_cart"
+        }
+      ]
+    },
+    "APP_FOREGROUND": {
+      "common_actions": [
+        {
+          "type": "refresh_page"
+        }
+      ]
+    }
+  },
+  "template_map": {
+    "single_product_horizontal_bounded": {
+      "tracking": {
+        "click_map": {
+          "event_name": "Product Clicked"
+        },
+        "interactions_map": {
+          "CUSTOM_CTA": {
+            "event_name": "Buy Now Clicked"
+          },
+          "TOP_RIGHT_ICON": {
+            "event_name": "ITEM_REMOVED_CLICKED"
+          },
+          "PRODUCT_FAVORITE_ICON": {
+            "event_name": "Product Favourite Icon Clicked"
+          },
+          "NOTIFY_ME": {
+            "event_name": "Notify Me Clicked"
+          },
+          "REMOVE_FROM_CART": {
+            "event_name": "Product Removed"
+          },
+          "ADD_TO_CART": {
+            "event_name": "Product Added"
+          },
+          "DISABLED_ADD_TO_CART": {
+            "event_name": "Insufficient Inventory Atc Clicked"
+          }
+        },
+        "impression_map": {
+          "event_name": "Product Shown"
+        }
+      },
+      "data": {
+        "stepper_data": {
+          "state": {
+            "title": {
+              "text": "enabled"
+            }
+          },
+          "size": "small"
+        },
+        "elevation": 10,
+        "name": {
+          "color": {
+            "tint": "900",
+            "type": "black"
+          },
+          "font": {
+            "weight": "semibold",
+            "size": "300"
+          }
+        },
+        "normal_price": {
+          "color": {
+            "tint": "900",
+            "type": "black"
+          },
+          "font": {
+            "weight": "semibold",
+            "size": "300"
+          }
+        },
+        "snippet_layout_config": {
+          "elevation": 20,
+          "top_radius": 12,
+          "padding": "8,8,8,8",
+          "corner_radius": 12,
+          "bottom_radius": 12,
+          "border": {
+            "width": 1,
+            "colors": [
+              {
+                "tint": "100",
+                "type": "grey"
+              }
+            ]
+          }
+        },
+        "mrp": {
+          "color": {
+            "tint": "600",
+            "type": "grey"
+          },
+          "font": {
+            "weight": "medium",
+            "size": "200"
+          },
+          "is_markdown": 1
+        },
+        "image": {},
+        "visible_card": 1.068,
+        "variant": {
+          "color": {
+            "tint": "800",
+            "type": "grey"
+          },
+          "number_of_lines": 1,
+          "font": {
+            "weight": "medium",
+            "size": "200"
+          }
+        },
+        "show_variant_dropdown": false,
+        "corner_radius": 12,
+        "show_border": false,
+        "bg_color": {
+          "tint": "900",
+          "type": "white"
+        },
+        "animation_type": "SCALE_EFFECT",
+        "offer_tag": {
+          "title": {}
+        },
+        "visible_cards": 1.068
+      },
+      "snippet_type": "product_card_bounded_horizontal"
+    },
+    "product": {
+      "tracking": {
+        "impression_map": {
+          "event_name": "Product Shown"
+        },
+        "interactions_map": {
+          "CUSTOM_CTA": {
+            "event_name": "Buy Now Clicked"
+          },
+          "PRODUCT_FAVORITE_ICON": {
+            "event_name": "Product Favourite Icon Clicked"
+          },
+          "NOTIFY_ME": {
+            "event_name": "Notify Me Clicked"
+          },
+          "REMOVE_FROM_CART": {
+            "event_name": "Product Removed"
+          },
+          "ADD_TO_CART": {
+            "event_name": "Product Added"
+          },
+          "DISABLED_ADD_TO_CART": {
+            "event_name": "Insufficient Inventory Atc Clicked"
+          }
+        },
+        "click_map": {
+          "event_name": "Product Clicked"
+        }
+      },
+      "data": {
+        "stepper_data": {
+          "state": {
+            "title": {
+              "text": "enabled"
+            }
+          },
+          "size": "small"
+        },
+        "name": {
+          "color": {
+            "tint": "900",
+            "type": "black"
+          },
+          "font": {
+            "weight": "semibold",
+            "size": "300"
+          }
+        },
+        "normal_price": {
+          "color": {
+            "tint": "900",
+            "type": "black"
+          },
+          "font": {
+            "weight": "semibold",
+            "size": "300"
+          }
+        },
+        "mrp": {
+          "color": {
+            "tint": "600",
+            "type": "grey"
+          },
+          "font": {
+            "weight": "medium",
+            "size": "200"
+          }
+        },
+        "image": {},
+        "visible_card": 2.8,
+        "variant": {
+          "color": {
+            "tint": "800",
+            "type": "grey"
+          },
+          "number_of_lines": 1,
+          "font": {
+            "weight": "medium",
+            "size": "200"
+          }
+        },
+        "show_variant_dropdown": false,
+        "bg_color": {
+          "tint": "900",
+          "type": "white"
+        },
+        "show_border": false,
+        "animation_type": "SCALE_EFFECT",
+        "offer_tag": {
+          "title": {}
+        },
+        "visible_cards": 2.8
+      },
+      "snippet_type": "product_card_type_unbounded"
+    },
+    "product_horizontal_bounded": {
+      "tracking": {
+        "click_map": {
+          "event_name": "Product Clicked"
+        },
+        "interactions_map": {
+          "CUSTOM_CTA": {
+            "event_name": "Buy Now Clicked"
+          },
+          "TOP_RIGHT_ICON": {
+            "event_name": "ITEM_REMOVED_CLICKED"
+          },
+          "PRODUCT_FAVORITE_ICON": {
+            "event_name": "Product Favourite Icon Clicked"
+          },
+          "NOTIFY_ME": {
+            "event_name": "Notify Me Clicked"
+          },
+          "REMOVE_FROM_CART": {
+            "event_name": "Product Removed"
+          },
+          "ADD_TO_CART": {
+            "event_name": "Product Added"
+          },
+          "DISABLED_ADD_TO_CART": {
+            "event_name": "Insufficient Inventory Atc Clicked"
+          }
+        },
+        "impression_map": {
+          "event_name": "Product Shown"
+        }
+      },
+      "data": {
+        "stepper_data": {
+          "state": {
+            "title": {
+              "text": "enabled"
+            }
+          },
+          "size": "small"
+        },
+        "elevation": 10,
+        "name": {
+          "color": {
+            "tint": "900",
+            "type": "black"
+          },
+          "font": {
+            "weight": "semibold",
+            "size": "300"
+          }
+        },
+        "normal_price": {
+          "color": {
+            "tint": "900",
+            "type": "black"
+          },
+          "font": {
+            "weight": "semibold",
+            "size": "300"
+          }
+        },
+        "snippet_layout_config": {
+          "elevation": 20,
+          "top_radius": 12,
+          "padding": "8,8,8,8",
+          "corner_radius": 12,
+          "bottom_radius": 12,
+          "border": {
+            "width": 1,
+            "colors": [
+              {
+                "tint": "100",
+                "type": "grey"
+              }
+            ]
+          }
+        },
+        "mrp": {
+          "color": {
+            "tint": "600",
+            "type": "grey"
+          },
+          "font": {
+            "weight": "medium",
+            "size": "200"
+          },
+          "is_markdown": 1
+        },
+        "image": {},
+        "visible_card": 1.45,
+        "variant": {
+          "color": {
+            "tint": "800",
+            "type": "grey"
+          },
+          "number_of_lines": 1,
+          "font": {
+            "weight": "medium",
+            "size": "200"
+          }
+        },
+        "show_variant_dropdown": false,
+        "corner_radius": 12,
+        "show_border": false,
+        "bg_color": {
+          "tint": "900",
+          "type": "white"
+        },
+        "animation_type": "SCALE_EFFECT",
+        "offer_tag": {
+          "title": {}
+        },
+        "visible_cards": 1.45
+      },
+      "snippet_type": "product_card_bounded_horizontal"
+    },
+    "pill": {
+      "tracking": {
+        "impression_map": {
+          "event_name": "Pill Shown"
+        },
+        "click_map": {
+          "event_name": "Pill Clicked"
+        }
+      },
+      "data": {
+        "selected_pill_data": {
+          "bg_color": {
+            "tint": "700",
+            "type": "green"
+          },
+          "stroke_color": {
+            "tint": "700",
+            "type": "green"
+          },
+          "title": {
+            "color": {
+              "tint": "900",
+              "type": "white"
+            },
+            "font": {
+              "weight": "semibold",
+              "size": "200"
+            }
+          },
+          "stroke_width": 0.5,
+          "padding": "12,6,12,6",
+          "corner_radius": 8,
+          "margin": "0,0,0,0"
+        },
+        "unselected_pill_data": {
+          "bg_color": {
+            "tint": "900",
+            "type": "white"
+          },
+          "stroke_color": {
+            "tint": "300",
+            "type": "grey"
+          },
+          "title": {
+            "color": {
+              "tint": "800",
+              "type": "grey"
+            },
+            "font": {
+              "weight": "medium",
+              "size": "200"
+            }
+          },
+          "stroke_width": 0.5,
+          "padding": "12,6,12,6",
+          "corner_radius": 8,
+          "margin": "0,0,8,0"
+        }
+      },
+      "snippet_type": "pill_snippet_type_2"
+    },
+    "product_horizontal": {
+      "tracking": {
+        "impression_map": {
+          "event_name": "Product Shown"
+        },
+        "interactions_map": {
+          "CUSTOM_CTA": {
+            "event_name": "Buy Now Clicked"
+          },
+          "PRODUCT_FAVORITE_ICON": {
+            "event_name": "Product Favourite Icon Clicked"
+          },
+          "NOTIFY_ME": {
+            "event_name": "Notify Me Clicked"
+          },
+          "REMOVE_FROM_CART": {
+            "event_name": "Product Removed"
+          },
+          "ADD_TO_CART": {
+            "event_name": "Product Added"
+          },
+          "DISABLED_ADD_TO_CART": {
+            "event_name": "Insufficient Inventory Atc Clicked"
+          }
+        },
+        "click_map": {
+          "event_name": "Product Clicked"
+        }
+      },
+      "data": {
+        "stepper_data": {
+          "state": {
+            "title": {
+              "text": "enabled"
+            }
+          },
+          "size": "small"
+        },
+        "elevation": 10,
+        "name": {
+          "color": {
+            "tint": "900",
+            "type": "black"
+          },
+          "font": {
+            "weight": "semibold",
+            "size": "300"
+          }
+        },
+        "normal_price": {
+          "color": {
+            "tint": "900",
+            "type": "black"
+          },
+          "font": {
+            "weight": "semibold",
+            "size": "300"
+          }
+        },
+        "snippet_layout_config": {
+          "elevation": 20,
+          "top_radius": 12,
+          "padding": "8,8,8,8",
+          "corner_radius": 12,
+          "bottom_radius": 12,
+          "border": {
+            "width": 1,
+            "colors": [
+              {
+                "tint": "100",
+                "type": "grey"
+              }
+            ]
+          }
+        },
+        "mrp": {
+          "color": {
+            "tint": "600",
+            "type": "grey"
+          },
+          "font": {
+            "weight": "medium",
+            "size": "200"
+          },
+          "is_markdown": 1
+        },
+        "image": {},
+        "visible_card": 1.45,
+        "variant": {
+          "color": {
+            "tint": "800",
+            "type": "grey"
+          },
+          "number_of_lines": 1,
+          "font": {
+            "weight": "medium",
+            "size": "200"
+          }
+        },
+        "show_variant_dropdown": false,
+        "corner_radius": 12,
+        "show_border": false,
+        "bg_color": {
+          "tint": "900",
+          "type": "white"
+        },
+        "animation_type": "SCALE_EFFECT",
+        "offer_tag": {
+          "title": {}
+        },
+        "visible_cards": 1.45
+      },
+      "snippet_type": "product_card_bounded_horizontal"
+    }
+  },
+  "page_meta": {
+    "id": null,
+    "revision_id": "1",
+    "custom_data": {
+      "shipments": [
+        {
+          "shipment_value": 54,
+          "slot_amount": 0,
+          "slot_date": "24 Oct 2025",
+          "shipment_type": "GROCERY",
+          "is_earliest_slot": true,
+          "slot_time": "5:30 PM - 6 PM",
+          "shipment_id": "177"
+        }
+      ],
+      "merchants": [
+        {
+          "serviceability_reason": null,
+          "is_serviceable": true,
+          "merchant_id": 41217,
+          "product_ids": [
+            212722
+          ],
+          "assortment_tag": "express"
+        }
+      ],
+      "unique_products_in_cart": 1,
+      "items_in_cart": 2,
+      "cart_value": 54,
+      "shipping": 25,
+      "products": [
+        {
+          "name": "Nestle KitKat 4 Fingers Choco Coated Wafer Chocolate",
+          "type_id": 3598,
+          "price": 27,
+          "mrp": 35,
+          "brand_name": "Nestle KitKat",
+          "inventory_limit": 50,
+          "currency": "INR",
+          "sbc_price": 27,
+          "quantity": 2,
+          "shipment_id": "177",
+          "product_id": 212722
+        }
+      ],
+      "total_shipments_in_cart": 1,
+      "current_cart_savings": 16,
+      "total_products_in_cart": 2
+    },
+    "name": "Cart",
+    "title": "Cart"
+  },
+  "actions": [
+    {
+      "type": "trigger_observers",
+      "tracking": null,
+      "data": {
+        "trigger": "ETA"
+      }
+    },
+    {
+      "type": "sync_user_session",
+      "tracking": {
+        "custom_data": {
+          "dialog_type": "FORCE_LOGOUT_USER"
+        }
+      },
+      "data": null
+    }
+  ],
+  "cart_data": {
+    "cart_type": "product",
+    "address_id": null,
+    "user_gst_detail": null,
+    "disabled_payment_modes": null,
+    "gift_details": null,
+    "checkout_block_details": null,
+    "status_code": 0,
+    "slot_details": null,
+    "updated_at": 0,
+    "is_checked_out": false,
+    "is_gst_opted": false,
+    "rewards": null,
+    "saved_items_widget_data": null,
+    "is_free_delivery_offer_applied": false,
+    "snackbar_info_strip": null,
+    "unavailable_products": [],
+    "gift_visibility": null,
+    "membership_config": null,
+    "id": 0,
+    "serviceability_location_polygon": null,
+    "is_sos": false,
+    "app_client": "consumer_web",
+    "user_id": 0,
+    "karma_info": null,
+    "additional_charges": [
+      {
+        "amount": 2,
+        "meta": {
+          "variation": [
+            {
+              "amount": 2,
+              "mov": 0,
+              "strike_off_amount": 0
+            }
+          ]
+        },
+        "charge_id": 3,
+        "name": null
+      },
+      {
+        "amount": 20,
+        "meta": {
+          "variation": [
+            {
+              "amount": 20,
+              "mov": 0,
+              "strike_off_amount": 20
+            },
+            {
+              "amount": 0,
+              "mov": 99,
+              "strike_off_amount": 0
+            }
+          ]
+        },
+        "charge_id": 7,
+        "name": null
+      }
+    ],
+    "merchant_details": {
+      "id": 41217
+    },
+    "promo_snackbar_details": {
+      "rule_set": []
+    },
+    "pharmacy_serviceability": {
+      "pharmacist_reopen_time": "",
+      "rx_picking_time": 0,
+      "central_pharmacist_serviceable": false,
+      "reason_code": "",
+      "doctor_reopen_time": ""
+    },
+    "merchant_status": [
+      {
+        "is_serviceable": true,
+        "merchant_id": 41217,
+        "reason_code": null,
+        "product_ids": [
+          212722
+        ],
+        "assortment_tag": "express"
+      }
+    ],
+    "available_entities": [],
+    "is_festive_offer_applied": null,
+    "import_z_address_data": null,
+    "zgold_freedc_offer_details": null,
+    "is_all_digital_item": false,
+    "delivery_instructions": {
+      "delivery_suggestion": [],
+      "is_save_instruction": false
+    },
+    "entry_source": null,
+    "poi_location_polygon_config": null,
+    "zgold_freedc_campaign": null,
+    "app_version": "52434332",
+    "free_delivery_offer": null,
+    "parent_checked_out_cart_id": 0,
+    "shipments": [
+      {
+        "eta_callout": null,
+        "serviceability_status": {
+          "is_checkout_disabled": false,
+          "reason_code": null,
+          "is_disrupted": false,
+          "next_start_time": null
+        },
+        "is_free_slot_available": false,
+        "bill_details": {
+          "total_items": 2,
+          "bill_total": 54,
+          "total_mrp": 70,
+          "total_cost": 54,
+          "unavailable_items": 0,
+          "available_items": 2,
+          "product_discount": 16,
+          "surge_charge_v2": {
+            "is_cached": false,
+            "surge_amount": 0,
+            "is_graded_mec_fe_surge_enabled": false,
+            "striked_off_amount": 0,
+            "fe_mec_type": "",
+            "mov": 0,
+            "picker_mec_type": "",
+            "source": "",
+            "is_mec_picker_surge_enabled": false,
+            "rain_device": null,
+            "checkouts_block_mov": 0,
+            "rain_coverage": 0,
+            "type": "",
+            "small_cart_fee": 0,
+            "small_cart_mov": 99
+          },
+          "slot_charge": 0
+        },
+        "is_earlier_slot_available": false,
+        "are_more_slots_available": false,
+        "merchant_type": "GROCERY",
+        "product_ids": [
+          212722
+        ],
+        "merchant_id": 41217,
+        "slot_details": {
+          "cashback_amount": 0,
+          "end": 1761309000,
+          "are_all_products_deliverable": null,
+          "serviceability": {
+            "new_user_priority_score": null,
+            "eta_threshold_override": {
+              "config": {
+                "is_enabled": false,
+                "max_eta": 0
+              },
+              "is_override": false,
+              "tags": null
+            },
+            "session_id": "e7b50366-aa9d-4f5d-bdbd-31c7f0bf5127",
+            "surge_charge_v2": {
+              "is_cached": false,
+              "surge_amount": 0,
+              "is_graded_mec_fe_surge_enabled": false,
+              "striked_off_amount": 0,
+              "fe_mec_type": "",
+              "mov": 0,
+              "picker_mec_type": "",
+              "source": "",
+              "is_mec_picker_surge_enabled": true,
+              "rain_device": null,
+              "checkouts_block_mov": 0,
+              "rain_coverage": 0,
+              "type": "FLAT",
+              "small_cart_fee": 20,
+              "small_cart_mov": 99
+            },
+            "near_by_stores": {
+              "is_enabled": false,
+              "disrupted_merchants": null,
+              "primary_merchants": null
+            },
+            "serviceability_tags": [],
+            "merchants": {
+              "41217": {
+                "assortment_tags": [
+                  "express"
+                ]
+              }
+            },
+            "customer_lat": 28.6276781,
+            "disruption_index": {
+              "picker": 0,
+              "fe_di_with_busy_picker": 0.2857142857,
+              "fe": 0
+            },
+            "batching": {
+              "is_batching_enabled": false,
+              "store_stress_level": 1,
+              "location_polygon": null,
+              "handshake_time": 1.5
+            },
+            "user_priority": {
+              "score": 3,
+              "tags": [
+                {
+                  "name": "new_user",
+                  "value": 3
+                }
+              ]
+            },
+            "location_polygon": null,
+            "eta_override": null,
+            "is_new_user": true,
+            "components": [
+              {
+                "duration": 3.7319672108,
+                "type": "activity",
+                "payload": {
+                  "computation_method": "model",
+                  "distance_calculation_method": "zosrm",
+                  "distances": [
+                    {
+                      "name": "road_network",
+                      "value": 1.0396
+                    }
+                  ],
+                  "computed_duration": 3.7319672108,
+                  "model_version": "se_travel_time_estimation_less_than_4km_v1.0_202509301155",
+                  "buffer_duration": 0,
+                  "google_maps_data": null,
+                  "speed": 16.713973215,
+                  "model_name": "se_travel_time_estimation_less_than_4km"
+                },
+                "name": "travel",
+                "display_duration": 5.3897045326
+              },
+              {
+                "duration": 0.4306117334,
+                "type": "activity",
+                "payload": {
+                  "assembly_time_model_id": "",
+                  "computation_method": "model",
+                  "constant_picking_duration": 0.4306117334,
+                  "max_eta_station_id": 0,
+                  "picking_duration_per_sku": 0.4306117334,
+                  "order_preparation_time": 0,
+                  "model_version": "se_picking_time_estimation_v1.0_202501291106",
+                  "assembly_time": 0,
+                  "prep_time": 0,
+                  "picking_duration": 0.4306117334,
+                  "sku_per_order": 1,
+                  "model_name": "se_picking_time_estimation",
+                  "min_wait_time": 0
+                },
+                "name": "picking",
+                "display_duration": 0.4378697149
+              },
+              {
+                "duration": 0.167,
+                "type": "activity",
+                "payload": {},
+                "name": "billing",
+                "display_duration": 0.1698147931
+              },
+              {
+                "duration": 1.5683993874,
+                "type": "buffer",
+                "payload": {
+                  "dispatch_buffer": 0,
+                  "order_schedule_buffer": 0,
+                  "category_buffer": 0,
+                  "overall_eta_buffer": 0,
+                  "drop_handshake_time": 0,
+                  "picker_eta_buffer": 0,
+                  "fe_eta_buffer": 0,
+                  "model_buffer": 1.5683993874,
+                  "store_buffer": 0.1,
+                  "rain_buffer": 0,
+                  "model_version": "se_buffer_time_estimation_v1.0_20240612084404",
+                  "duration": 1.5683993874,
+                  "model_name": "se_buffer_time_estimation"
+                },
+                "name": "buffer",
+                "display_duration": 0
+              },
+              {
+                "duration": 0.0349622797,
+                "type": "buffer",
+                "payload": {
+                  "additional_buffer": 0,
+                  "pickers_order_backlog": 0,
+                  "busy_pickers": 4,
+                  "mec_eta": 0.0349622797,
+                  "manpower_availability_updated_at": "2025-10-24T11:56:08.228926+00:00",
+                  "picker_turnaround_time": 5,
+                  "available_pickers": 1,
+                  "buffer_duration": 0,
+                  "duration": 0.0349622797,
+                  "formula_eta": 0,
+                  "mec_eta_updated_at": "2025-10-24T11:56:18.423412",
+                  "selected_source": "manpower_eta_computed"
+                },
+                "name": "picker_eta",
+                "display_duration": 0.0355515706
+              },
+              {
+                "duration": 0,
+                "type": "buffer",
+                "payload": {
+                  "busy_field_executives": 9,
+                  "additional_buffer": 0,
+                  "fe_turnaround_time": 20,
+                  "buffer_duration": 0,
+                  "duration_after_pre_enroute_subtraction": 0,
+                  "field_executives_order_backlog": 0,
+                  "mec_eta": 0.5,
+                  "available_field_executives": 5,
+                  "manpower_availability_updated_at": "2025-10-24T11:56:08.228926+00:00",
+                  "mec_after_buffer_addition": 0.5,
+                  "formula_eta": 0,
+                  "mec_eta_v1": 0.4572565474,
+                  "apply_fe_mec_buffer_flag": false,
+                  "duration": 0.5,
+                  "mec_eta_v2": 0.5,
+                  "selected_source": "manpower_eta_computedV2",
+                  "mec_eta_updated_at": "2025-10-24T11:56:19.634800+00:00"
+                },
+                "name": "field_executive_eta",
+                "display_duration": 0
+              }
+            ],
+            "fleet_serviceability": [
+              {
+                "reopen_time": "18:30",
+                "reason_code": "NO_FLEET_AT_STORE",
+                "carrier_property": {
+                  "available": 0,
+                  "name": "three_wheeler"
+                },
+                "serviceable": false,
+                "eta": 11,
+                "type": "large_order"
+              }
+            ],
+            "schedule": {
+              "is_scheduled": false,
+              "schedule_config": {
+                "is_enabled": false,
+                "buffer_eta": 0,
+                "time_end_HHMM": 0,
+                "mov": 0,
+                "max_eta": 0,
+                "time_start_HHMM": 0
+              }
+            },
+            "user_priority_score": null,
+            "location_hex": "8b3da11480c4fff",
+            "surge_charge": 0,
+            "customer_lon": 77.2935263,
+            "merchant_rank": 1,
+            "computed_eta": 6,
+            "assortment_tags": [
+              "express"
+            ],
+            "distance": 1.0396,
+            "store_handshake_time": 1.5683993874,
+            "serviceability_reason": null,
+            "user_dependency_score": null,
+            "overlapping_merchants": {
+              "STORE_POLYGON": [
+                "41217"
+              ],
+              "SUPER_LONGTAIL": [
+                "39468"
+              ],
+              "LONGTAIL_POLYGON": [
+                "43649"
+              ],
+              "NIGHT_POLYGON": [
+                "31408"
+              ]
+            },
+            "serviceable": true,
+            "is_batching_enabled": false,
+            "eta": 8,
+            "entity_serviceability": [
+              {
+                "reopen_time": null,
+                "reason_code": "NO_PHARMACIST_AT_STORE",
+                "serviceable": false,
+                "eta": null,
+                "value": "otx",
+                "type": "pharma"
+              },
+              {
+                "reopen_time": null,
+                "reason_code": "NO_PHARMACIST_AT_STORE",
+                "serviceable": false,
+                "eta": null,
+                "value": "rx",
+                "type": "pharma"
+              },
+              {
+                "reopen_time": null,
+                "reason_code": "NO_PHARMACIST_AT_STORE",
+                "serviceable": false,
+                "eta": null,
+                "value": "doctor",
+                "type": "pharma"
+              },
+              {
+                "reopen_time": null,
+                "reason_code": "NO_PHARMACIST_AT_STORE",
+                "serviceable": false,
+                "eta": null,
+                "value": "pharmacist",
+                "type": "pharma"
+              },
+              {
+                "reopen_time": null,
+                "reason_code": "SERVICE_NOT_AVAILABLE",
+                "value": "fan_installation",
+                "eta": null,
+                "serviceable": false,
+                "service_id": 704,
+                "type": "installation"
+              }
+            ],
+            "total_eta": 7.5,
+            "union_assortment_tags": null
+          },
+          "is_default": true,
+          "start": 1761307200,
+          "slot_type": "normal",
+          "is_closed": false,
+          "surge_charge_v2": {
+            "is_cached": false,
+            "surge_amount": 0,
+            "is_graded_mec_fe_surge_enabled": false,
+            "striked_off_amount": 0,
+            "fe_mec_type": "",
+            "mov": 0,
+            "picker_mec_type": "",
+            "source": "",
+            "is_mec_picker_surge_enabled": false,
+            "rain_device": null,
+            "checkouts_block_mov": 0,
+            "rain_coverage": 0,
+            "type": "",
+            "small_cart_fee": 0,
+            "small_cart_mov": 99
+          },
+          "slot_charge": 0,
+          "capacity_type": "default"
+        },
+        "weight_limit": 100000,
+        "checkouts_block_mov": 0,
+        "items": [
+          {
+            "group_id": 2374087,
+            "return_product_config": {
+              "eligibility_days": 0,
+              "is_exchange_eligible": false,
+              "is_return_eligible": false
+            },
+            "is_forced_oos": false,
+            "weight": 42,
+            "type_id": 3598,
+            "additional_charges": null,
+            "updated_at": 1761306983,
+            "is_digital_item": false,
+            "service_tag": "",
+            "mapping_id": 304232236,
+            "is_giftable_item": false,
+            "merchant_type": "express",
+            "meta": null,
+            "is_gift_wrappable_item": true,
+            "categories": [
+              {
+                "name": "Wafer Chocolates",
+                "level": null,
+                "is_primary": true,
+                "parent_id": null,
+                "type": null,
+                "id": 1172
+              }
+            ],
+            "food_type": "veg",
+            "attributes": null,
+            "cart_id": null,
+            "unit": "38 g",
+            "should_validate_imei": null,
+            "gifting_details": null,
+            "merchant_id": 41217,
+            "themes": [],
+            "combo_composition": [],
+            "group_config": {
+              "group_type": ""
+            },
+            "combo_flag": false,
+            "shipment_id": "41217",
+            "packaging_type": null,
+            "shipment_split_key": "177",
+            "pharmacy_product_type": null,
+            "discounts": null,
+            "large_image_url": "https://cdn.grofers.com/da/cms-assets/cms/product/large_images/3b163ea4-b9e4-4828-81a4-9a297e0ded41.jpg?ts=1760008131",
+            "brand_code": null,
+            "is_imported_from_external_source": false,
+            "inventory_limit_toast_type": "default",
+            "total_discount": 0,
+            "offer_meta": {
+              "1609": true
+            },
+            "image_url": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.jpg",
+            "purchase_limit": null,
+            "type": {
+              "id": 3598,
+              "name": "Wafer Chocolate"
+            },
+            "brand": "Nestle KitKat",
+            "cashback_amount": null,
+            "is_easy_return_eligible": null,
+            "total_mrp": 70,
+            "is_gift_item": null,
+            "price": 27,
+            "variant": null,
+            "entity_attributes": [
+              {
+                "name": "Unit",
+                "value": "38 g",
+                "sort_order": 1,
+                "attribute_id": 80,
+                "service_type": "PDP",
+                "type": "key_highlights",
+                "id": 142816
+              },
+              {
+                "name": "Unit",
+                "value": "38 g",
+                "sort_order": 1,
+                "attribute_id": 80,
+                "service_type": "PLP",
+                "type": "key_highlights",
+                "id": 142822
+              },
+              {
+                "name": "Chocolate Type",
+                "value": "Wafer Chocolate",
+                "sort_order": 2,
+                "attribute_id": 3267,
+                "service_type": "PLP",
+                "type": "key_highlights",
+                "id": 142823
+              },
+              {
+                "name": "Return Service Promise",
+                "value": "72 Hours Replacement",
+                "sort_order": 3,
+                "attribute_id": 3591,
+                "service_type": "PDP",
+                "type": "service_promises",
+                "id": 103375
+              },
+              {
+                "name": "Cocoa Percentage",
+                "value": "4.50%",
+                "sort_order": 4,
+                "attribute_id": 4882,
+                "service_type": "PDP",
+                "type": "key_highlights",
+                "id": 142819
+              },
+              {
+                "name": "Cocoa Percentage",
+                "value": "4.50%",
+                "sort_order": 4,
+                "attribute_id": 4882,
+                "service_type": "PLP",
+                "type": "key_highlights",
+                "id": 142825
+              },
+              {
+                "name": "Chocolate Type",
+                "value": "Wafer Chocolate",
+                "sort_order": 5,
+                "attribute_id": 3267,
+                "service_type": "PDP",
+                "type": "key_highlights",
+                "id": 142820
+              },
+              {
+                "name": "Shelf Life",
+                "value": "9 months",
+                "sort_order": 6,
+                "attribute_id": 242,
+                "service_type": "PDP",
+                "type": "key_highlights",
+                "id": 142821
+              }
+            ],
+            "denomination": null,
+            "enabled_flag": true,
+            "gift_ineligible_reason": null,
+            "promos": [],
+            "handling_type": "refrigerated",
+            "is_available": null,
+            "unavailable_quantity": 0,
+            "is_obd_eligible": false,
+            "milestone_id": null,
+            "offer_type": "",
+            "ofse_details": null,
+            "is_auto_add_freebie": null,
+            "grofers_price": 0,
+            "third_party_services": null,
+            "total_price": 54,
+            "name": "Nestle KitKat 4 Fingers Choco Coated Wafer Chocolate",
+            "product_tags": [
+              {
+                "type": "oln_english",
+                "properties": [],
+                "name": "Kit kat",
+                "id": 10766
+              },
+              {
+                "type": "oln_english",
+                "properties": [],
+                "name": "Sharebag",
+                "id": 10763
+              },
+              {
+                "type": "oln_english",
+                "properties": [],
+                "name": "gift",
+                "id": 2103
+              },
+              {
+                "type": "oln_english",
+                "properties": [],
+                "name": "break",
+                "id": 10767
+              },
+              {
+                "type": "oln_english",
+                "properties": [],
+                "name": "cocoa",
+                "id": 2174
+              },
+              {
+                "type": "oln_english",
+                "properties": [],
+                "name": "assorted",
+                "id": 5230
+              },
+              {
+                "type": "oln_english",
+                "properties": [],
+                "name": "assortment",
+                "id": 10768
+              },
+              {
+                "type": "oln_english",
+                "properties": [],
+                "name": "premium",
+                "id": 2024
+              },
+              {
+                "type": "oln_english",
+                "properties": [],
+                "name": "festive",
+                "id": 3162
+              }
+            ],
+            "item_attributes": [],
+            "created_at": 1761306983,
+            "mrp": 35,
+            "storage_type": "fridge",
+            "inventory_limit": 50,
+            "request_quantity": 2,
+            "category_hierarchy": [
+              {
+                "is_leaf": true,
+                "is_primary": true,
+                "type": "subcategory",
+                "id": 1172
+              },
+              {
+                "is_leaf": false,
+                "is_primary": true,
+                "type": "subcategory",
+                "id": 944
+              },
+              {
+                "is_leaf": false,
+                "is_primary": true,
+                "type": "category",
+                "id": 9
+              }
+            ],
+            "id": 212722,
+            "related_brand": {
+              "display_name": "Nestle KitKat",
+              "id": 3549,
+              "properties": []
+            },
+            "freedc_threshold": null,
+            "png_image_url": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.png",
+            "image_url_v2": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.jpg",
+            "model": null,
+            "services_opted": null,
+            "product_id": 212722,
+            "order": null,
+            "is_on_demand": null,
+            "quantity": 2
+          }
+        ],
+        "depot_id": null,
+        "split_key": "177"
+      }
+    ],
+    "should_consume_address": true,
+    "meta_info": null,
+    "tip_suggestions": null,
+    "shared_cart_key": null,
+    "snackbar": {
+      "data": null,
+      "ruleset": []
+    },
+    "gift_wrapping_merchant_bag_details": null,
+    "is_active": true,
+    "gifting_details": {
+      "wrap": {
+        "is_enabled": true,
+        "is_opted": false,
+        "charge": 30,
+        "is_available": false
+      },
+      "card": {
+        "is_enabled": false,
+        "is_opted": false,
+        "charge": 5,
+        "is_available": false
+      }
+    },
+    "low_consideration_recommendations": [],
+    "unavailable_entities": [],
+    "feeding_india_default_amount": null,
+    "gift_details_v2": null,
+    "parent_cart_id": null,
+    "payment_option_details": {
+      "is_non_grocery_cart": false,
+      "additional_params": "{\"block_payment_methods\": [], \"eligible_bank_codes\": null, \"emi_details\": null, \"hidden_payment_methods\": [], \"service_type\": \"BLINKIT\", \"show_warning_banner\": 1, \"user_details\": {\"addressDetails\": null}}",
+      "credits_used": 0,
+      "reset_payment_method": false,
+      "promo_details": {
+        "share_promo_details_with_sdk": false,
+        "promo_code": ""
+      },
+      "service_type": "BLINKIT",
+      "payments_config_params": null
+    },
+    "patient_contact_details": null,
+    "gifting_widget_state": "",
+    "validations": [
+      {
+        "code": "FORCE_LOGOUT_USER",
+        "data": null
+      }
+    ],
+    "is_all_pharmacy_item": false,
+    "device_id": "29c286a5ac5cf300",
+    "pharmacy_cart_prescription": null,
+    "is_gift": false,
+    "prioritised_oos_recommendations": null,
+    "address": null,
+    "cart_flow_type": "",
+    "cart_properties": {},
+    "bill_details": {
+      "additional_charge": 22,
+      "product_discount": 16,
+      "surge_charge_v2": {
+        "is_cached": false,
+        "surge_amount": 0,
+        "is_graded_mec_fe_surge_enabled": false,
+        "striked_off_amount": 0,
+        "fe_mec_type": "",
+        "mov": 0,
+        "picker_mec_type": "",
+        "source": "",
+        "is_mec_picker_surge_enabled": false,
+        "rain_device": null,
+        "checkouts_block_mov": 0,
+        "rain_coverage": 0,
+        "type": "",
+        "small_cart_fee": 0,
+        "small_cart_mov": 99
+      },
+      "slot_charge": 0,
+      "payable_amount": 101,
+      "total_items": 2,
+      "freedc_reason": null,
+      "delivery_charge": 25,
+      "total_cost": 54,
+      "is_all_digital_item": false,
+      "gifting_services_charge": null,
+      "gateway_offers": null,
+      "reserved_amount_for_payment_method": 0,
+      "bill_total": 101,
+      "total_mrp": 70,
+      "only_print_items": false,
+      "unavailable_items": 0,
+      "offer_discounts": null,
+      "gateway_payable_amount": null,
+      "free_delivery_mov": 250,
+      "non_gateway_offers_order_tags": null,
+      "show_delivery_sub_text": true,
+      "promo_discount": 0,
+      "bxgy_discounts": null,
+      "emi_details": null,
+      "available_items": 2,
+      "z_money_data": null,
+      "flat_delivery_charge_attributes": {
+        "next_construct_delivery_charge": 0,
+        "min_amount": 0,
+        "variation_id": 11,
+        "flat_delivery_charge": 25,
+        "required_amount_for_next_discount": 146,
+        "free_delivery_mov": 199,
+        "striked_off_delivery_charge": 25,
+        "graded_delivery_charge_constructs": [
+          {
+            "max_amount": 199,
+            "delivery_charge": 25,
+            "striked_off_amount": 25,
+            "min_amount": 0
+          },
+          {
+            "max_amount": 99999,
+            "delivery_charge": 0,
+            "striked_off_amount": 25,
+            "min_amount": 199
+          }
+        ]
+      }
+    },
+    "items": [
+      {
+        "return_product_config": {
+          "eligibility_days": 0,
+          "is_exchange_eligible": false,
+          "is_return_eligible": false
+        },
+        "is_forced_oos": false,
+        "type_id": 3598,
+        "mrp": 35,
+        "updated_at": 1761306983,
+        "membership_price": null,
+        "service_tag": "",
+        "mapping_id": 304232236,
+        "merchant_type": "express",
+        "is_beauty_freebie": null,
+        "is_gift_wrappable_item": true,
+        "additional_info": {
+          "is_gift_item": null
+        },
+        "unit": "38 g",
+        "offer_type": "",
+        "shipment_split_key": "177",
+        "discounts": null,
+        "inventory": 50,
+        "offer_meta": {
+          "1609": true
+        },
+        "type": {
+          "id": 3598,
+          "name": "Wafer Chocolate"
+        },
+        "price": 27,
+        "inventory_limit_toast_type": "default",
+        "is_membership_enabled": null,
+        "is_easy_return_eligible": null,
+        "total_mrp": 70,
+        "name": "Nestle KitKat 4 Fingers Choco Coated Wafer Chocolate",
+        "quantity": 2,
+        "is_gift_item": null,
+        "brand": "Nestle KitKat",
+        "attribute_group_collection": null,
+        "png_image_url": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.png",
+        "promos": [],
+        "image_url_v2": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.jpg",
+        "unavailable_quantity": 0,
+        "is_obd_eligible": false,
+        "merchant_id": 41217,
+        "categories": [
+          {
+            "name": "Wafer Chocolates",
+            "level": null,
+            "is_primary": true,
+            "parent_id": null,
+            "type": null,
+            "id": 1172
+          }
+        ],
+        "grofers_price": 0,
+        "total_price": 54,
+        "product_id": 212722,
+        "item_attributes": [],
+        "created_at": 1761306983,
+        "is_digital_item": false,
+        "inventory_limit": 50,
+        "image_url": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.jpg",
+        "related_brand": {
+          "logo": "",
+          "display_name": "Nestle KitKat",
+          "store_deep_link": null,
+          "aggregator_brand": null,
+          "id": 3549
+        },
+        "freedc_threshold": 0,
+        "gift_ineligible_reason": null,
+        "group_id": 2374087,
+        "services_opted": null
+      }
+    ],
+    "created_at": 0,
+    "wallet_amount": 0,
+    "error_snackbars": [],
+    "is_save_tip_selected": null,
+    "user_details": null,
+    "gst_applicability_error": "MISSING_DATA_USER_GST_DETAIL",
+    "wallet_details": null,
+    "gift_packing_type": null,
+    "prescription_method_opted": "",
+    "is_save_fi_donation_selected": false,
+    "promo_details": null,
+    "cart_source": null,
+    "cl_id": 0,
+    "gifting_widget_position": ""
+  },
+  "objects": [
+    {
+      "tracking": {
+        "widget_meta": {
+          "custom_data": {
+            "shipment_value": 54,
+            "unique_products_in_shipment": 1,
+            "subtitle": null,
+            "title": "Delivery in 8 minutes",
+            "slot_amount": 0,
+            "slot_date": "24 Oct 2025",
+            "shipment_type": "GROCERY",
+            "products_in_shipment": [
+              {
+                "product_id": 212722
+              }
+            ],
+            "is_earliest_slot": true,
+            "slot_time": "Delivery in 8 minutes",
+            "total_products_in_shipment": 2,
+            "shipment_id": "177"
+          },
+          "name": "Shipment Widget",
+          "title": "Shipment Widget"
+        }
+      },
+      "data": {
+        "mandatory_product_ids": [
+          212722
+        ],
+        "subtitle": null,
+        "right_header": "Shipment of 2 items",
+        "title": "Delivery in 8 minutes",
+        "left_header": null,
+        "highlight_text": "Shipment of 2 items",
+        "action_text": null,
+        "shipment_icon_uri": "https://cdn.grofers.com/assets/eta-icons/15-mins-filled.png",
+        "identity": {
+          "id": "cart_page_shipments_41217"
+        }
+      },
+      "meta": {
+        "slot": {
+          "cashback_amount": 0,
+          "end": 1761309000,
+          "are_all_products_deliverable": null,
+          "serviceability": {
+            "assortment_tags": [
+              "express"
+            ],
+            "eta_threshold_override": {
+              "is_override": false,
+              "config": {
+                "is_enabled": false,
+                "max_eta": 0
+              },
+              "tags": null
+            },
+            "overlapping_merchants": {
+              "STORE_POLYGON": [
+                "41217"
+              ],
+              "SUPER_LONGTAIL": [
+                "39468"
+              ],
+              "LONGTAIL_POLYGON": [
+                "43649"
+              ],
+              "NIGHT_POLYGON": [
+                "31408"
+              ]
+            },
+            "surge_charge_v2": {
+              "surge_amount": 0,
+              "is_graded_mec_fe_surge_enabled": false,
+              "striked_off_amount": 0,
+              "fe_mec_type": "",
+              "mov": 0,
+              "picker_mec_type": "",
+              "source": "",
+              "rain_device": null,
+              "is_mec_picker_surge_enabled": true,
+              "is_cached": false,
+              "checkouts_block_mov": 0,
+              "rain_coverage": 0,
+              "type": "FLAT",
+              "small_cart_fee": 20,
+              "small_cart_mov": 99
+            },
+            "near_by_stores": {
+              "is_enabled": false,
+              "disrupted_merchants": null,
+              "primary_merchants": null
+            },
+            "serviceability_tags": [],
+            "merchants": {
+              "41217": {
+                "assortment_tags": [
+                  "express"
+                ]
+              }
+            },
+            "customer_lat": 28.6276781,
+            "disruption_index": {
+              "picker": 0,
+              "fe_di_with_busy_picker": 0.2857142857,
+              "fe": 0
+            },
+            "serviceable": true,
+            "batching": {
+              "is_batching_enabled": false,
+              "store_stress_level": 1,
+              "location_polygon": null,
+              "handshake_time": 1.5
+            },
+            "user_priority": {
+              "score": 3,
+              "tags": [
+                {
+                  "name": "new_user",
+                  "value": 3
+                }
+              ]
+            },
+            "location_polygon": null,
+            "eta_override": null,
+            "is_new_user": true,
+            "total_eta": 7.5,
+            "fleet_serviceability": [
+              {
+                "reopen_time": "18:30",
+                "reason_code": "NO_FLEET_AT_STORE",
+                "carrier_property": {
+                  "available": 0,
+                  "name": "three_wheeler"
+                },
+                "serviceable": false,
+                "eta": 11,
+                "type": "large_order"
+              }
+            ],
+            "schedule": {
+              "is_scheduled": false,
+              "schedule_config": {
+                "is_enabled": false,
+                "buffer_eta": 0,
+                "time_end_HHMM": 0,
+                "mov": 0,
+                "max_eta": 0,
+                "time_start_HHMM": 0
+              }
+            },
+            "user_priority_score": null,
+            "location_hex": "8b3da11480c4fff",
+            "surge_charge": 0,
+            "customer_lon": 77.2935263,
+            "merchant_rank": 1,
+            "computed_eta": 6,
+            "new_user_priority_score": null,
+            "distance": 1.0396,
+            "store_handshake_time": 1.5683993874,
+            "serviceability_reason": null,
+            "user_dependency_score": null,
+            "session_id": "e7b50366-aa9d-4f5d-bdbd-31c7f0bf5127",
+            "is_batching_enabled": false,
+            "eta": 8,
+            "entity_serviceability": [
+              {
+                "reopen_time": null,
+                "reason_code": "NO_PHARMACIST_AT_STORE",
+                "value": "otx",
+                "eta": null,
+                "serviceable": false,
+                "type": "pharma"
+              },
+              {
+                "reopen_time": null,
+                "reason_code": "NO_PHARMACIST_AT_STORE",
+                "value": "rx",
+                "eta": null,
+                "serviceable": false,
+                "type": "pharma"
+              },
+              {
+                "reopen_time": null,
+                "reason_code": "NO_PHARMACIST_AT_STORE",
+                "value": "doctor",
+                "eta": null,
+                "serviceable": false,
+                "type": "pharma"
+              },
+              {
+                "reopen_time": null,
+                "reason_code": "NO_PHARMACIST_AT_STORE",
+                "value": "pharmacist",
+                "eta": null,
+                "serviceable": false,
+                "type": "pharma"
+              },
+              {
+                "reopen_time": null,
+                "reason_code": "SERVICE_NOT_AVAILABLE",
+                "serviceable": false,
+                "eta": null,
+                "value": "fan_installation",
+                "service_id": 704,
+                "type": "installation"
+              }
+            ],
+            "components": [
+              {
+                "duration": 3.7319672108,
+                "display_duration": 5.3897045326,
+                "type": "activity",
+                "payload": {
+                  "computation_method": "model",
+                  "distance_calculation_method": "zosrm",
+                  "distances": [
+                    {
+                      "name": "road_network",
+                      "value": 1.0396
+                    }
+                  ],
+                  "computed_duration": 3.7319672108,
+                  "model_version": "se_travel_time_estimation_less_than_4km_v1.0_202509301155",
+                  "buffer_duration": 0,
+                  "google_maps_data": null,
+                  "speed": 16.713973215,
+                  "model_name": "se_travel_time_estimation_less_than_4km"
+                },
+                "name": "travel"
+              },
+              {
+                "duration": 0.4306117334,
+                "display_duration": 0.4378697149,
+                "type": "activity",
+                "payload": {
+                  "assembly_time_model_id": "",
+                  "computation_method": "model",
+                  "constant_picking_duration": 0.4306117334,
+                  "max_eta_station_id": 0,
+                  "picking_duration_per_sku": 0.4306117334,
+                  "order_preparation_time": 0,
+                  "model_version": "se_picking_time_estimation_v1.0_202501291106",
+                  "assembly_time": 0,
+                  "prep_time": 0,
+                  "picking_duration": 0.4306117334,
+                  "sku_per_order": 1,
+                  "model_name": "se_picking_time_estimation",
+                  "min_wait_time": 0
+                },
+                "name": "picking"
+              },
+              {
+                "duration": 0.167,
+                "display_duration": 0.1698147931,
+                "type": "activity",
+                "payload": {},
+                "name": "billing"
+              },
+              {
+                "duration": 1.5683993874,
+                "display_duration": 0,
+                "type": "buffer",
+                "payload": {
+                  "dispatch_buffer": 0,
+                  "order_schedule_buffer": 0,
+                  "category_buffer": 0,
+                  "overall_eta_buffer": 0,
+                  "drop_handshake_time": 0,
+                  "picker_eta_buffer": 0,
+                  "fe_eta_buffer": 0,
+                  "model_buffer": 1.5683993874,
+                  "store_buffer": 0.1,
+                  "rain_buffer": 0,
+                  "model_version": "se_buffer_time_estimation_v1.0_20240612084404",
+                  "duration": 1.5683993874,
+                  "model_name": "se_buffer_time_estimation"
+                },
+                "name": "buffer"
+              },
+              {
+                "duration": 0.0349622797,
+                "display_duration": 0.0355515706,
+                "type": "buffer",
+                "payload": {
+                  "additional_buffer": 0,
+                  "mec_eta": 0.0349622797,
+                  "pickers_order_backlog": 0,
+                  "busy_pickers": 4,
+                  "manpower_availability_updated_at": "2025-10-24T11:56:08.228926+00:00",
+                  "picker_turnaround_time": 5,
+                  "available_pickers": 1,
+                  "buffer_duration": 0,
+                  "duration": 0.0349622797,
+                  "formula_eta": 0,
+                  "mec_eta_updated_at": "2025-10-24T11:56:18.423412",
+                  "selected_source": "manpower_eta_computed"
+                },
+                "name": "picker_eta"
+              },
+              {
+                "duration": 0,
+                "display_duration": 0,
+                "type": "buffer",
+                "payload": {
+                  "duration_after_pre_enroute_subtraction": 0,
+                  "fe_turnaround_time": 20,
+                  "apply_fe_mec_buffer_flag": false,
+                  "additional_buffer": 0,
+                  "field_executives_order_backlog": 0,
+                  "mec_eta": 0.5,
+                  "manpower_availability_updated_at": "2025-10-24T11:56:08.228926+00:00",
+                  "available_field_executives": 5,
+                  "busy_field_executives": 9,
+                  "mec_after_buffer_addition": 0.5,
+                  "formula_eta": 0,
+                  "buffer_duration": 0,
+                  "duration": 0.5,
+                  "mec_eta_v2": 0.5,
+                  "mec_eta_v1": 0.4572565474,
+                  "mec_eta_updated_at": "2025-10-24T11:56:19.634800+00:00",
+                  "selected_source": "manpower_eta_computedV2"
+                },
+                "name": "field_executive_eta"
+              }
+            ],
+            "union_assortment_tags": null
+          },
+          "is_default": true,
+          "start": 1761307200,
+          "slot_type": "normal",
+          "capacity_type": "default",
+          "surge_charge_v2": {
+            "surge_amount": 0,
+            "is_graded_mec_fe_surge_enabled": false,
+            "striked_off_amount": 0,
+            "fe_mec_type": "",
+            "mov": 0,
+            "picker_mec_type": "",
+            "source": "",
+            "rain_device": null,
+            "is_mec_picker_surge_enabled": false,
+            "is_cached": false,
+            "checkouts_block_mov": 0,
+            "rain_coverage": 0,
+            "type": "",
+            "small_cart_fee": 0,
+            "small_cart_mov": 99
+          },
+          "slot_charge": 0,
+          "is_closed": false
+        }
+      },
+      "identity": {
+        "id": "cart_page_shipments"
+      },
+      "action": {
+        "default_uri": "grofers://login"
+      },
+      "grid_span": 12,
+      "type": 114,
+      "layout_config": {
+        "margin_bottom": 1
+      }
+    },
+    {
+      "tracking": {
+        "common_attributes": {
+          "l1_category": "",
+          "title": "Nestle KitKat 4 Fingers Choco Coated Wafer Chocolate",
+          "price": 27,
+          "ptype": "Wafer Chocolate",
+          "currency": "INR",
+          "l2_category": "Wafer Chocolates",
+          "l0_category": "",
+          "brand": "Nestle KitKat",
+          "quantity": 2
+        },
+        "widget_meta": {
+          "name": "Product",
+          "title": "Product Widget",
+          "minimum_time_between_impressions": 5000,
+          "variation_id": null,
+          "custom_data": {
+            "eta_identifier": "express",
+            "price": 27,
+            "few_left_badge": "#-NA",
+            "mrp": 35,
+            "inventory_limit": 50,
+            "card_type": "Default",
+            "merchant_type": "express",
+            "sbc_price": 27,
+            "cta_type": "ATC",
+            "merchant_id": 41217,
+            "inventory": 50
+          },
+          "revision_id": null,
+          "id": 212722
+        }
+      },
+      "type": 123,
+      "meta": {
+        "merchant": {
+          "id": 41217
+        },
+        "product": {
+          "return_product_config": {
+            "eligibility_days": 0,
+            "is_exchange_eligible": false,
+            "is_return_eligible": false
+          },
+          "is_forced_oos": false,
+          "type_id": 3598,
+          "mrp": 35,
+          "updated_at": 1761306983,
+          "membership_price": null,
+          "service_tag": "",
+          "mapping_id": 304232236,
+          "freedc_threshold": 0,
+          "merchant_type": "express",
+          "sbc_price": 27,
+          "is_gift_wrappable_item": true,
+          "shipment_split_key": "177",
+          "unit": "38 g",
+          "offer_type": "",
+          "is_freebie": false,
+          "discounts": null,
+          "inventory": 50,
+          "offer_meta": {
+            "1609": true
+          },
+          "type": {
+            "id": 3598,
+            "name": "Wafer Chocolate"
+          },
+          "price": 27,
+          "inventory_limit_toast_type": "default",
+          "is_membership_enabled": null,
+          "is_easy_return_eligible": null,
+          "total_mrp": 70,
+          "quantity": 2,
+          "is_gift_item": null,
+          "brand": "Nestle KitKat",
+          "attribute_group_collection": null,
+          "png_image_url": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.png",
+          "promos": [],
+          "image_url_v2": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.jpg",
+          "unavailable_quantity": 0,
+          "is_obd_eligible": false,
+          "merchant_id": 41217,
+          "categories": [
+            {
+              "name": "Wafer Chocolates",
+              "level": null,
+              "is_primary": true,
+              "parent_id": null,
+              "type": null,
+              "id": 1172
+            }
+          ],
+          "grofers_price": 0,
+          "total_price": "₹54",
+          "name": "Nestle KitKat 4 Fingers Choco Coated Wafer Chocolate",
+          "total_mrp_text": "~~₹70~~",
+          "item_attributes": [],
+          "created_at": 1761306983,
+          "is_digital_item": false,
+          "inventory_limit": 50,
+          "allow_wishlist": true,
+          "product_id": 212722,
+          "image_url": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.jpg",
+          "related_brand": {
+            "id": 3549,
+            "logo": "",
+            "store_deep_link": null,
+            "aggregator_brand": null,
+            "display_name": "Nestle KitKat"
+          },
+          "is_beauty_freebie": null,
+          "gift_ineligible_reason": null,
+          "group_id": 2374087,
+          "allow_save_for_later": true,
+          "services_opted": null
+        }
+      },
+      "action": {
+        "default_uri": "grofers://product?expr=%22p212722%22"
+      },
+      "data": {
+        "product_image": {
+          "url": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.png",
+          "aspect_ratio": "1",
+          "bg_color_hex": "#F5F5F5"
+        },
+        "product": {
+          "return_product_config": {
+            "eligibility_days": 0,
+            "is_exchange_eligible": false,
+            "is_return_eligible": false
+          },
+          "is_forced_oos": false,
+          "type_id": 3598,
+          "mrp": 35,
+          "updated_at": 1761306983,
+          "membership_price": null,
+          "service_tag": "",
+          "mapping_id": 304232236,
+          "freedc_threshold": 0,
+          "merchant_type": "express",
+          "sbc_price": 27,
+          "is_gift_wrappable_item": true,
+          "shipment_split_key": "177",
+          "unit": "38 g",
+          "offer_type": "",
+          "is_freebie": false,
+          "discounts": null,
+          "inventory": 50,
+          "offer_meta": {
+            "1609": true
+          },
+          "type": {
+            "id": 3598,
+            "name": "Wafer Chocolate"
+          },
+          "price": 27,
+          "inventory_limit_toast_type": "default",
+          "is_membership_enabled": null,
+          "is_easy_return_eligible": null,
+          "total_mrp": 70,
+          "quantity": 2,
+          "is_gift_item": null,
+          "brand": "Nestle KitKat",
+          "attribute_group_collection": null,
+          "png_image_url": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.png",
+          "promos": [],
+          "image_url_v2": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.jpg",
+          "unavailable_quantity": 0,
+          "is_obd_eligible": false,
+          "merchant_id": 41217,
+          "categories": [
+            {
+              "name": "Wafer Chocolates",
+              "level": null,
+              "is_primary": true,
+              "parent_id": null,
+              "type": null,
+              "id": 1172
+            }
+          ],
+          "grofers_price": 0,
+          "total_price": "₹54",
+          "name": "Nestle KitKat 4 Fingers Choco Coated Wafer Chocolate",
+          "total_mrp_text": "~~₹70~~",
+          "item_attributes": [],
+          "created_at": 1761306983,
+          "is_digital_item": false,
+          "inventory_limit": 50,
+          "allow_wishlist": true,
+          "product_id": 212722,
+          "image_url": "https://cdn.grofers.com/da/cms-assets/cms/product/50ac0a0c-e9fe-4665-9812-5193d4bf23f5.jpg",
+          "related_brand": {
+            "id": 3549,
+            "logo": "",
+            "store_deep_link": null,
+            "aggregator_brand": null,
+            "display_name": "Nestle KitKat"
+          },
+          "is_beauty_freebie": null,
+          "gift_ineligible_reason": null,
+          "group_id": 2374087,
+          "allow_save_for_later": true,
+          "services_opted": null
+        }
+      },
+      "layout_config": {}
+    },
+    {
+      "tracking": {
+        "widget_meta": {
+          "name": "Coupon Widget",
+          "title": "Cart Page Promotions Strip",
+          "minimum_time_between_impressions": 5000,
+          "variation_id": null,
+          "custom_data": {
+            "coupon_code": null,
+            "state": "select",
+            "coupon_amount": 0,
+            "message": null,
+            "coupon_type": null
+          },
+          "revision_id": null,
+          "id": null
+        }
+      },
+      "type": 168,
+      "identity": {
+        "id": "cart_page_promotion_strip"
+      },
+      "action": {
+        "default_uri": "grofers://login"
+      },
+      "grid_span": 12,
+      "data": {
+        "subtitle": null,
+        "title": "Use Coupons",
+        "cta_text": "Login",
+        "disabled": false,
+        "state": "select",
+        "subtitle_no_of_lines": 2
+      },
+      "layout_config": {
+        "background_image": "#"
+      }
+    },
+    {
+      "type": 118,
+      "grid_span": 12,
+      "tracking": {
+        "widget_meta": {
+          "name": "Bill Details Widget",
+          "title": "Bill Details Widget",
+          "minimum_time_between_impressions": 5000,
+          "variation_id": null,
+          "custom_data": {
+            "tip_amount": 0,
+            "cart_savings": 16,
+            "sbc_cart_savings": 0,
+            "cart_value": 54,
+            "coupon_discount_value": 0,
+            "shipping": 25
+          },
+          "revision_id": null,
+          "id": null
+        }
+      },
+      "data": {
+        "bill_components": [
+          {
+            "left_header": {
+              "color": {
+                "tint": "900",
+                "type": "grey"
+              },
+              "text": "Bill details",
+              "font": {
+                "weight": "extrabold",
+                "size": "500"
+              }
+            },
+            "identity": {
+              "id": "bill_details"
+            },
+            "layout_config": {
+              "padding_top": 8,
+              "padding_right": 12,
+              "padding_left": 12
+            }
+          },
+          {
+            "left_header": {
+              "color": {
+                "tint": "900",
+                "type": "grey"
+              },
+              "text": "Items total",
+              "font": {
+                "weight": "medium",
+                "size": "300"
+              },
+              "prefix_icon": {
+                "color": {
+                  "tint": "800",
+                  "type": "grey"
+                },
+                "code": "e9bc"
+              }
+            },
+            "tag": {
+              "bg_color": {
+                "tint": "100",
+                "type": "blue"
+              },
+              "title": {
+                "color": {
+                  "tint": "500",
+                  "type": "blue"
+                },
+                "text": "Saved ₹16",
+                "font": {
+                  "weight": "semibold",
+                  "size": "050"
+                }
+              },
+              "size": "nano"
+            },
+            "layout_config": {
+              "padding_right": 12,
+              "padding_left": 12
+            },
+            "right_header": {
+              "color": {
+                "tint": "900",
+                "type": "grey"
+              },
+              "text": "~~{grey-700|₹70}~~ ₹54",
+              "markdown_version": 3,
+              "font": {
+                "weight": "medium",
+                "size": "300"
+              },
+              "is_markdown": 1
+            },
+            "identity": {
+              "id": "items_total"
+            }
+          },
+          {
+            "left_header": {
+              "color": {
+                "tint": "900",
+                "type": "grey"
+              },
+              "text": "Delivery charge",
+              "font": {
+                "weight": "medium",
+                "size": "300"
+              },
+              "prefix_icon": {
+                "color": {
+                  "tint": "800",
+                  "type": "grey"
+                },
+                "code": "e801"
+              }
+            },
+            "layout_config": {
+              "padding_right": 12,
+              "padding_left": 12
+            },
+            "right_header": {
+              "color": {
+                "tint": "900",
+                "type": "grey"
+              },
+              "text": "₹25",
+              "markdown_version": 3,
+              "font": {
+                "weight": "medium",
+                "size": "300"
+              },
+              "is_markdown": 1
+            },
+            "identity": {
+              "id": "delivery_charge"
+            },
+            "info_icon": {
+              "tooltip_items": [
+                {
+                  "title": {
+                    "color": {
+                      "tint": "800",
+                      "type": "grey"
+                    },
+                    "text": "₹25 for orders **below** ₹199",
+                    "markdown_version": 3,
+                    "font": {
+                      "weight": "medium",
+                      "size": "300"
+                    },
+                    "is_markdown": 1
+                  }
+                },
+                {
+                  "title": {
+                    "color": {
+                      "tint": "800",
+                      "type": "grey"
+                    },
+                    "text": "₹0 for orders **above** ₹199",
+                    "markdown_version": 3,
+                    "font": {
+                      "weight": "medium",
+                      "size": "300"
+                    },
+                    "is_markdown": 1
+                  }
+                }
+              ],
+              "layout_config": {
+                "margin_bottom": 1,
+                "margin_end": 16,
+                "margin_start": 16
+              }
+            }
+          },
+          {
+            "left_header": {
+              "color": {
+                "tint": "900",
+                "type": "grey"
+              },
+              "text": "Handling charge",
+              "font": {
+                "weight": "medium",
+                "size": "300"
+              },
+              "prefix_icon": {
+                "color": {
+                  "tint": "800",
+                  "type": "grey"
+                },
+                "code": "e8b5"
+              }
+            },
+            "layout_config": {
+              "padding_right": 12,
+              "padding_left": 12
+            },
+            "right_header": {
+              "color": {
+                "tint": "900",
+                "type": "grey"
+              },
+              "text": "₹2",
+              "markdown_version": 3,
+              "font": {
+                "weight": "medium",
+                "size": "300"
+              },
+              "is_markdown": 1
+            },
+            "identity": {
+              "id": "packaging_charge"
+            },
+            "info_icon": {
+              "tooltip_items": [
+                {
+                  "title": {
+                    "color": {
+                      "tint": "800",
+                      "type": "grey"
+                    },
+                    "text": "For proper handling and ensuring high quality quick-deliveries",
+                    "markdown_version": 3,
+                    "font": {
+                      "weight": "medium",
+                      "size": "300"
+                    },
+                    "is_markdown": 1
+                  }
+                }
+              ],
+              "layout_config": {
+                "margin_bottom": 1,
+                "margin_end": 16,
+                "margin_start": 16
+              }
+            }
+          },
+          {
+            "left_header": {
+              "color": {
+                "tint": "900",
+                "type": "grey"
+              },
+              "text": "Small cart charge",
+              "font": {
+                "weight": "medium",
+                "size": "300"
+              },
+              "prefix_icon": {
+                "color": {
+                  "tint": "800",
+                  "type": "grey"
+                },
+                "code": "e9d4"
+              }
+            },
+            "layout_config": {
+              "padding_right": 12,
+              "padding_left": 12
+            },
+            "right_header": {
+              "color": {
+                "tint": "900",
+                "type": "grey"
+              },
+              "text": "₹20",
+              "markdown_version": 3,
+              "font": {
+                "weight": "medium",
+                "size": "300"
+              },
+              "is_markdown": 1
+            },
+            "identity": {
+              "id": "small_cart_charge"
+            },
+            "info_icon": {
+              "tooltip_items": [
+                {
+                  "title": {
+                    "color": {
+                      "tint": "800",
+                      "type": "grey"
+                    },
+                    "text": "Please add more items to avoid this charge. We're charging a fee for orders below ₹99 to continue servicing your small requirements",
+                    "markdown_version": 3,
+                    "font": {
+                      "weight": "medium",
+                      "size": "300"
+                    },
+                    "is_markdown": 1
+                  }
+                }
+              ],
+              "layout_config": {
+                "margin_bottom": 1,
+                "margin_end": 16,
+                "margin_start": 16
+              }
+            }
+          },
+          {
+            "left_header": {
+              "color": {
+                "tint": "900",
+                "type": "black"
+              },
+              "text": "Grand total",
+              "font": {
+                "weight": "semibold",
+                "size": "400"
+              }
+            },
+            "layout_config": {
+              "padding_bottom": 8,
+              "padding_left": 12,
+              "padding_right": 12
+            },
+            "right_header": {
+              "color": {
+                "tint": "900",
+                "type": "black"
+              },
+              "text": "₹101",
+              "font": {
+                "weight": "semibold",
+                "size": "400"
+              }
+            },
+            "identity": {
+              "id": "bill_total"
+            }
+          }
+        ],
+        "footer_text": "Coupons are only applicable on the Blinkit app",
+        "total_savings": null,
+        "is_loading": false,
+        "should_remove_separator": false
+      },
+      "identity": {
+        "id": "bill"
+      }
+    },
+    {
+      "type": 214,
+      "grid_span": 12,
+      "tracking": {
+        "widget_meta": {
+          "name": "Cart Page Cancellation Policy",
+          "title": "Cart Page Cancellation Policy",
+          "minimum_time_between_impressions": 5000,
+          "variation_id": null,
+          "revision_id": null,
+          "id": null
+        }
+      },
+      "data": {
+        "title": "Cancellation Policy",
+        "subtitle": "Orders cannot be cancelled once packed for delivery. In case of unexpected delays, a refund will be provided, if applicable.",
+        "details": [],
+        "snippet_subtitle": {
+          "color": {
+            "tint": "600",
+            "type": "grey"
+          },
+          "text": "Orders cannot be cancelled once packed for delivery. In case of unexpected delays, a refund will be provided, if applicable.",
+          "font": {
+            "weight": "medium",
+            "size": "200"
+          }
+        },
+        "snippet_title": {
+          "color": {
+            "tint": "900",
+            "type": "grey"
+          },
+          "text": "Cancellation Policy",
+          "font": {
+            "weight": "extrabold",
+            "size": "300"
+          }
+        }
+      },
+      "identity": {
+        "id": "cancel_policy"
+      }
+    },
+    {
+      "tracking": {
+        "widget_meta": {
+          "name": "Cart Address Checkout Widget",
+          "title": "Address Widget",
+          "minimum_time_between_impressions": 5000,
+          "variation_id": null,
+          "custom_data": {
+            "total_products_in_cart": 2,
+            "cart_value": 54,
+            "total_shipments_in_cart": 1,
+            "total_cart_value": 101,
+            "unique_products_in_cart": 1,
+            "additional_charge_amount": 47
+          },
+          "revision_id": null,
+          "id": null
+        }
+      },
+      "data": {
+        "right_button_data": null,
+        "address_subtitle": null,
+        "address_icon": "E",
+        "address_title": "Delivering to Other",
+        "title": "2 items",
+        "cta_text": "Proceed",
+        "sub_heading": {
+          "text": null,
+          "number_of_lines": 1
+        },
+        "address_cta_text": "Change",
+        "disabled_message": "",
+        "left_image": {
+          "url": "https://cdn.grofers.com/layout-engine/v2/2024-12/address_other_location_v4/light.png"
+        },
+        "disabled": false,
+        "label_id": "OTHER",
+        "location_strip_data": {
+          "text": {
+            "color": {
+              "tint": "600",
+              "type": "orange"
+            },
+            "text": "Selected address is %s away from your current location",
+            "font": {
+              "weight": "medium",
+              "size": "100"
+            }
+          },
+          "show_distance_message": true,
+          "bg_color_hex": "#FFF1E6"
+        },
+        "cut_price": 117,
+        "heading": {
+          "text": "Delivering to Other"
+        },
+        "net_price": 101
+      },
+      "meta": {
+        "address_info": null,
+        "gift_details": null
+      },
+      "identity": {
+        "id": "address_v2"
+      },
+      "action": {
+        "default_uri": "grofers://choose-address?address_id="
+      },
+      "grid_span": 12,
+      "type": 115,
+      "layout_config": {
+        "margin_bottom": 0,
+        "background_image": "#",
+        "sticky": "bottom"
+      }
+    }
+  ],
+  "meta": {
+    "search_disabled": false,
+    "variation_id": ""
+  },
+  "cart_state": "invalid",
+  "promo_data": {
+    "toast_message": null,
+    "supplementary_charges": {},
+    "promo_code": null,
+    "success": true,
+    "promo_value": 0,
+    "promo_type": null,
+    "promo_applied": false,
+    "discount": 0,
+    "state": "select",
+    "cashback": 0,
+    "items_with_silent_offer": [],
+    "custom_message": null,
+    "promo_cashback_type": null,
+    "promotion_id": 0
+  },
+  "layout_name": "Cart Page",
+  "layout_config": {
+    "bg_color": "#F5F5F5",
+    "status_bar": {
+      "bg_color": "#fcfcfc",
+      "theme": "LIGHT"
+    }
+  },
+  "extras": {}
+}

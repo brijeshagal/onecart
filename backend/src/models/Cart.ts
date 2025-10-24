@@ -188,11 +188,11 @@ export const cartModel = {
       throw error;
     }
   },
-  findById: async (id: string) => {
+  findById: async (id: string): Promise<ICart | null> => {
     try {
       // Validate if the ID is a valid MongoDB ObjectId
 
-      return await Model.findById(new mongoose.Types.ObjectId(id));
+      return await Model.findById(new mongoose.Types.ObjectId(id)) as ICart | null;
     } catch (error) {
       console.error('❌ Failed to find cart by ID:', error);
       return null;
@@ -297,10 +297,10 @@ export const cartModel = {
       return null;
     }
   },
-  findByCartId: async (cartId: string) => {
+  findByCartId: async (cartId: string): Promise<ICart | null> => {
     try {
       const Model = getCartModel();
-      return await Model.findOne({ cartId });
+      return await Model.findOne({ cartId }) as ICart | null;
     } catch (error) {
       console.error('❌ Failed to find cart by cart ID:', error);
       return null;

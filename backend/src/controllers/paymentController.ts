@@ -191,7 +191,7 @@ export class PaymentController {
       }
 
       // Normalize user's wallet addresses for comparison
-      const normalizedUserAddresses = user.walletAddresses.map((addr) =>
+      const normalizedUserAddresses = user.walletAddresses.map((addr: string) =>
         addr.toLowerCase()
       );
 
@@ -225,19 +225,8 @@ export class PaymentController {
         return next(error);
       }
 
-      // Fetch transaction details to get the sender
-      const transaction = await publicClient.getTransaction({
-        hash: txHash as `0x${string}`,
-      });
-
-      if (!transaction) {
-        const error = new AppError('Transaction details not found');
-        error.statusCode = 404;
-        return next(error);
-      }
-
       // Normalize sender address
-      const senderAddress = transaction.from.toLowerCase();
+      const senderAddress = receipt.from.toLowerCase();
       console.log(`💸 Transaction sender: ${senderAddress}`);
 
       // Verify sender is in user's wallet addresses

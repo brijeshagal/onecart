@@ -122,7 +122,7 @@ export const userModel = {
       throw error;
     }
   },
-  findById: async (id: string) => {
+  findById: async (id: string): Promise<IUser | null> => {
     try {
       // Validate if the ID is a valid MongoDB ObjectId
       if (!mongoose.Types.ObjectId.isValid(id)) {

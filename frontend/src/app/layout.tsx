@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import "./globals.css";
 import { ClientLayout } from "./ClientLayout";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "OneCart - Smart Shopping Assistant",

@@ -5,8 +5,9 @@ import { useCheckoutCart } from "@/lib/cartStore";
 import { useAppStore } from "@/lib/store";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function OrderSuccessPage() {
+function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const txHash = searchParams?.get("txHash") || null;
   const orderId = searchParams?.get("orderId") || null;
@@ -185,6 +186,25 @@ export default function OrderSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OrderSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white">
+        <Navbar showCart={false} />
+        <div className="pt-16 max-w-md mx-auto px-4 py-8 border-x border-gray-200 min-h-screen">
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4 animate-pulse" />
+            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-2" />
+            <div className="h-4 w-64 bg-gray-200 rounded animate-pulse" />
+          </div>
+        </div>
+      </div>
+    }>
+      <OrderSuccessContent />
+    </Suspense>
   );
 }
 

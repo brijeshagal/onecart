@@ -4,7 +4,7 @@ import { cartModel, ICart, ISimplifiedCartItem } from '../models/Cart';
 import { userModel } from '../models/User';
 import { AddressData } from '../types/address';
 import { CartResponse } from '../types/api';
-import { launchBrowser } from '../utils/blinkit/browserUtils';
+import BrowserManager from '../utils/BrowserManager';
 import {
   addProductToCart,
   waitForCartResponse,
@@ -13,8 +13,9 @@ import { setAddressOnPage } from '../utils/blinkit/searchUtils';
 import {
   clearCart,
   createNewCart,
+  decrementCartProductQuantity,
   handleExistingCart,
-  removeCartItem,
+  removeProductFromCart,
   validateAddToCartRequest,
   validateCartOwnership,
   validateUsersExist,
@@ -37,7 +38,7 @@ export class CartController {
    * @param {string} req.body.orderNotes - Optional order notes
    * @returns {Promise<void>}
    */
-  static async addToCart(
+  static async createCart(
     req: Request<
       {},
       CartResponse,
@@ -203,12 +204,12 @@ export class CartController {
 
   /**
    * Remove item from user's active cart
-   * @route DELETE /api/cart/:userId/:productId
+   * @route DELETE /api/product/remove/:userId/:cartId/:productId
    * @param {string} req.params.userId - User ID (as sender)
    * @param {string} req.params.productId - Product ID to remove
    * @returns {Promise<void>}
    */
-  static async removeFromCart(
+  static async removeProductFromCart(
     req: Request<{ userId: string; productId: string; cartId: string }>,
     res: Response<CartResponse>,
     next: NextFunction
@@ -239,7 +240,7 @@ export class CartController {
       const cart = cartValidation.cart!;
 
       // Remove item from cart
-      const removeResult = await removeCartItem(cart, productId);
+      const removeResult = await removeProductFromCart(cart, productId);
       if (!removeResult.success) {
         res.status(404).json({
           success: false,
@@ -421,7 +422,7 @@ export class CartController {
         return;
       }
 
-      const browser = await launchBrowser();
+      const browser = await BrowserManager.getBrowser();
       const [page] = (await browser.pages()) as [Page];
 
       await page.goto('https://blinkit.com', { waitUntil: 'networkidle2' });
@@ -521,6 +522,130 @@ export class CartController {
       });
     } catch (error) {
       console.error('❌ Get received orders error:', error);
+      next(error);
+    }
+  }
+
+  static async removeItemFromCart(
+    req: Request<{ userId: string; cartId: string; productId: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { userId, cartId, productId } = req.params;
+      const cart = await cartModel.findByCartId(cartId);
+      if (!cart) {
+        res.status(400).json({
+          success: false,
+          error: 'Cart not found',
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      if (cart.senderUserId !== userId) {
+        res.status(400).json({
+          success: false,
+          error: 'Cart not found',
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      await removeProductFromCart(cart, productId);
+      res.status(200).json({
+        success: true,
+        data: cart,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('❌ Remove item from cart error:', error);
+      next(error);
+    }
+  }
+
+  static async decrementProductQuantity(
+    req: Request<{ userId: string; cartId: string; productId: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { userId, cartId, productId } = req.params;
+      const cart = await cartModel.findByCartId(cartId);
+      if (!cart) {
+        res.status(400).json({
+          success: false,
+          error: 'Cart not found',
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      if (cart.senderUserId !== userId) {
+        res.status(400).json({
+          success: false,
+          error: 'Cart not found',
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      await decrementCartProductQuantity(cart, productId);
+      res.status(200).json({
+        success: true,
+        data: cart,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('❌ Decrement product quantity error:', error);
+      next(error);
+    }
+  }
+
+  static async incrementProductQuantity(
+    req: Request<{ userId: string; cartId: string; productId: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { userId, cartId, productId } = req.params;
+      const cart = await cartModel.findByCartId(cartId);
+      if (!cart) {
+        res.status(400).json({
+          success: false,
+          error: 'Cart not found',
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      if (cart.senderUserId !== userId) {
+        res.status(400).json({
+          success: false,
+          error: 'Cart not found',
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      const product = cart.items.find(
+        (item: ISimplifiedCartItem) => item.productId === productId
+      );
+      if (!product) {
+        res.status(400).json({
+          success: false,
+          error: 'Product not found',
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      product.quantity! += 1;
+      cart.totalItems! += 1;
+      await cartModel.updateOne(
+        { _id: cart._id },
+        { $set: { items: cart.items, totalItems: cart.totalItems } }
+      );
+      res.status(200).json({
+        success: true,
+        data: cart,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('❌ Increment product quantity error:', error);
       next(error);
     }
   }

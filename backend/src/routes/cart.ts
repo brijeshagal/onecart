@@ -9,7 +9,7 @@ const router: Router = Router();
 
 /**
  * @swagger
- * /api/cart/add:
+ * /api/cart/create:
  *   post:
  *     summary: Add item to sender's active cart
  *     description: |
@@ -391,7 +391,7 @@ const router: Router = Router();
  *                   format: date-time
  *                   example: "2024-01-15T10:30:00.000Z"
  */
-router.post('/add', CartController.addToCart);
+router.post('/create', CartController.createCart);
 
 /**
  * @swagger
@@ -624,10 +624,10 @@ router.get('/received/:userId', CartController.getReceivedOrders);
 
 /**
  * @swagger
- * /api/cart/{userId}/{cartId}/{productId}:
- *   delete:
- *     summary: Remove item from user's active cart
- *     description: Remove a specific product from the user's active cart
+ * /api/product/remove/{userId}/{cartId}/{productId}:
+ *   get:
+ *     summary: Completely remove item from user's active cart
+ *     description: Remove all units of a specific product completely from the user's active cart, regardless of quantity
  *     tags: [Cart]
  *     parameters:
  *       - in: path
@@ -649,7 +649,7 @@ router.get('/received/:userId', CartController.getReceivedOrders);
  *         required: true
  *         schema:
  *           type: string
- *         description: Product ID to remove
+ *         description: Product ID to remove completely from cart
  *         example: "product_123"
  *     responses:
  *       200:
@@ -669,17 +669,146 @@ router.get('/received/:userId', CartController.getReceivedOrders);
  *                       type: string
  *                     totalItems:
  *                       type: number
- *                     removedProductId:
- *                       type: string
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
  *                 timestamp:
  *                   type: string
  *                   format: date-time
+ *       400:
+ *         description: Bad request - Cart not found or invalid parameters
  *       404:
  *         description: Cart or product not found
  *       500:
  *         description: Internal server error
  */
-router.get('/remove/:userId/:cartId/:productId', CartController.removeFromCart);
+router.get('/product/remove/:userId/:cartId/:productId', CartController.removeProductFromCart);
+
+/**
+ * @swagger
+ * /api/cart/product/increment/{userId}/{cartId}/{productId}:
+ *   post:
+ *     summary: Increment item quantity in user's active cart
+ *     description: Increment the quantity of a product in the user's active cart by 1 unit
+ *     tags: [Cart]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID (as sender)
+ *         example: "507f1f77bcf86cd799439011"
+ *       - in: path
+ *         name: cartId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Cart ID
+ *         example: "cart_1761209168596_ny90b33fy"
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID to increment quantity
+ *         example: "product_123"
+ *     responses:
+ *       200:
+ *         description: Product quantity incremented successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     cartId:
+ *                       type: string
+ *                     totalItems:
+ *                       type: number
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: Cart or product not found
+ *       404:
+ *         description: Cart or product not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/product/increment/:userId/:cartId/:productId', CartController.incrementProductQuantity);
+/**
+ * @swagger
+ * /api/cart/product/decrement/{userId}/{cartId}/{productId}:
+ *   delete:
+ *     summary: Decrement item quantity in user's active cart
+ *     description: Decrement the quantity of a product in the user's active cart by 1 unit. If quantity becomes 0, the item is removed from cart.
+ *     tags: [Cart]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID (as sender)
+ *         example: "507f1f77bcf86cd799439011"
+ *       - in: path
+ *         name: cartId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Cart ID
+ *         example: "cart_1761209168596_ny90b33fy"
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID to decrement quantity
+ *         example: "product_123"
+ *     responses:
+ *       200:
+ *         description: Product quantity decremented successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     cartId:
+ *                       type: string
+ *                     totalItems:
+ *                       type: number
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: Bad request - Cart not found or invalid parameters
+ *       404:
+ *         description: Cart or product not found
+ *       500:
+ *         description: Internal server error
+ */
+router.delete('/product/decrement/:userId/:cartId/:productId', CartController.decrementProductQuantity);
 
 /**
  * @swagger

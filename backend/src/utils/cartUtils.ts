@@ -13,20 +13,10 @@ const generateCartId = () =>
 export const validateAddToCartRequest = (
   reqBody: any
 ): { isValid: boolean; error?: string } => {
-  const {
-    senderUserId,
-    receiverUserId,
-    receiveAddress,
-    items,
-    quantity,
-  } = reqBody;
+  const { senderUserId, receiverUserId, receiveAddress, items, quantity } =
+    reqBody;
 
-  if (
-    !senderUserId ||
-    !receiverUserId ||
-    !receiveAddress ||
-    !items?.length
-  ) {
+  if (!senderUserId || !receiverUserId || !receiveAddress || !items?.length) {
     return {
       isValid: false,
       error: 'Sender ID, receiver ID, address, and items are required',
@@ -103,7 +93,10 @@ export const updateUserActiveCart = async (
   userId: string,
   cartId: string
 ): Promise<void> => {
-  await userModel.updateOne({ _id: userId }, { $push: { activeCartIds: cartId } });
+  await userModel.updateOne(
+    { _id: userId },
+    { $push: { activeCartIds: cartId } }
+  );
 };
 
 /**
@@ -166,9 +159,44 @@ export const createNewCart = async (
 };
 
 /**
- * Removes an item from cart and updates totals
+ * Decrements item quantity in cart (removes 1 unit)
  */
-export const removeCartItem = async (
+export const decrementCartProductQuantity = async (
+  cart: ICart,
+  productId: string
+): Promise<{ success: boolean; error?: string }> => {
+  const productIndex = cart.items.findIndex(
+    (item: ISimplifiedCartItem) => item.productId === productId
+  );
+
+  if (productIndex === -1) {
+    return { success: false, error: 'Product not found in cart' };
+  }
+
+  const item = cart.items[productIndex] as ISimplifiedCartItem;
+  
+  // Decrement quantity
+  if (item.quantity! > 1) {
+    item.quantity! -= 1;
+  } else {
+    // If quantity is 1, remove the item completely
+    cart.items.splice(productIndex, 1);
+  }
+
+  // Update total items
+  cart.totalItems = cart.items.reduce(
+    (total: number, item: ISimplifiedCartItem) => total + item.quantity!,
+    0
+  );
+
+  await saveCart(cart);
+  return { success: true };
+};
+
+/**
+ * Completely removes an item from cart
+ */
+export const removeProductFromCart = async (
   cart: ICart,
   productId: string
 ): Promise<{ success: boolean; error?: string }> => {

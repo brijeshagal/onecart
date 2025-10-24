@@ -26,6 +26,7 @@ export class SearchItemsController {
     res: Response<SearchItemsResponse>,
     next: NextFunction
   ): Promise<void> {
+    const browser = await launchBrowser();
     try {
       const {
         userId,
@@ -39,7 +40,6 @@ export class SearchItemsController {
         `🔍 Search items request: query="${query}", newAddress provided: ${!!newAddress}`
       );
 
-      const browser = await launchBrowser();
       const [page] = (await browser.pages()) as [Page];
       await page.goto('https://www.blinkit.com', {
         waitUntil: 'domcontentloaded',
@@ -97,10 +97,9 @@ export class SearchItemsController {
       }
 
       await setAddressOnPage(addressData, page);
-      await new Promise(resolve => setTimeout(resolve, 1400));
+      await new Promise(resolve => setTimeout(resolve, 1200));
       const blinkitSearchResponse = await performBlinkitSearch(page, query);
 
-      await browser.close();
       res.status(200).json({
         success: true,
         data: blinkitSearchResponse,
@@ -109,6 +108,8 @@ export class SearchItemsController {
     } catch (error) {
       console.error('❌ Search items error:', error);
       next(error);
+    } finally {
+      await browser.close();
     }
   }
 }

@@ -10,7 +10,7 @@ import {
 } from "@/lib/cartStore";
 import { getCurrentLocation } from "@/lib/location";
 import { useAppStore } from "@/lib/store";
-import { BillDetailsWidget } from "@/types";
+import { BillDetailsWidget, CheckoutCartResponse } from "@/types";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -36,7 +36,8 @@ export default function CartPage() {
   } | null>(null);
 
   // Local mutable copy of checkoutCart for UI updates
-  const [localCheckoutCart, setLocalCheckoutCart] = useState<any>(null);
+  const [localCheckoutCart, setLocalCheckoutCart] =
+    useState<CheckoutCartResponse | null>(null);
   // Sync localCheckoutCart with global checkoutCart
   useEffect(() => {
     if (checkoutCart) {
@@ -656,15 +657,15 @@ export default function CartPage() {
                       );
                     const itemPrice = itemCheckoutDetails?.price || item.price;
                     const itemMrp = itemCheckoutDetails?.mrp || item.mrp;
-                    const itemBrand = itemCheckoutDetails?.brand || item.brand;
-                    const itemUnit = itemCheckoutDetails?.unit || item.unit;
+                    // const _itemBrand = itemCheckoutDetails?.brand || item.brand;
+                    // const _itemUnit = itemCheckoutDetails?.unit || item.unit;
                     const itemQuantity =
                       itemCheckoutDetails?.quantity || item.quantity;
-                    const itemTotalPrice =
-                      itemCheckoutDetails?.total_price || item.totalPrice;
-                    const itemIsFromCheckout = itemCheckoutDetails
-                      ? true
-                      : false;
+                    // const _itemTotalPrice =
+                    //   itemCheckoutDetails?.total_price || item.totalPrice;
+                    // const _itemIsFromCheckout = itemCheckoutDetails
+                    // ? true
+                    // : false;
                     return (
                       <div
                         key={item.productId}

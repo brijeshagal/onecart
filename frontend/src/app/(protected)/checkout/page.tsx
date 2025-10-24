@@ -9,15 +9,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import {
-  Abi,
-  createPublicClient,
-  createWalletClient,
-  erc20Abi,
-  http,
-  parseUnits,
-} from "viem";
-import { baseSepolia } from "viem/chains";
+import type { Abi } from "viem";
 import { useAccount } from "wagmi";
 
 export default function CheckoutPage() {
@@ -31,7 +23,7 @@ export default function CheckoutPage() {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "crypto">(
+  const [_paymentMethod, setPaymentMethod] = useState<"razorpay" | "crypto">(
     "crypto"
   );
 
@@ -216,6 +208,11 @@ export default function CheckoutPage() {
 
       // Step 2: Send transaction
       console.log("💸 Sending transaction...");
+      
+      // Dynamic import to avoid server-side issues
+      const { createWalletClient, createPublicClient, http, parseUnits, erc20Abi } = await import("viem");
+      const { baseSepolia } = await import("viem/chains");
+      
       const walletClient = createWalletClient({
         chain: baseSepolia,
         transport: http(),

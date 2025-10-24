@@ -2,7 +2,7 @@
 
 import { apiService } from "@/lib/api";
 import { DEFAULT_COORDINATES } from "@/lib/location";
-import { AddressData, UISuggestion } from "@/types";
+import { UISuggestion } from "@/types";
 import React, { useEffect, useRef, useState } from "react";
 import { Input } from "./ui/Input";
 
@@ -13,7 +13,7 @@ interface AddressSearchProps {
 
 export const AddressSearch: React.FC<AddressSearchProps> = ({
   currentLocation,
-  phone = "",
+  phone: _phone = "",
 }) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<UISuggestion[]>([]);
@@ -87,8 +87,8 @@ export const AddressSearch: React.FC<AddressSearchProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSuggestionSelect = (suggestion: UISuggestion) => {
-    const coords = getBestCoordinates();
+  const handleSuggestionSelect = (_suggestion: UISuggestion) => {
+    const _coords = getBestCoordinates();
     
     setQuery("");
     setShowSuggestions(false);

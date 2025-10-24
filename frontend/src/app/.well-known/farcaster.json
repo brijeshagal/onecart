@@ -1,0 +1,21 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEyMzQ1LCJ0eXBlIjoiY3VzdG9keSIsImtleSI6IjB4MTIzNDU2Nzg5YWJjZGVmIn0",
+    "payload": "eyJkb21haW4iOiJvbmVjYXJ0LmFwcCJ9",
+    "signature": "MHg..."
+  },
+  "miniapp": {
+    "name": "OneCart",
+    "description": "Seamless address-based delivery. Connect with nearby stores and get your groceries delivered to your doorstep with crypto or fiat payments.",
+    "url": "https://onecart.app",
+    "iconUrl": "https://onecart.app/icon.png",
+    "requiredChains": [
+      "eip155:84532"
+    ],
+    "requiredCapabilities": [
+      "actions.ready",
+      "wallet.getEthereumProvider"
+    ]
+  }
+}
+

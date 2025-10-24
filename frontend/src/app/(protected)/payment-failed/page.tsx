@@ -11,8 +11,8 @@ export default function PaymentFailedPage() {
   const [countdown, setCountdown] = useState(5);
 
   // Get error details from URL params
-  const errorMessage = searchParams.get("error") || "Payment failed. Please try again.";
-  const paymentMethod = searchParams.get("method") || "payment";
+  const errorMessage = searchParams?.get("error") || "Payment failed. Please try again.";
+  const paymentMethod = searchParams?.get("method") || "payment";
 
   // Countdown and auto-redirect
   useEffect(() => {

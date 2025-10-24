@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/Input";
 import { apiService } from "@/lib/api";
 import { getCurrentLocation } from "@/lib/location";
 import { useAppStore } from "@/lib/store";
-import { AddressData, RegisterUserRequest } from "@/types";
+import { RegisterUserRequest } from "@/types";
+import { useMiniApp } from "@neynar/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -15,6 +16,8 @@ import { useAccount, useDisconnect } from "wagmi";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { isSDKLoaded: _isSDKLoaded, context, added: _added, notificationDetails: _notificationDetails, actions: _actions } =
+    useMiniApp();
   const { isLoading, setLoading, setError, setUser } = useAppStore();
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
@@ -36,7 +39,9 @@ export default function RegisterPage() {
   });
 
   // Farcaster and wallet state
-  const [farcasterUsername, setFarcasterUsername] = useState("");
+  const [farcasterUsername, setFarcasterUsername] = useState(
+    context?.user?.username || ""
+  );
   const [walletAddresses, setWalletAddresses] = useState<
     Array<{
       address: string;
@@ -44,7 +49,7 @@ export default function RegisterPage() {
       id: string;
     }>
   >([]);
-  const { address, isConnected, isConnecting } = useAccount();
+  const { address, isConnected, isConnecting: _isConnecting } = useAccount();
   const [isConnectingFarcaster, setIsConnectingFarcaster] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { disconnect } = useDisconnect();
@@ -78,10 +83,7 @@ export default function RegisterPage() {
   const handleFarcasterConnect = async () => {
     setIsConnectingFarcaster(true);
     try {
-      // Simulate Farcaster connection
-      // In a real app, this would use Farcaster's SDK
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setFarcasterUsername("user123"); // This would come from Farcaster
+      setFarcasterUsername(context?.user?.username || "");
     } catch (error) {
       console.error("Failed to connect Farcaster:", error);
     } finally {
@@ -110,7 +112,7 @@ export default function RegisterPage() {
     };
 
     setWalletAddresses((prev) => [...prev, newWallet]);
-    
+
     // Set the first wallet (index 0) as primary by default
     if (walletAddresses.length === 0) {
       setFormData((prev) => ({ ...prev, primaryWalletIndex: 0 }));
@@ -120,18 +122,18 @@ export default function RegisterPage() {
   const handleRemoveWallet = (walletId: string) => {
     const walletIndex = walletAddresses.findIndex((w) => w.id === walletId);
     setWalletAddresses((prev) => prev.filter((w) => w.id !== walletId));
-    
+
     // If we're removing the primary wallet, update the primary wallet index
     if ((formData.primaryWalletIndex ?? -1) === walletIndex) {
       setFormData((prev) => ({
         ...prev,
-        primaryWalletIndex: walletAddresses.length > 1 ? 0 : -1
+        primaryWalletIndex: walletAddresses.length > 1 ? 0 : -1,
       }));
     } else if ((formData.primaryWalletIndex ?? -1) > walletIndex) {
       // If we're removing a wallet before the primary wallet, adjust the index
       setFormData((prev) => ({
         ...prev,
-        primaryWalletIndex: (prev.primaryWalletIndex ?? 0) - 1
+        primaryWalletIndex: (prev.primaryWalletIndex ?? 0) - 1,
       }));
     }
   };
@@ -192,7 +194,12 @@ export default function RegisterPage() {
           : [],
         walletAddresses: verifiedWallets.map((w) => w.address),
         farcasterWalletAddress: verifiedWallets.length > 0 ? 0 : -1,
-        primaryWalletIndex: (formData.primaryWalletIndex ?? -1) >= 0 ? (formData.primaryWalletIndex ?? -1) : (verifiedWallets.length > 0 ? 0 : -1),
+        primaryWalletIndex:
+          (formData.primaryWalletIndex ?? -1) >= 0
+            ? formData.primaryWalletIndex ?? -1
+            : verifiedWallets.length > 0
+            ? 0
+            : -1,
       } as RegisterUserRequest;
 
       const response = await apiService.registerUser(registrationData);
@@ -332,8 +339,8 @@ export default function RegisterPage() {
                     <div
                       key={wallet.id}
                       className={`p-3 rounded-lg border text-gray-400 cursor-pointer transition-colors ${
-                        isPrimary 
-                          ? "bg-blue-50 border-blue-200" 
+                        isPrimary
+                          ? "bg-blue-50 border-blue-200"
                           : "bg-green-50 border-green-200 hover:bg-green-100"
                       }`}
                       onClick={() => handleSetPrimaryWallet(wallet.id)}

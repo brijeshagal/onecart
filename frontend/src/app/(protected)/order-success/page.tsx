@@ -5,13 +5,12 @@ import { useCheckoutCart } from "@/lib/cartStore";
 import { useAppStore } from "@/lib/store";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 
 export default function OrderSuccessPage() {
   const searchParams = useSearchParams();
-  const txHash = searchParams.get("txHash");
-  const orderId = searchParams.get("orderId");
-  const paymentId = searchParams.get("paymentId");
+  const txHash = searchParams?.get("txHash") || null;
+  const orderId = searchParams?.get("orderId") || null;
+  const paymentId = searchParams?.get("paymentId") || null;
 
   const { selectedAddress } = useAppStore();
   const checkoutCart = useCheckoutCart();

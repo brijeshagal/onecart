@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import MiniAppKitWrapper from "./MiniAppKitWrapper";
-import WalletWrapper from "./WalletWrapper";
-import { AppInitializer } from "@/components/AppInitializer";
+import { ClientLayout } from "./ClientLayout";
 
 export const metadata: Metadata = {
   title: "OneCart - Smart Shopping Assistant",
@@ -22,11 +20,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://auth.farcaster.xyz" />
       </head>
       <body className="font-sans antialiased">
-        <MiniAppKitWrapper>
-          <WalletWrapper>
-            <AppInitializer>{children}</AppInitializer>
-          </WalletWrapper>
-        </MiniAppKitWrapper>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@
 import { apiService } from "@/lib/api";
 import { Cart, useCartStore } from "@/lib/cartStore";
 import { useAppStore } from "@/lib/store";
+import { sdk } from "@farcaster/miniapp-sdk";
 import { useEffect, useRef } from "react";
 
 /**
@@ -49,11 +50,12 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
       } finally {
         setLoading(false);
       }
+      await sdk.actions.ready();
     };
 
     // Run initialization
     initializeApp();
-  }, [user?.id]); // Only re-run if user ID changes
+  }, [user?.id, setUser, setCart, setLoading]); // Only re-run if user ID changes
 
   // Ensure selectedAddress is always set to user's default address if not already set
   useEffect(() => {

@@ -36,7 +36,7 @@ export default function SearchItemsPage() {
 
   // Pagination state
   const [offset, setOffset] = useState(0);
-  const [limit, setLimit] = useState(20);
+  const [limit, _setLimit] = useState(20);
   const [totalItems, setTotalItems] = useState(0);
   const [hasMore, setHasMore] = useState(false);
 
@@ -322,7 +322,7 @@ export default function SearchItemsPage() {
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-black mb-4"></div>
             <p className="text-sm text-gray-600 mb-1">Getting results...</p>
             <p className="text-xs text-gray-500">
-              Searching for "{searchQuery}"
+              Searching for &ldquo;{searchQuery}&rdquo;
             </p>
           </div>
         ) : hasSearched ? (
@@ -332,7 +332,7 @@ export default function SearchItemsPage() {
                 Found{" "}
                 <span className="font-medium text-black">{totalItems}</span>{" "}
                 items for{" "}
-                <span className="font-medium text-black">"{searchQuery}"</span>
+                <span className="font-medium text-black">&ldquo;{searchQuery}&rdquo;</span>
               </p>
             </div>
 
@@ -521,7 +521,7 @@ export default function SearchItemsPage() {
             ) : (
               <div className="text-center py-16">
                 <p className="text-sm text-gray-600 mb-1">
-                  No items found for "{searchQuery}"
+                  No items found for &ldquo;{searchQuery}&rdquo;
                 </p>
                 <p className="text-xs text-gray-500">
                   Try searching with different keywords

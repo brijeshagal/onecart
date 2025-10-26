@@ -79,12 +79,14 @@ const defaultUser: User = {
   },
 };
 
+const allowDefaultUserState = false;
+
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       // Initial state with default user data
-      user: defaultUser,
-      isAuthenticated: true,
+      user: allowDefaultUserState ? defaultUser : null,
+      isAuthenticated: allowDefaultUserState,
       isLoading: false,
       error: null,
       currentLocation: {

@@ -28,6 +28,10 @@ body {
   color: var(--foreground);
 }
 
+button {
+  cursor: pointer;
+}
+
 * {
   box-sizing: border-box;
 }

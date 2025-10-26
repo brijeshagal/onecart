@@ -8,7 +8,8 @@ import { apiService } from "@/lib/api";
 import { getCurrentLocation } from "@/lib/location";
 import { useAppStore } from "@/lib/store";
 import { RegisterUserRequest } from "@/types";
-import { useMiniApp } from "@neynar/react";
+import { SignInButton, useProfile, useSignIn } from "@farcaster/auth-kit";
+import "@farcaster/auth-kit/styles.css";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -16,8 +17,6 @@ import { useAccount, useDisconnect } from "wagmi";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { isSDKLoaded: _isSDKLoaded, context, added: _added, notificationDetails: _notificationDetails, actions: _actions } =
-    useMiniApp();
   const { isLoading, setLoading, setError, setUser } = useAppStore();
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
@@ -38,10 +37,6 @@ export default function RegisterPage() {
     primaryWalletIndex: -1,
   });
 
-  // Farcaster and wallet state
-  const [farcasterUsername, setFarcasterUsername] = useState(
-    context?.user?.username || ""
-  );
   const [walletAddresses, setWalletAddresses] = useState<
     Array<{
       address: string;
@@ -49,10 +44,11 @@ export default function RegisterPage() {
       id: string;
     }>
   >([]);
-  const { address, isConnected, isConnecting: _isConnecting } = useAccount();
-  const [isConnectingFarcaster, setIsConnectingFarcaster] = useState(false);
+  const { address, isConnected } = useAccount();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { disconnect } = useDisconnect();
+  const { isAuthenticated, profile } = useProfile();
+  const { signOut } = useSignIn({});
 
   // Get current location on mount
   useEffect(() => {
@@ -77,17 +73,6 @@ export default function RegisterPage() {
     // Clear error for this field
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
-  };
-
-  const handleFarcasterConnect = async () => {
-    setIsConnectingFarcaster(true);
-    try {
-      setFarcasterUsername(context?.user?.username || "");
-    } catch (error) {
-      console.error("Failed to connect Farcaster:", error);
-    } finally {
-      setIsConnectingFarcaster(false);
     }
   };
 
@@ -158,7 +143,7 @@ export default function RegisterPage() {
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
     }
-    if (!farcasterUsername) {
+    if (!profile) {
       newErrors.farcaster = "Farcaster connection is required";
     }
     if (walletAddresses.length === 0) {
@@ -189,8 +174,14 @@ export default function RegisterPage() {
       // Prepare registration data with Farcaster and wallet info
       const registrationData: RegisterUserRequest = {
         ...formData,
-        socialLogins: farcasterUsername
-          ? [{ platform: "farcaster", username: farcasterUsername }]
+        socialLogins: profile.username
+          ? [
+              {
+                platform: "farcaster",
+                username: profile.username,
+                fid: profile.fid?.toString() ?? "",
+              },
+            ]
           : [],
         walletAddresses: verifiedWallets.map((w) => w.address),
         farcasterWalletAddress: verifiedWallets.length > 0 ? 0 : -1,
@@ -238,49 +229,49 @@ export default function RegisterPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Farcaster Connection */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <label className="block text-sm font-medium text-gray-700">
-              Social Logins
+              Social Logins*
             </label>
-            {farcasterUsername ? (
+
+            {isAuthenticated && profile ? (
+              // Connected State
               <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">F</span>
-                  </div>
+                  {profile?.pfpUrl ? (
+                    <span className="text-white text-sm font-bold w-8 h-8 rounded-full">
+                      <img
+                        src={profile?.pfpUrl ?? ""}
+                        alt="Farcaster"
+                        className="w-full h-full rounded-full"
+                        width={32}
+                        height={32}
+                      />
+                    </span>
+                  ) : (
+                    <span className="text-white text-sm font-bold w-8 h-8 rounded-full bg-gray-200">
+                      <span className="text-gray-400 text-sm font-bold">
+                        {profile?.username?.charAt(0)}
+                      </span>
+                    </span>
+                  )}
                   <span className="text-green-800 font-medium">
-                    @{farcasterUsername}
+                    {profile?.username}
+                  </span>
+                  <span className="text-xs text-green-600">
+                    {profile?.fid?.toString()}
                   </span>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setFarcasterUsername("")}
-                  className="text-red-600 hover:text-red-800 text-sm"
+                  className="text-red-600 hover:text-red-800 text-sm font-medium"
+                  onClick={() => signOut()}
                 >
                   Disconnect
                 </button>
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={handleFarcasterConnect}
-                disabled={isConnectingFarcaster}
-                className="text-gray-400 w-full flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-              >
-                {isConnectingFarcaster ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-                    <span>Connecting...</span>
-                  </>
-                ) : (
-                  <>
-                    <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">F</span>
-                    </div>
-                    <span>Connect with Farcaster</span>
-                  </>
-                )}
-              </button>
+              <SignInButton />
             )}
             {errors.farcaster && (
               <p className="text-sm text-red-600">{errors.farcaster}</p>
@@ -296,7 +287,16 @@ export default function RegisterPage() {
             {/* Connect Wallet */}
             {!isConnected || !address ? (
               <div className="mb-2">
-                <ConnectButton />
+                <ConnectButton.Custom>
+                  {({ openConnectModal }) => (
+                    <button
+                      onClick={openConnectModal}
+                      className="cursor-pointer px-6 py-3 bg-white text-gray-900 border-2 border-gray-900 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-left flex items-center justify-between"
+                    >
+                      <span>Connect Wallet</span>
+                    </button>
+                  )}
+                </ConnectButton.Custom>
               </div>
             ) : (
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">

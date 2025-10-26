@@ -90,8 +90,8 @@ export const useAppStore = create<AppState>()(
       isLoading: false,
       error: null,
       currentLocation: {
-        lat: 28.4652382,
-        lng: 77.0615957,
+        lat: 0,
+        lng: 0,
       },
       // Initialize selectedAddress from default user's first address
       selectedAddress:

@@ -2,18 +2,20 @@
 
 import { apiService } from "@/lib/api";
 import { DEFAULT_COORDINATES } from "@/lib/location";
-import { UISuggestion } from "@/types";
+import { AddressData, UISuggestion } from "@/types";
 import React, { useEffect, useRef, useState } from "react";
 import { Input } from "./ui/Input";
 
 interface AddressSearchProps {
   currentLocation: { lat: number; lng: number } | null;
   phone?: string;
+  onAddressSelect?: (address: AddressData) => void;
 }
 
 export const AddressSearch: React.FC<AddressSearchProps> = ({
   currentLocation,
   phone: _phone = "",
+  onAddressSelect,
 }) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<UISuggestion[]>([]);
@@ -87,8 +89,66 @@ export const AddressSearch: React.FC<AddressSearchProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSuggestionSelect = (_suggestion: UISuggestion) => {
-    const _coords = getBestCoordinates();
+  const handleSuggestionSelect = (suggestion: UISuggestion) => {
+    const coords = getBestCoordinates();
+
+    // Create address object from suggestion
+    const address: AddressData = {
+      id: Date.now(),
+      name: selectedLabel,
+      label: selectedLabel,
+      label_id: selectedLabel.toLowerCase(),
+      line1: suggestion.title.text,
+      line2: suggestion.subtitle?.text || "",
+      display_address: `${suggestion.title.text}${
+        suggestion.subtitle?.text ? `, ${suggestion.subtitle.text}` : ""
+      }`,
+      landmark: null,
+      latitude: coords.lat,
+      longitude: coords.lng,
+      use_corrected_location: false,
+      install_ts: new Date().toISOString(),
+      update_ts: new Date().toISOString(),
+      corrected_location_info: {
+        confidence: "high",
+        landmark: "",
+        latitude: coords.lat,
+        longitude: coords.lng,
+      },
+      location_info: {
+        state: "",
+        postal_code: "",
+        city: "",
+      },
+      address_meta: {
+        source: "user",
+        source_ref_id: "search_page",
+      },
+      location: {
+        latitude: coords.lat,
+        longitude: coords.lng,
+      },
+      coordinates: {
+        lat: coords.lat,
+        lon: coords.lng,
+      },
+      address_details_info: {
+        tower: "",
+        house: "",
+        floor: "",
+        phone: _phone || "",
+        landmark: "",
+        tags: selectedLabel.toLowerCase(),
+        template_id: 1,
+        alias_id: 0,
+        name: selectedLabel,
+      },
+    };
+
+    // Call the callback to add the address
+    if (onAddressSelect) {
+      onAddressSelect(address);
+    }
     
     setQuery("");
     setShowSuggestions(false);

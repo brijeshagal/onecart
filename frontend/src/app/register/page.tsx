@@ -4,13 +4,14 @@ import { AddressList } from "@/components/AddressList";
 import { AddressSearch } from "@/components/AddressSearch";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { apiService } from "@/lib/api";
 import { getCurrentLocation } from "@/lib/location";
 import { useAppStore } from "@/lib/store";
+import { RegistrationService } from "@/services/registrationService";
 import { RegisterUserRequest } from "@/types";
 import { SignInButton, useProfile, useSignIn } from "@farcaster/auth-kit";
 import "@farcaster/auth-kit/styles.css";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAccount, useDisconnect } from "wagmi";
@@ -131,32 +132,14 @@ export default function RegisterPage() {
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
+    const validation = RegistrationService.validateRegistrationData({
+      formData,
+      profile,
+      walletAddresses,
+    });
 
-    if (!formData.phone) newErrors.phone = "Phone number is required";
-    if (!formData.addresses || formData.addresses.length === 0) {
-      newErrors.addresses = "At least one address is required";
-    }
-    if (formData.username && formData.username.length < 3) {
-      newErrors.username = "Username must be at least 3 characters";
-    }
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-    if (!profile) {
-      newErrors.farcaster = "Farcaster connection is required";
-    }
-    if (walletAddresses.length === 0) {
-      newErrors.wallet = "At least one wallet address is required";
-    } else {
-      const verifiedWallets = walletAddresses.filter((w) => w.verified);
-      if (verifiedWallets.length === 0) {
-        newErrors.wallet = "At least one wallet address must be verified";
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(validation.errors);
+    return validation.isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -168,38 +151,23 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      // Get verified wallet addresses
-      const verifiedWallets = walletAddresses.filter((w) => w.verified);
+      // Prepare registration data using the service
+      const registrationData = RegistrationService.prepareRegistrationData({
+        formData,
+        profile,
+        walletAddresses,
+      });
 
-      // Prepare registration data with Farcaster and wallet info
-      const registrationData: RegisterUserRequest = {
-        ...formData,
-        socialLogins: profile.username
-          ? [
-              {
-                platform: "farcaster",
-                username: profile.username,
-                fid: profile.fid?.toString() ?? "",
-              },
-            ]
-          : [],
-        walletAddresses: verifiedWallets.map((w) => w.address),
-        farcasterWalletAddress: verifiedWallets.length > 0 ? 0 : -1,
-        primaryWalletIndex:
-          (formData.primaryWalletIndex ?? -1) >= 0
-            ? formData.primaryWalletIndex ?? -1
-            : verifiedWallets.length > 0
-            ? 0
-            : -1,
-      } as RegisterUserRequest;
+      // Submit registration using the service
+      const result = await RegistrationService.submitRegistration(
+        registrationData
+      );
 
-      const response = await apiService.registerUser(registrationData);
-
-      if (response.success && response.data) {
-        setUser(response.data.user);
+      if (result.success && result.user) {
+        setUser(result.user);
         router.push("/");
       } else {
-        setError(response.error?.message || "Registration failed");
+        setError(result.error || "Registration failed");
       }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "Registration failed");
@@ -215,15 +183,43 @@ export default function RegisterPage() {
     }));
   };
 
+  const handleAddressUpdate = (index: number, updatedAddress: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      addresses: prev.addresses?.map((addr, i) => 
+        i === index ? updatedAddress : addr
+      ) || [],
+    }));
+  };
+
+  const handleAddressSelect = (address: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      addresses: [...(prev.addresses || []), address],
+    }));
+  };
+
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen bg-white px-6 py-8 pb-32">
+      <div className="max-w-md w-full mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-black mb-2">Create Account</h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mb-4">
             Join OneCart for seamless global deliveries
           </p>
+          {(!isAuthenticated || !profile) && (
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 mb-4">
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">F</span>
+                </div>
+                <p className="text-sm text-purple-800 font-medium">
+                  Farcaster sign-in required to create account
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Form */}
@@ -231,7 +227,7 @@ export default function RegisterPage() {
           {/* Farcaster Connection */}
           <div className="space-y-3">
             <label className="block text-sm font-medium text-gray-700">
-              Social Logins*
+              Farcaster Sign-In (Required)*
             </label>
 
             {isAuthenticated && profile ? (
@@ -240,18 +236,31 @@ export default function RegisterPage() {
                 <div className="flex items-center space-x-2">
                   {profile?.pfpUrl ? (
                     <span className="text-white text-sm font-bold w-8 h-8 rounded-full">
-                      <img
+                      <Image
                         src={profile?.pfpUrl ?? ""}
                         alt="Farcaster"
                         className="w-full h-full rounded-full"
                         width={32}
                         height={32}
+                        onError={(e) => {
+                          // Fallback to username initial if image fails to load
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = "none";
+                          const parent = target.parentElement;
+                          if (parent) {
+                            parent.innerHTML = `<span class="text-gray-400 text-sm font-bold">${
+                              profile?.username?.charAt(0) || "F"
+                            }</span>`;
+                            parent.className =
+                              "text-white text-sm font-bold w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center";
+                          }
+                        }}
                       />
                     </span>
                   ) : (
-                    <span className="text-white text-sm font-bold w-8 h-8 rounded-full bg-gray-200">
+                    <span className="text-white text-sm font-bold w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
                       <span className="text-gray-400 text-sm font-bold">
-                        {profile?.username?.charAt(0)}
+                        {profile?.username?.charAt(0) || "F"}
                       </span>
                     </span>
                   )}
@@ -438,11 +447,14 @@ export default function RegisterPage() {
             <AddressList
               addresses={formData.addresses || []}
               onRemove={handleAddressRemove}
+              onUpdate={handleAddressUpdate}
+              primaryPhone={formData.phone}
             />
 
             <AddressSearch
               currentLocation={currentLocation}
               phone={formData.phone || ""}
+              onAddressSelect={handleAddressSelect}
             />
 
             {errors.addresses && (
@@ -475,11 +487,13 @@ export default function RegisterPage() {
           {/* Submit Button */}
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !isAuthenticated || !profile}
             isLoading={isLoading}
             className="w-full"
           >
-            Create Account
+            {!isAuthenticated || !profile
+              ? "Please sign in with Farcaster first"
+              : "Create Account"}
           </Button>
         </form>
       </div>

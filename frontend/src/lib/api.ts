@@ -103,6 +103,41 @@ class ApiService {
     }
   }
 
+  async reverseGeocode(
+    lat: number,
+    lng: number,
+    addressDetailsInfo: any
+  ): Promise<ApiResponse<{
+    location_info: {
+      state: string;
+      postal_code: string;
+      city: string;
+    };
+    coordinates: { lat: number; lng: number };
+    address_details_info: any;
+  }>> {
+    try {
+      const response = await this.client.post<
+        ApiResponse<{
+          location_info: {
+            state: string;
+            postal_code: string;
+            city: string;
+          };
+          coordinates: { lat: number; lng: number };
+          address_details_info: any;
+        }>
+      >("/location/reverse-geocode", {
+        lat,
+        lng,
+        address_details_info: addressDetailsInfo,
+      });
+      return this.handleResponse(response);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
   // Search Items API endpoints
   async searchItems(request: SearchItemsRequest): Promise<SearchItemsResponse> {
     try {

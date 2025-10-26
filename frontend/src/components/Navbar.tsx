@@ -28,7 +28,7 @@ export function Navbar({
         {/* Main navbar - Mobile design centered on desktop */}
         <div className="px-4 py-2 flex items-center justify-between gap-2">
           {/* Logo */}
-          <Link href={user ? "/dashboard" : "/register"} className="flex items-center gap-2 shrink-0">
+          <Link href={user ? "/search-items" : "/register"} className="flex items-center gap-2 shrink-0">
             <div className="w-7 h-7 bg-black rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xs">O</span>
             </div>

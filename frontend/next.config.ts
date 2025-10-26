@@ -6,10 +6,6 @@ const nextConfig: NextConfig = {
     config.externals.push('pino-pretty', 'lokijs', 'encoding');
     return config;
   },
-  // Disable server-side rendering for wagmi/rainbowkit
-  experimental: {
-    optimizePackageImports: ['@rainbow-me/rainbowkit', 'wagmi', 'viem'],
-  },
 };
 
 export default nextConfig;

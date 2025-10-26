@@ -1,6 +1,7 @@
 "use client";
 
 import { AddressModal } from "@/components/AddressModal";
+import { BottomNav } from "@/components/BottomNav";
 import { Navbar } from "@/components/Navbar";
 import {
   useCart,
@@ -1093,6 +1094,9 @@ export default function CartPage() {
           </div>
         )}
       </div>
+
+      {/* Bottom Navigation */}
+      <BottomNav />
     </div>
   );
 }

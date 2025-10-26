@@ -171,13 +171,12 @@ function OrderSuccessContent() {
             Continue Shopping
           </Link>
           
-          {/* TODO: Add order tracking page */}
-          {/* <Link
+          <Link
             href="/orders"
             className="block w-full px-6 py-3 bg-white text-gray-900 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors text-center"
           >
             View My Orders
-          </Link> */}
+          </Link>
         </div>
 
         {/* Additional Info */}

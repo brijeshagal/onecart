@@ -1,6 +1,7 @@
 "use client";
 
 import { AddressModal } from "@/components/AddressModal";
+import { BottomNav } from "@/components/BottomNav";
 import { Navbar } from "@/components/Navbar";
 import { apiService } from "@/lib/api";
 import { useCartActions, useCartStore } from "@/lib/cartStore";
@@ -540,6 +541,9 @@ export default function SearchItemsPage() {
           </div>
         )}
       </main>
+
+      {/* Bottom Navigation */}
+      <BottomNav />
     </div>
   );
 }

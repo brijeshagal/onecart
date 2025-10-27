@@ -29,7 +29,7 @@ class ApiService {
     return response.data;
   }
 
-  private async handleError(error: unknown): Promise<never> {
+  private async handleError(error: unknown) {
     let errorMessage = "An error occurred";
 
     if (error && typeof error === "object" && "response" in error) {
@@ -40,8 +40,7 @@ class ApiService {
     } else if (error instanceof Error) {
       errorMessage = error.message;
     }
-
-    throw new Error(errorMessage);
+    return errorMessage;
   }
 
   // User API endpoints
@@ -53,7 +52,14 @@ class ApiService {
       );
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: {
+          message: errorMessage || "An error occurred",
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -66,23 +72,49 @@ class ApiService {
       >(`/user/${userId}`);
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: {
+          message: errorMessage || "An error occurred",
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
   async addWalletAddress(
     userId: string,
     walletAddress: string
-  ): Promise<ApiResponse<{ walletAddress: string; isNew: boolean; walletAddresses: string[]; primaryWalletIndex: number }>> {
+  ): Promise<
+    ApiResponse<{
+      walletAddress: string;
+      isNew: boolean;
+      walletAddresses: string[];
+      primaryWalletIndex: number;
+    }>
+  > {
     try {
       const response = await this.client.post<
-        ApiResponse<{ walletAddress: string; isNew: boolean; walletAddresses: string[]; primaryWalletIndex: number }>
+        ApiResponse<{
+          walletAddress: string;
+          isNew: boolean;
+          walletAddresses: string[];
+          primaryWalletIndex: number;
+        }>
       >(`/user/${userId}/wallet-address`, {
         walletAddress,
       });
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: {
+          message: errorMessage || "An error occurred",
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -99,7 +131,12 @@ class ApiService {
       );
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: errorMessage || "An error occurred",
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -107,15 +144,17 @@ class ApiService {
     lat: number,
     lng: number,
     addressDetailsInfo: any
-  ): Promise<ApiResponse<{
-    location_info: {
-      state: string;
-      postal_code: string;
-      city: string;
-    };
-    coordinates: { lat: number; lng: number };
-    address_details_info: any;
-  }>> {
+  ): Promise<
+    ApiResponse<{
+      location_info: {
+        state: string;
+        postal_code: string;
+        city: string;
+      };
+      coordinates: { lat: number; lng: number };
+      address_details_info: any;
+    }>
+  > {
     try {
       const response = await this.client.post<
         ApiResponse<{
@@ -134,7 +173,14 @@ class ApiService {
       });
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: {
+          message: errorMessage || "An error occurred",
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -147,7 +193,12 @@ class ApiService {
       );
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: errorMessage || "An error occurred",
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -159,7 +210,12 @@ class ApiService {
       );
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: errorMessage || "An error occurred",
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -170,7 +226,14 @@ class ApiService {
       );
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: { message: errorMessage || "An error occurred" } as {
+          message: string;
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -185,7 +248,14 @@ class ApiService {
       );
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: { message: errorMessage || "An error occurred" } as {
+          message: string;
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -200,7 +270,14 @@ class ApiService {
       );
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: { message: errorMessage || "An error occurred" } as {
+          message: string;
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -215,7 +292,14 @@ class ApiService {
       );
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: { message: errorMessage || "An error occurred" } as {
+          message: string;
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -226,7 +310,14 @@ class ApiService {
       );
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: { message: errorMessage || "An error occurred" } as {
+          message: string;
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -243,7 +334,14 @@ class ApiService {
       });
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: { message: errorMessage || "An error occurred" } as {
+          message: string;
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -264,7 +362,14 @@ class ApiService {
       );
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: { message: errorMessage || "An error occurred" } as {
+          message: string;
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -284,7 +389,14 @@ class ApiService {
       );
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: { message: errorMessage || "An error occurred" } as {
+          message: string;
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -295,7 +407,14 @@ class ApiService {
       );
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: { message: errorMessage || "An error occurred" } as {
+          message: string;
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -303,10 +422,22 @@ class ApiService {
     userId: string,
     txHash: string,
     expectedAmount: number
-  ): Promise<ApiResponse<{ txHash: string; sender: string; status: string; blockNumber: string }>> {
+  ): Promise<
+    ApiResponse<{
+      txHash: string;
+      sender: string;
+      status: string;
+      blockNumber: string;
+    }>
+  > {
     try {
       const response = await this.client.post<
-        ApiResponse<{ txHash: string; sender: string; status: string; blockNumber: string }>
+        ApiResponse<{
+          txHash: string;
+          sender: string;
+          status: string;
+          blockNumber: string;
+        }>
       >("/payment/verify-crypto", {
         userId,
         txHash,
@@ -314,7 +445,14 @@ class ApiService {
       });
       return this.handleResponse(response);
     } catch (error) {
-      return this.handleError(error);
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: { message: errorMessage || "An error occurred" } as {
+          message: string;
+        },
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 }

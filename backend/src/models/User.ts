@@ -13,7 +13,7 @@ const AddressSchema = new Schema<AddressData>(
     corrected_location_info: { type: Object, required: true },
     location_info: { type: Object, required: true },
     display_address: { type: String, required: true },
-    landmark: { type: String, required: true },
+    landmark: { type: String },
     latitude: { type: Number, required: true },
     longitude: { type: Number, required: true },
     use_corrected_location: { type: Boolean, required: true },

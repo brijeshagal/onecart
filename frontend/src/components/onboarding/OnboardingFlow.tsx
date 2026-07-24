@@ -16,6 +16,7 @@ interface OnboardingFlowProps {
     address: AddressData;
   }) => void;
   onCancel?: () => void;
+  onExistingUser?: (user: any) => void;
 }
 
 type OnboardingStep = 'auth' | 'phone' | 'address' | 'details';
@@ -23,6 +24,7 @@ type OnboardingStep = 'auth' | 'phone' | 'address' | 'details';
 export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   onComplete,
   onCancel,
+  onExistingUser,
 }) => {
   const [currentStep, setCurrentStep] = useState<OnboardingStep>('auth');
   const [currentLocation, setCurrentLocation] = useState<{
@@ -134,6 +136,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
           <FarcasterAuthStep
             onComplete={handleAuthComplete}
             onBack={onCancel}
+            onExistingUser={onExistingUser}
           />
         );
       case 'phone':

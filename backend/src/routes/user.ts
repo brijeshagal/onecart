@@ -70,6 +70,60 @@ router.post('/register', UserController.registerUser);
 
 /**
  * @swagger
+ * /api/user/farcaster/{fid}:
+ *   get:
+ *     summary: Check if user exists by Farcaster FID
+ *     description: |
+ *       Check if a user already exists in the database by their Farcaster FID.
+ *       This is used during login to determine if the user should be signed in or registered.
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: fid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Farcaster FID
+ *         example: "1234567"
+ *     responses:
+ *       200:
+ *         description: Check completed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     exists:
+ *                       type: boolean
+ *                       description: Whether user exists or not
+ *                     user:
+ *                       description: User data (only if exists is true)
+ *                       $ref: '#/components/schemas/User'
+ *                     activeCart:
+ *                       description: Active cart data (only if exists is true)
+ *                       type: object
+ *                     message:
+ *                       type: string
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.get('/farcaster/:fid', UserController.getUserByFarcasterFid);
+
+/**
+ * @swagger
  * /api/user/{id}:
  *   get:
  *     summary: Get user profile

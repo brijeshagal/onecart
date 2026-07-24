@@ -1,10 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
+import { Page } from 'puppeteer';
 import { FeedRequest, FeedResponse } from '../types/api';
+import { launchBrowser } from '../utils/blinkit/browserUtils';
+import { getBlinkitHomeFeed, setAddressOnPage } from '../utils/blinkit/searchUtils';
+import { AddressData } from '../types/address';
 
 /**
  * Feed Controller
  * Handles home page product feed based on user's location (Blinkit India)
- * TODO: Replace with actual Blinkit API integration
  */
 export class FeedController {
   /**
@@ -18,64 +21,43 @@ export class FeedController {
     res: Response<FeedResponse>,
     next: NextFunction
   ): Promise<void> {
+    const browser = await launchBrowser();
     try {
-      const { lat, lng, offset = 0, limit = 20 } = req.query;
+      const { lat, lng, offset = 0, limit = 20, address } = req.query;
 
       console.log(`📱 Feed request: lat=${lat}, lng=${lng}, offset=${offset}, limit=${limit}`);
 
-      // TODO: Replace with actual Blinkit API call
-      // For now, return a basic structure that will be replaced with real data
-      const response: FeedResponse = {
-        success: true,
-        data: {
-          sections: [
-            {
-              id: 'categories',
-              title: 'Shop by Category',
-              type: 'categories',
-              categories: [
-                'Fruits & Vegetables',
-                'Dairy & Eggs',
-                'Bakery',
-                'Beverages',
-                'Snacks & Munchies'
-              ]
-            }
-          ],
-          location: {
-            lat,
-            lng,
-            city: this.getCityFromCoordinates(lat, lng)
-          },
-          pagination: {
-            offset,
-            limit,
-            hasMore: false
-          }
-        },
-        timestamp: new Date().toISOString()
-      };
+      const [page] = (await browser.pages()) as [Page];
+      await page.goto('https://www.blinkit.com', {
+        waitUntil: 'domcontentloaded',
+      });
 
-      res.status(200).json(response);
+      // Set address if provided
+      if (address) {
+        try {
+          const addressData = typeof address === 'string' 
+            ? JSON.parse(address) as AddressData 
+            : address as AddressData;
+          await setAddressOnPage(addressData, page);
+          await new Promise(resolve => setTimeout(resolve, 1200));
+        } catch (error) {
+          console.warn('Failed to set address, using default location:', error);
+        }
+      }
+
+      // Get home feed from Blinkit
+      const blinkitFeedResponse = await getBlinkitHomeFeed(page);
+
+      res.status(200).json({
+        success: true,
+        data: blinkitFeedResponse,
+        timestamp: new Date().toISOString(),
+      } as any);
     } catch (error) {
       console.error('❌ Feed error:', error);
       next(error);
+    } finally {
+      await browser.close();
     }
-  }
-
-  /**
-   * Get city name from coordinates (simplified logic)
-   */
-  private static getCityFromCoordinates(lat: number, lng: number): string {
-    // In a real implementation, this would use reverse geocoding
-    if (lat >= 12 && lat <= 14 && lng >= 77 && lng <= 78) {
-      return 'Bangalore';
-    } else if (lat >= 28 && lat <= 29 && lng >= 77 && lng <= 78) {
-      return 'Delhi';
-    } else if (lat >= 19 && lat <= 20 && lng >= 72 && lng <= 73) {
-      return 'Mumbai';
-    }
-
-    return 'India'; // Default fallback
   }
 }

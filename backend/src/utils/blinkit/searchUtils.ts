@@ -143,3 +143,84 @@ export async function setAddressOnPage(
     await new Promise(resolve => setTimeout(resolve, 500));
   }
 }
+
+/**
+ * Wait for home page feed results from Blinkit's API
+ * This function listens for network responses to the feed endpoint
+ * Endpoint: https://blinkit.com/feed/?template_version=9
+ *
+ * @param page - Puppeteer Page instance
+ * @param timeoutMs - Timeout in milliseconds (default: 5000ms)
+ * @returns Promise that resolves with feed results data
+ */
+export async function waitForHomeFeedResults(
+  page: Page,
+  timeoutMs: number = 5000
+): Promise<BlinkitProductResponse> {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+
+    const responseHandler = async (response: any) => {
+      try {
+        const url = response.url();
+        // Listen for the feed API endpoint
+        // Example: https://blinkit.com/feed/?template_version=9
+        if (!url.includes('/feed/')) return;
+
+        const json: any = await response.json();
+        const snippets = json?.response?.snippets ?? [];
+        cleanup();
+        settled = true;
+        resolve(snippets);
+      } catch (err) {
+        // Swallow parsing errors for non-JSON responses
+      }
+    };
+
+    const cleanup = () => {
+      try {
+        page.off('response', responseHandler);
+      } catch {}
+    };
+
+    const timer = setTimeout(() => {
+      if (settled) return;
+      cleanup();
+      console.warn('Home feed request timeout');
+      reject(new Error('Home feed request timeout'));
+    }, timeoutMs);
+
+    // attach
+    page.on('response', responseHandler);
+
+    // Ensure we clear timer on natural resolve/reject
+    const originalResolve = resolve as any;
+    const originalReject = reject as any;
+    resolve = ((value: any) => {
+      clearTimeout(timer);
+      originalResolve(value);
+    }) as any;
+    reject = ((reason: any) => {
+      clearTimeout(timer);
+      originalReject(reason);
+    }) as any;
+  });
+}
+
+/**
+ * Get home page feed from Blinkit
+ * @param page - Puppeteer Page instance
+ * @returns Promise that resolves with feed results data
+ */
+export async function getBlinkitHomeFeed(
+  page: Page
+): Promise<BlinkitProductResponse> {
+  const feedPromise = waitForHomeFeedResults(page);
+
+  // Navigate to Blinkit home page
+  await page.goto('https://blinkit.com', {
+    waitUntil: 'networkidle2',
+  });
+
+  return await feedPromise;
+}

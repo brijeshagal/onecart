@@ -1,9 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import { apiService } from "@/lib/api";
 import { SignInButton, useProfile, useSignIn } from "@farcaster/auth-kit";
 import "@farcaster/auth-kit/styles.css";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 interface FarcasterAuthStepProps {
   onComplete: (data: {
@@ -11,14 +13,17 @@ interface FarcasterAuthStepProps {
     walletAddresses: Array<{ address: string; verified: boolean; id: string }>;
   }) => void;
   onBack?: () => void;
+  onExistingUser?: (user: any) => void;
 }
 
 export const FarcasterAuthStep: React.FC<FarcasterAuthStepProps> = ({
   onComplete,
   onBack,
+  onExistingUser,
 }) => {
   const { isAuthenticated, profile } = useProfile();
   const { signOut } = useSignIn({});
+  const [isCheckingUser, setIsCheckingUser] = useState(false);
 
   // Get verified wallet addresses from profile
   const getVerifiedWallets = () => {
@@ -30,6 +35,32 @@ export const FarcasterAuthStep: React.FC<FarcasterAuthStepProps> = ({
       id: `verified-${index}`,
     }));
   };
+
+  // Check if user exists when authenticated
+  useEffect(() => {
+    const checkExistingUser = async () => {
+      if (isAuthenticated && profile?.fid) {
+        setIsCheckingUser(true);
+        try {
+          const response = await apiService.getUserByFarcasterFid(profile.fid.toString());
+          
+          if (response.success && response.data?.exists && response.data.user) {
+            console.log("User already exists, signing in:", response.data.user);
+            if (onExistingUser) {
+              onExistingUser(response.data.user);
+            }
+          }
+        } catch (error) {
+          console.error("Error checking existing user:", error);
+        } finally {
+          setIsCheckingUser(false);
+        }
+      }
+    };
+
+    checkExistingUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, profile?.fid]);
 
   const handleContinue = () => {
     if (isAuthenticated && profile) {
@@ -57,6 +88,11 @@ export const FarcasterAuthStep: React.FC<FarcasterAuthStepProps> = ({
         <p className="text-gray-600">
           Sign in with Farcaster to use your verified wallet addresses
         </p>
+        {isCheckingUser && (
+          <p className="text-sm text-blue-600 mt-2">
+            Checking account...
+          </p>
+        )}
       </div>
 
       {/* Farcaster Connection */}

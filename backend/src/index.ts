@@ -1,7 +1,6 @@
 import cors from 'cors';
 import express, { Application } from 'express';
 import helmet from 'helmet';
-
 import swaggerUi from 'swagger-ui-express';
 import { database } from './config/database';
 import { env } from './config/env';
@@ -37,10 +36,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Routes
 app.use('/api', mainRouter);
 
-// Swagger documentation
 app.use(
   '/api-docs',
-  swaggerUi.serve,
+  ...swaggerUi.serve,
   swaggerUi.setup(swaggerSpec, {
     explorer: true,
     customCss: '.swagger-ui .topbar { display: none }',

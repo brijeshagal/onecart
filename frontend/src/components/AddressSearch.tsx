@@ -55,8 +55,12 @@ export const AddressSearch: React.FC<AddressSearchProps> = ({
 
           console.log(response.data);
 
-          if (response.success && response.data) {
-            setSuggestions(response.data.suggestions);
+          if (response.success) {
+            const nextSuggestions = response.data?.suggestions ?? [];
+            setSuggestions(nextSuggestions);
+            setShowSuggestions(true);
+          } else {
+            setSuggestions([]);
             setShowSuggestions(true);
           }
         } catch (error) {

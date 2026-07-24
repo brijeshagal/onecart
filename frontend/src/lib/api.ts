@@ -83,6 +83,30 @@ class ApiService {
     }
   }
 
+  async getUserByFarcasterFid(fid: string): Promise<ApiResponse<{
+    exists: boolean;
+    user?: User;
+    activeCart?: Cart;
+  }>> {
+    try {
+      const response = await this.client.get<ApiResponse<{
+        exists: boolean;
+        user?: User;
+        activeCart?: Cart;
+      }>>(`/user/farcaster/${fid}`);
+      return this.handleResponse(response);
+    } catch (error) {
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: {
+          message: errorMessage || "An error occurred",
+        },
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
   async addWalletAddress(
     userId: string,
     walletAddress: string
@@ -178,6 +202,37 @@ class ApiService {
         success: false,
         error: {
           message: errorMessage || "An error occurred",
+        },
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  // Feed API endpoints
+  async getFeed(request: {
+    lat: number;
+    lng: number;
+    offset?: number;
+    limit?: number;
+    address?: AddressData;
+  }): Promise<ApiResponse<any>> {
+    try {
+      const response = await this.client.get<ApiResponse<any>>("/feed", {
+        params: {
+          lat: request.lat,
+          lng: request.lng,
+          offset: request.offset || 0,
+          limit: request.limit || 20,
+          address: request.address ? JSON.stringify(request.address) : undefined,
+        },
+      });
+      return this.handleResponse(response);
+    } catch (error) {
+      const errorMessage = await this.handleError(error);
+      return {
+        success: false,
+        error: { message: errorMessage || "An error occurred" } as {
+          message: string;
         },
         timestamp: new Date().toISOString(),
       };

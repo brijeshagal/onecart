@@ -64,10 +64,10 @@ export function BottomNav() {
                     : "text-gray-600 hover:text-black hover:bg-gray-50"
                 }`}
               >
-                <div className="relative">
+                <div className="relative inline-flex items-center justify-center">
                   {item.icon}
                   {item.badge && item.badge > 0 && (
-                    <div className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full min-w-4 h-4 flex items-center justify-center text-xs font-bold px-1">
+                    <div className="absolute -bottom-0.5 -right-0.5 bg-red-500 text-white rounded-full min-w-4 h-4 flex items-center justify-center text-xs font-bold px-1">
                       {item.badge > 9 ? "9+" : item.badge}
                     </div>
                   )}

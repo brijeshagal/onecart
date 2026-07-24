@@ -10,6 +10,12 @@ export default function RegisterPage() {
   const router = useRouter();
   const { setLoading, setError, setUser } = useAppStore();
 
+  const handleExistingUser = async (user: any) => {
+    console.log("User already exists, signing in:", user);
+    setUser(user);
+    router.push("/");
+  };
+
   const handleOnboardingComplete = async (data: {
     profile: any;
     walletAddresses: Array<{ address: string; verified: boolean; id: string }>;
@@ -67,6 +73,7 @@ export default function RegisterPage() {
     <OnboardingFlow
       onComplete={handleOnboardingComplete}
       onCancel={handleCancel}
+      onExistingUser={handleExistingUser}
     />
   );
 }

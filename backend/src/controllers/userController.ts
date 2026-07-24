@@ -175,6 +175,77 @@ export class UserController {
   }
 
   /**
+   * Check if user exists by Farcaster FID
+   * @route GET /api/user/farcaster/:fid
+   * @param {string} req.params.fid - Farcaster FID
+   * @returns {Promise<void>}
+   */
+  static async getUserByFarcasterFid(
+    req: Request<{ fid: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { fid } = req.params;
+
+      console.log(`🔍 Check user by Farcaster FID: FID=${fid}`);
+
+      const user = await userModel.findOne({
+        'socialLogins.farcaster.fid': fid,
+      });
+
+      if (!user) {
+        console.log(`❌ No user found with FID: ${fid}`);
+        res.status(200).json({
+          success: true,
+          data: {
+            exists: false,
+            message: 'User not found',
+          },
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      let activeCartData: ICart | null = null;
+      if (user.activeCartIds && user.activeCartIds.length > 0) {
+        const activeCart = await cartModel.findByCartId(user.activeCartIds[0]);
+        if (activeCart) {
+          activeCartData = activeCart;
+        }
+      }
+
+      console.log(`✅ User found with FID: ${fid}, UserID=${user._id}`);
+
+      res.status(200).json({
+        success: true,
+        data: {
+          exists: true,
+          user: {
+            id: user._id.toString(),
+            username: user.username,
+            email: user.email,
+            phone: user.phone,
+            addresses: user.addresses,
+            defaultAddressIndex: user.defaultAddressIndex,
+            receiveAddressIndex: user.receiveAddressIndex,
+            askBeforeReceiving: user.askBeforeReceiving,
+            walletAddresses: user.walletAddresses,
+            farcasterWalletAddress: user.farcasterWalletAddress,
+            primaryWalletIndex: user.primaryWalletIndex,
+          },
+          activeCart: activeCartData,
+          message: 'User found',
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('❌ Check user by Farcaster FID error:', error);
+      next(error);
+    }
+  }
+
+  /**
    * Add or verify wallet address for user
    * @route POST /api/user/:id/wallet-address
    * @param {string} req.params.id - User ID

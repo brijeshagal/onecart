@@ -142,7 +142,7 @@ export interface UISuggestion {
 export interface SearchLocationResponse {
   success: boolean;
   data?: {
-    suggestions: UISuggestion[];
+    suggestions?: UISuggestion[];
     query: string;
     coordinates: {
       lat: number;

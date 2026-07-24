@@ -54,7 +54,7 @@ export const PhoneNumberStep: React.FC<PhoneNumberStepProps> = ({
           Add Your Phone Number
         </h2>
         <p className="text-gray-600">
-          We'll use this to contact you about your orders
+          {`We'll use this to contact you about your orders`}
         </p>
       </div>
 

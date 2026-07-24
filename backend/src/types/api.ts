@@ -61,6 +61,7 @@ export interface FeedRequest {
   lng: number;
   offset?: number;
   limit?: number;
+  address?: string; // JSON string of AddressData
 }
 
 // TODO: Add FeedProduct and FeedSection interfaces when implementing actual Blinkit integration

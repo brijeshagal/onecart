@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { AddressData } from '@/types';
-import { AddressDetailsForm } from './AddressDetailsForm';
+import { AddressData } from "@/types";
+import React, { useState } from "react";
+import { AddressDetailsForm } from "./AddressDetailsForm";
 
 interface AddressListProps {
   addresses: AddressData[];
@@ -13,7 +13,7 @@ export const AddressList: React.FC<AddressListProps> = ({
   addresses,
   onRemove,
   onUpdate,
-  primaryPhone
+  primaryPhone,
 }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
@@ -38,11 +38,7 @@ export const AddressList: React.FC<AddressListProps> = ({
   };
 
   if (addresses.length === 0) {
-    return (
-      <p className="text-sm text-gray-500 italic">
-        No address added yet
-      </p>
-    );
+    return <p className="text-sm text-gray-500 italic">No address added yet</p>;
   }
 
   return (
@@ -71,7 +67,7 @@ export const AddressList: React.FC<AddressListProps> = ({
                   <p className="text-sm text-gray-600 mb-1">
                     {address.display_address}
                   </p>
-                  
+
                   {/* Show address details if available */}
                   {address.address_details_info && (
                     <div className="text-xs text-gray-500 space-y-1">
@@ -89,20 +85,28 @@ export const AddressList: React.FC<AddressListProps> = ({
                       )}
                       {address.location_info && address.location_info.state && (
                         <p>
-                          {address.location_info.city}, {address.location_info.state} - {address.location_info.postal_code}
+                          {address.location_info.city},{" "}
+                          {address.location_info.state} -{" "}
+                          {address.location_info.postal_code}
                         </p>
                       )}
                     </div>
                   )}
                 </div>
-                
+
                 <div className="flex flex-col gap-1 ml-2">
                   <button
                     type="button"
-                    onClick={() => address.address_details_info ? handleEdit(index) : handleAddDetails(index)}
+                    onClick={() =>
+                      address.address_details_info
+                        ? handleEdit(index)
+                        : handleAddDetails(index)
+                    }
                     className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                   >
-                    {address.address_details_info ? 'Edit Details' : 'Add Details'}
+                    {address.address_details_info
+                      ? "Edit Details"
+                      : "Add Details"}
                   </button>
                   {onRemove && (
                     <button

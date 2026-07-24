@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   images: {
     remotePatterns: [
       {
@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
     config.externals.push('pino-pretty', 'lokijs', 'encoding');
     return config;
   },
-};
+  turbopack: {},
+} satisfies NextConfig;
 
 export default nextConfig;

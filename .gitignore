@@ -1,0 +1,7 @@
+.DS_Store
+
+# The previous backend/ and frontend/ projects do not exist on this branch —
+# see the `legacy` and `sacred` branches. Local leftovers (node_modules, .env,
+# build output) may still sit on disk; ignore them here.
+backend/
+frontend/

@@ -1,0 +1,9 @@
+target/
+node_modules/
+.env
+*.tsbuildinfo
+
+# Session state NEVER enters the tree. docs/11-procurement.md 3.
+profiles/
+*.session.json
+session.json

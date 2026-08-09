@@ -1,0 +1,39 @@
+# Rate limits, concurrency caps and lease timings.
+# Starting points to be tuned against real behaviour, not measured truths.
+
+[read_pool]
+# Blinkit rate-limits aggressively (docs/03-adapters.md 4). Be a good citizen.
+max_concurrent_per_identity = 2
+requests_per_minute         = 30
+backoff_initial_ms          = 1_000
+backoff_max_ms              = 60_000
+# Circuit-break an identity after this many consecutive body-level failures.
+circuit_break_failures      = 5
+health_check_seconds        = 180
+
+[order_pool]
+lease_ttl_seconds           = 600
+lease_heartbeat_seconds     = 30
+# An account is leasable only if its session was verified this recently.
+# This single value is what keeps OTP off the procurement path (D-010).
+auth_freshness_seconds      = 600
+# Until probe 5 answers whether Blinkit caps concurrent live orders.
+max_live_orders_per_account = 1
+health_check_seconds        = 180
+
+[address_book]
+# Grace before an orphaned supplier address is deleted. The rider may still
+# call, support may need to read it back, a refund can land days later.
+gc_grace_hours              = 24
+gc_batch_size               = 5
+gc_max_delete_failures      = 3
+
+[harness]
+canary_interval_seconds     = 600
+app_version_poll_seconds    = 900
+
+[coverage]
+# A single failed probe is a transient store outage, not unserviceability.
+probe_failures_before_negative = 3
+
+

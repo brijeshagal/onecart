@@ -1,0 +1,80 @@
+# Order states and the legal transitions between them.
+# Generated into both languages so adding a state fails the build until both
+# sides handle it. That is the entire point of generating them.
+
+[[state]]
+id = "DRAFT"
+to = ["QUOTED", "ABANDONED"]
+
+[[state]]
+id = "QUOTED"
+to = ["AUTHORIZED", "QUOTE_STALE", "ABANDONED"]
+
+[[state]]
+id = "QUOTE_STALE"
+to = ["QUOTED", "ABANDONED"]
+
+[[state]]
+id = "AUTHORIZED"
+to = ["PROCURING", "PROCUREMENT_FAILED"]
+
+[[state]]
+id = "PROCURING"
+to = ["PLACED", "PROCUREMENT_FAILED"]
+
+[[state]]
+id = "PLACED"
+to = ["CONFIRMED", "CANCELLED_BY_PLATFORM"]
+
+[[state]]
+id = "CONFIRMED"
+to = ["OUT_FOR_DELIVERY", "CANCELLED_BY_PLATFORM"]
+
+[[state]]
+id = "OUT_FOR_DELIVERY"
+to = ["DELIVERED", "PARTIAL_FULFILL", "CANCELLED_BY_PLATFORM"]
+
+# D-005 makes partial fulfilment the COMMON path, not an edge case.
+[[state]]
+id = "PARTIAL_FULFILL"
+to = ["DELIVERED"]
+
+[[state]]
+id = "DELIVERED"
+to = ["CAPTURED"]
+
+[[state]]
+id = "CAPTURED"
+to = ["SETTLED"]
+
+[[state]]
+id = "SETTLED"
+to = []
+
+[[state]]
+id = "PROCUREMENT_FAILED"
+to = []
+
+[[state]]
+id = "ABANDONED"
+to = []
+
+[[state]]
+id = "CANCELLED_BY_PLATFORM"
+to = ["REFUND_PENDING"]
+
+[[state]]
+id = "REFUND_PENDING"
+to = ["REFUND_ISSUED"]
+
+[[state]]
+id = "REFUND_ISSUED"
+to = []
+
+# States after which a recipient's supplier-side address may be garbage
+# collected. Read by the address GC query (docs/11-procurement.md 6.2).
+[terminal]
+for_address_gc = [
+  "DELIVERED", "SETTLED", "CANCELLED_BY_PLATFORM",
+  "REFUND_ISSUED", "PROCUREMENT_FAILED", "ABANDONED",
+]

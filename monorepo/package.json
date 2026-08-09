@@ -1,0 +1,14 @@
+{
+  "name": "monorepo",
+  "private": true,
+  "scripts": {
+    "codegen": "cargo run -q -p codegen",
+    "codegen:check": "cargo run -q -p codegen -- --check",
+    "build": "pnpm -r build",
+    "db:up": "docker compose up -d db",
+    "db:reset": "docker compose down -v && docker compose up -d db"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

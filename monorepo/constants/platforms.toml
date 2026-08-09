@@ -1,0 +1,41 @@
+# Single source of truth for platform identity and the client we impersonate.
+# Generated into crates/constants/src/generated.rs and packages/constants/src/generated.ts.
+# CI fails if those are stale relative to this file.
+
+[[platform]]
+id            = "blinkit"
+display_name  = "Blinkit"
+# Order path. Only Blinkit procures in v1 (README non-goals).
+order_enabled = true
+# Read path host. D-011: the web host, not api2.grofers.com.
+read_host     = "blinkit.com"
+# The TLS fingerprint we present. Ages, and looks anomalous when it ages badly.
+# Bumped deliberately, in a PR. See docs/11-procurement.md 2.1.
+#
+# Ceilinged by wreq-util, which tops out at chrome137 while real Chrome is on
+# ~146. We are already ~9 releases stale and can only get staler until wreq-util
+# ships newer profiles. blinkit::emulation() has a test that fails the build if
+# this string is not a variant it supports, so this can never silently rot into
+# a runtime surprise.
+impersonate   = "chrome137"
+# The supplier build we claim to be. D-002 drift signal; observed 18.9.3 on 2026-07-25.
+app_version   = "18.9.3"
+app_client    = "consumer_web"
+
+[[platform]]
+id            = "zepto"
+display_name  = "Zepto"
+order_enabled = false
+read_host     = "www.zeptonow.com"
+impersonate   = "chrome137"
+app_version   = "26.3.1"
+app_client    = "android"
+
+[[platform]]
+id            = "instamart"
+display_name  = "Swiggy Instamart"
+order_enabled = false
+read_host     = "www.swiggy.com"
+impersonate   = "chrome137"
+app_version   = ""
+app_client    = "web"

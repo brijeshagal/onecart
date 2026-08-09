@@ -1,0 +1,18 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      # CI fails if generated files are stale relative to the TOML.
+      # This rule is what makes the whole constants scheme work.
+      - run: cargo run -q -p codegen -- --check
+      - run: cargo test --workspace
+      - uses: pnpm/action-setup@v4
+        with: { version: 11 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r build

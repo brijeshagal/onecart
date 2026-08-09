@@ -1,0 +1,42 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/constants",
+    "crates/adapters/blinkit",
+    "crates/harness",
+    "tools/codegen",
+    "tools/migrate",
+]
+
+# Crates listed in docs/01-architecture.md 3 but not yet built — coverage,
+# catalog, basket, orchestrator, session, ledger — are added when they are
+# written, not scaffolded empty ahead of time.
+
+[workspace.package]
+edition = "2024"
+license = "UNLICENSED"
+publish = false
+
+[workspace.dependencies]
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml       = "0.9"
+anyhow     = "1"
+thiserror  = "2"
+sha2       = "0.10"
+tokio      = { version = "1", features = ["macros", "rt-multi-thread"] }
+# TLS-impersonating client. The crates docs/03-adapters.md names (rquest,
+# reqwest-impersonate) are both 0.0.0 placeholders now; the project renamed
+# to wreq. See docs/11-procurement.md 2.1.
+#
+# Pinned to stable 5.x, not 6.0.0-rc: wreq-util 2.x resolves wreq to 5.x, and
+# 5.x/6.x link boringssl through different -sys crates (boring-sys2 vs
+# btls-sys), which cargo refuses to co-link. Stable is the right side of that
+# conflict to land on for a path this close to money.
+wreq       = "5"
+wreq-util  = "2"
+# rustls rather than native-tls: Railway's Postgres proxy requires TLS and
+# rustls avoids depending on the host's OpenSSL.
+sqlx       = { version = "0.9", default-features = false, features = [
+    "postgres", "runtime-tokio", "tls-rustls", "migrate", "macros",
+] }

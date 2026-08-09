@@ -24,6 +24,7 @@ card, and it arrives at an Indian address in minutes via a quick-commerce suppli
 | [08 — Ops runbook](./docs/08-ops-runbook.md) | What runs, what alerts, what to do at 3am |
 | [09 — Legal and risk](./docs/09-legal.md) | Honest read on where the exposure is |
 | [10 — Build order](./docs/10-roadmap.md) | What to build, in what order, and why |
+| [11 — Procurement](./docs/11-procurement.md) | Accounts, leases, sessions, OTP, the address book, and what happens when an order is already ongoing |
 
 ---
 
@@ -69,9 +70,13 @@ Two consequences that drive most of [03-adapters](./docs/03-adapters.md):
 
 - **Cloudflare fingerprints the TLS handshake.** A stock HTTP client is blocked at the socket
   layer before any header is read. The `http` implementation requires a TLS-impersonating client
-  or it does not exist.
-- **A 200 is not a success.** Instamart silently circuit-breaks with HTTP 200 and an empty body.
-  Validate response bodies, never status codes.
+  or it does not exist. **Verified** — stock `curl` gets 403 from an Indian IP on both hosts;
+  `curl_cffi` impersonating Chrome gets 200 and real JSON. See
+  [11-procurement](./docs/11-procurement.md) §2.1.
+- **A 200 is not a success.** Validate response bodies, never status codes. **Verified on Blinkit,
+  not just Instamart** — `api2.grofers.com` returns HTTP 200 with a full, plausible layout envelope,
+  `is_success: false` and `snippets: null`. It parses. See
+  [11-procurement](./docs/11-procurement.md) §2.2.
 
 > **Search hazard.** Most results for "Zepto API" describe **Zepto Payments**, an unrelated
 > Australian A2A payments company. Same for "Blink API." Pin this in any agent prompt that does
@@ -103,6 +108,9 @@ Full rationale in [DECISIONS.md](./DECISIONS.md).
 | Scope | **National India from day one.** No city concept anywhere in the system |
 | `app_number` | Two separate mechanisms: supplier build version (drift) and our contract version (cache) |
 | Brand name | **OPEN.** Blocks the merchant descriptor, which blocks PSP signup |
+| Browser adapter | **TS sidecar**, called by the Rust orchestrator over a four-method RPC. Amends the stack decision |
+| OTP | Human-in-the-loop in v1, and **never on the procurement path** |
+| Read path | The **web host**, not the Android API — measured, see [11-procurement](./docs/11-procurement.md) §2.3 |
 
 ---
 

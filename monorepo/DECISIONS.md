@@ -236,6 +236,93 @@ standing behind it. See [09-legal](./docs/09-legal.md).
 
 ---
 
+## D-009 — The browser adapter is a TS sidecar, not a Rust crate
+
+**This amends [D-001](#d-001--stack-build-it-as-blueprinted).**
+
+**Question.** D-001 puts Adapters and Session Pool in Rust.
+[03-adapters](./docs/03-adapters.md) §6.2 mandates Playwright with a persistent context. Playwright
+has no maintained Rust binding. Both cannot be satisfied as written.
+
+**Decision.** The order path's browser work moves into a Node/TS `procurement-worker` service. The
+Rust orchestrator calls it over a narrow RPC exposing exactly the order-path trait methods —
+`build_cart`, `checkout`, `order_status`, `list_recent_orders` — and nothing more. Everything else
+D-001 names stays in Rust, including the orchestrator, the ledger, the read-path adapter and the
+harness.
+
+**Why.** The contradiction is real and had to be resolved somewhere. Resolving it here costs the
+least: Rust keeps every path that touches money or state transitions, which is what D-001's
+reasoning was actually about ("the money paths and the adapter layer both benefit from strict
+typing", "exhaustive matching over generated enums"). Meanwhile the browser work gets the mature
+ecosystem it needs — persistent contexts, role/text locators, tracing for post-mortem — and the
+prior working implementation on `legacy` survives as prior art instead of being discarded.
+
+Driving Chrome from Rust over raw CDP was considered and rejected: it hand-rolls auto-waiting,
+locators and tracing to satisfy a language boundary that buys nothing on a path that runs once per
+order, where correctness dominates and speed does not.
+
+**Consequence.** One more service and one more language on the order path. The RPC surface is
+deliberately tiny so the seam stays honest — if it grows past those four methods, business logic has
+leaked across it.
+
+**Reversal cost.** Low. The seam is the trait boundary that already exists.
+
+---
+
+## D-010 — OTP is human-in-the-loop in v1, and never on the procurement path
+
+**Question.** Order-pool accounts log in with an SMS OTP to an Indian number. Procurement is
+time-critical — payment is authorised, the quote is ~90 seconds old. How does the OTP arrive?
+
+**Decision.** Two parts, and the second matters more than the first.
+
+1. **OTP never blocks a procurement.** An account is leasable only if its session was verified
+   healthy in the last ten minutes. Re-auth is a background ritual that evicts the account from the
+   eligible pool first, so a procurement is never handed a doubtful session.
+2. **v1 intake is a human.** The session keeper pages an operator, who reads the OTP off the SIM and
+   types it into a small admin page.
+
+**Why.** Part 1 is the load-bearing half and is free — it is one predicate in the lease query. Part 2
+is the laziest thing that satisfies it: with roughly three accounts re-authing rarely, an admin page
+is hours of work and no new hardware.
+
+Rented virtual Indian numbers were rejected outright. Delivery from Indian shortcodes is unreliable
+and those ranges are commonly flagged — the last property you want on an account carrying a funding
+instrument.
+
+**Upgrade path.** A handset running an SMS forwarder that POSTs to a webhook, plus an `otp_inbox`
+table and a claim protocol. Build it when the admin page is used more than about weekly.
+
+**Reversal cost.** Low, and the expensive half (part 1) is the half we would keep anyway.
+
+---
+
+## D-011 — The v1 read path reads the web host, not the Android API
+
+**Question.** [03-adapters](./docs/03-adapters.md) §3.1 specs impersonating the Android client
+against `api2.grofers.com/v1/layout/feed`. The prior working implementation read the website. Which
+is the v1 read path?
+
+**Decision.** The web host. `api2.grofers.com` stays documented as the second implementation.
+
+**Why.** Measured, not assumed — see [11-procurement](./docs/11-procurement.md) §2.3. With a
+TLS-impersonating client and only location cookies, the web endpoints return real catalog data:
+`/location/autoSuggest`, `/feed/`, and `POST /v1/layout/search?q=` all answer with
+`is_success: true` and populated snippets. The same client against `api2.grofers.com` returns
+HTTP 200 with `is_success: false` and `snippets: null` because it has no valid app `auth_key` — and
+we have no acquisition path for one short of instrumenting an Android emulator.
+
+So the Android route costs a second, unrelated identity system for every disposable read account, to
+reach data the web host already gives us unauthenticated. The web host is also the same origin the
+browser order path authenticates against, which keeps it to one identity system.
+
+**Consequence.** §3.1's header table describes the Android client and no longer describes what we
+send in v1. It is retained there as the reference for the second implementation.
+
+**Reversal cost.** Low. Both sit behind the same trait, and the flip is already per-method.
+
+---
+
 ## Decision index
 
 | ID | Decision | Reversal cost |
@@ -248,3 +335,6 @@ standing behind it. See [09-legal](./docs/09-legal.md).
 | D-006 | National from day one, no city scoping | Low |
 | D-007 | Merchant descriptor | **OPEN** |
 | D-008 | Interaction grammar yes, trade dress no | Low |
+| D-009 | Browser adapter is a TS sidecar — **amends D-001** | Low |
+| D-010 | OTP human-in-the-loop, never on the procurement path | Low |
+| D-011 | v1 read path is the web host, not the Android API | Low |

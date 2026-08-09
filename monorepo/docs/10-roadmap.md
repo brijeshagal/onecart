@@ -112,8 +112,11 @@ matters and the only way to know the reconciliation works.
 
 17. **Zepto adapter, read-only.** Serviceability via `servicableGeofence` polygon — exact
     coverage, no probing.
-18. **Instamart adapter, read-only.** Cookie-based location, `spin` product identity, and the
-    silent-circuit-break handling that makes body assertions non-negotiable.
+18. **Instamart adapter, read-only — over MCP.** Per
+    [D-012](../DECISIONS.md#d-012--swiggy-mcp-is-a-sanctioned-read-path-for-instamart-and-cannot-be-the-order-path)
+    this is an OAuth client against `mcp.swiggy.com/im`, not a scrape: no impersonation, no cookie
+    jar, no circuit-break guessing. Smaller than it looks. Budget the effort into the 70 req/min
+    per-account quota instead, which is the real constraint.
 19. **Basket engine over three platforms**, still ordering only through Blinkit. The split
     evaluation now has real comparative data.
 

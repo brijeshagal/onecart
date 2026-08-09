@@ -4,7 +4,11 @@
 **Last updated:** 2026-07-25
 
 How we get supplier data out, and how we get orders in, given that
-**no supplier exposes a consumer ordering API**.
+**no supplier exposes a consumer ordering API we can actually complete**.
+
+Swiggy is the near miss and the reason that sentence is worded carefully: its MCP server does
+expose `checkout`, but no payment method settles without a human, so it is a read path only
+(D-012). Blinkit and Zepto expose nothing.
 
 This is the highest-risk component in the system and the one most likely to break without
 warning. Read [08-ops-runbook](./08-ops-runbook.md) alongside it — this doc says how it works,
@@ -65,15 +69,20 @@ pub trait PlatformAdapter: Send + Sync {
 }
 ```
 
-Two implementations per platform:
+Implementations per platform:
 
-| Impl | Mechanism | Speed | Durability |
-|---|---|---|---|
-| `http` | replay the app's own JSON endpoints | fast | fragile |
-| `browser` | Playwright, persistent context | slow | survives shape drift |
+| Impl | Mechanism | Speed | Durability | Where |
+|---|---|---|---|---|
+| `http` | replay the app's own JSON endpoints | fast | fragile | Blinkit, Zepto |
+| `browser` | Playwright, persistent context | slow | survives shape drift | Blinkit order path |
+| `mcp` | authorised JSON-RPC, OAuth bearer | fast | **contractual, not scraped** | Instamart read path |
 
 Default `http`. Auto-flip to `browser` when the contract harness reports drift. **This dual path
 is the single reason this survives their release cadence instead of dying to it.**
+
+`mcp` (D-012) is the exception that does not need the flip: a sanctioned API does not drift
+without a deprecation notice, so there is no `browser` fallback behind it and the `tools_list`
+fixture watches for change instead. It is available on exactly one platform and cannot order.
 
 Both impls satisfy the same trait and are swapped behind a runtime flag per platform per method.
 The flip is per-method, not per-adapter — `quote` can be on `http` while `checkout` is on
@@ -147,7 +156,68 @@ covers, coverage is free and exact. See [01-architecture](./01-architecture.md) 
 Zepto's defences are notably weak — a single IP has been reported sustaining tens of thousands
 of requests before hitting a limit.
 
-### 3.3 Swiggy Instamart — read-only shadow in v1
+### 3.3 Swiggy Instamart — sanctioned MCP, read-only in v1
+
+Per [D-012](../DECISIONS.md#d-012--swiggy-mcp-is-a-sanctioned-read-path-for-instamart-and-cannot-be-the-order-path),
+Instamart reads through Swiggy's **official MCP server**, not through the scrape below. No TLS
+impersonation, no cookie jar, no ToS exposure. §4 and §5 do not apply to this platform.
+
+```
+POST https://mcp.swiggy.com/im                # JSON-RPC, OAuth 2.1 bearer
+```
+
+Auth is OAuth 2.1 + PKCE against `https://mcp.swiggy.com/auth`, dynamically registered. **No
+refresh token is issued** — the access token is a 5-day JWT, after which re-auth is interactive
+phone + OTP. So D-010 applies here too, just on a predictable clock: refresh it before it expires
+rather than in response to a failure. No session keeper.
+
+Three wire facts, all measured, all of which the published docs get wrong:
+
+- **No `initialize` handshake and no `Mcp-Session-Id`.** A bearer token alone is enough.
+- **`Accept` must offer `text/event-stream`**, or the server answers `406` before reading the
+  body — even though it always replies `application/json`.
+- **The payload is JSON serialised into a string** at `result.content[0].text`.
+  `structuredContent` came back `{}` on every response. `instamart::unwrap_result` lifts it out.
+
+This is why the adapter speaks JSON-RPC directly instead of using an MCP SDK: `harness` replays a
+`RequestSpec` verbatim so the recorder, canary and production issue byte-identical requests, and
+an SDK between us and the wire would break that. The whole client is one POST.
+
+| Tool | Gives us |
+|---|---|
+| `search_products` (`addressId`, `query`) | `spinId` / `skuId`, `mrp`, `discountedFinalPrice`, `isInStockAndAvailable` |
+| `update_cart` (`selectedAddressId`, `items[{spinId, quantity}]`) | replaces the whole cart; clamps to `maxQuantity` and says so |
+| `get_cart` | full bill breakdown, `cartId`, and the pod as `storeId` |
+| `get_addresses` | read-only — **there is no `create_address`** |
+
+Product identity is `spinId`, confirming the guess the scraping spec below made. The pod arrives as
+`storeId` on each cart line rather than something we resolve separately.
+
+The bill is rendered money, not numbers — `"₹495.00"` and `"₹498"` in the same response — so it goes
+through `harness::money`, which already exists for Blinkit's identical habit. Do not write a second
+parser. The whole breakdown was byte-stable over 120s, so it is a usable quote at the 90s TTL.
+
+**Two limits that shape how we use it.** Bulk catalogue export is explicitly prohibited, and the
+quota is 70 req/min general / 30 writes, **per authenticated Swiggy account** — dynamic
+registration hands every integration the same public `client_id`, so more clients buys nothing and
+only more accounts do. Live price and availability go through MCP; the precompute crawl in
+[README](../README.md) does not. There are no `X-RateLimit-*` headers despite the docs promising
+them, so the budget is counted locally or not at all.
+
+**Implemented** in `crates/adapters/instamart`, mirroring the Blinkit crate file for file. Three
+fixtures, one of which (`search_without_address`) must stay red — Instamart's HTTP 200 error
+envelope is its version of `api2_feed_unauthenticated`. Its canary is authenticated where
+Blinkit's is not, so with no token it skips with an explanation rather than reporting a false red;
+CI runs `cargo test --workspace`, never the canary. The bearer token is applied at send time and
+never stored in a `RequestSpec`, because those get committed as fixtures.
+
+The original exploratory spike is `tools/spikes/swiggy-mcp` (gitignored — its captures carry the
+account's real address book).
+
+#### The scrape, retained as fallback
+
+What follows is the unauthenticated path, kept for the case where MCP access is withdrawn. It is
+not what v1 runs.
 
 ```
 GET  <select-location home API>                              # returns podId

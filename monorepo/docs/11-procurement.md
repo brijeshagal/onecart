@@ -7,6 +7,14 @@
 **on**: the accounts, the leases that make them safe to share, the sessions that keep them logged
 in, and the address book we push into them and take back out again.
 
+> **Scope: the impersonated suppliers.** Everything here — the browser profiles, the session keeper,
+> the OTP ritual, the just-in-time address push — is about accounts we drive by pretending to be a
+> consumer app. Instamart is no longer one of those; per
+> [D-012](../DECISIONS.md#d-012--swiggy-mcp-is-a-sanctioned-read-path-for-instamart-and-cannot-be-the-order-path)
+> it reads over OAuth and never orders, so §3–§6 do not apply to it. Two of §1's constraints still
+> do: it has one shared cart, so it still needs the lease, and its saved-address list is read-only
+> over MCP, which is stricter than the capped-and-shared list §1 assumes. Its refresh token renews
+> without a human, so it has no session keeper.
 
 It exists because the blueprint left four things undefined, and all four are load-bearing:
 

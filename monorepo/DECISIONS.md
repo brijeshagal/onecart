@@ -1,7 +1,7 @@
 # Decisions
 
 **Status:** v1
-**Last updated:** 2026-07-25
+**Last updated:** 2026-08-09
 
 Resolves the open questions in the [blueprint](./README.md) §8, plus one correction to the
 blueprint itself. Every doc in `docs/` must agree with this file. Where they disagree, this file
@@ -323,6 +323,81 @@ send in v1. It is retained there as the reference for the second implementation.
 
 ---
 
+## D-012 — Swiggy MCP is a sanctioned read path for Instamart, and cannot be the order path
+
+**Question.** Swiggy ships an official MCP server at `https://mcp.swiggy.com/im`.
+[09-legal](./docs/09-legal.md) §2 says the honest resolution to our ToS exposure is "a supplier
+relationship, not a better scraper." Is this that relationship? Does it replace the Instamart
+scraping spec in [03-adapters](./docs/03-adapters.md) §3.3, and can Instamart order through it?
+
+**Decision.** **Yes to the read path, no to the order path.**
+
+Instamart's read path becomes MCP: sanctioned, authenticated, no TLS impersonation, no cookie jar.
+§3.3's scraping spec is demoted to fallback. The order path stays out of reach for a reason we
+cannot engineer around — see the payment finding below — so Instamart remains **read-only in v1**,
+which is what [10-roadmap](./docs/10-roadmap.md) item 18 already assumed. Nothing in the roadmap
+moves; one task gets easier and one door stays shut.
+
+**Measured 2026-08-09** against the live server, `tools/spikes/swiggy-mcp`. All `[VERIFIED]`, in
+the sense of [11-procurement](./docs/11-procurement.md) §2 — run, not inferred.
+
+| | Finding |
+|---|---|
+| Auth | DCR at `/auth/register` accepts any client, then returns the **shared public `client_id: "swiggy-mcp"`** with `token_endpoint_auth_method: none`. There is no per-integration identity at the dev tier. |
+| Sessions | **No refresh token is issued at all**, despite discovery advertising the grant and our client requesting it. What we get is a 5-day RS256 JWT (`iss: ozone-cx`, `iat`→`exp` exactly 432000s). A stored token reconnects with no OTP until it expires, then re-auth is the interactive phone + OTP flow. *(Corrected 2026-08-09: an earlier draft of this row read "refresh_token works headlessly" — that was the 5-day access token still being valid, not a refresh.)* |
+| Bill | `get_cart` returns a complete pre-checkout breakdown — item total, handling fee, delivery fee, `toPay` — plus `cartId` and `storeId`. **Byte-stable over 120s.** |
+| Stock | `update_cart` with `quantity: 99` **clamped to 5** and reported `maxQuantity: 5` + `isInStockAndAvailable` per line. The shortfall is legible in the response. |
+| Identity | `spinId` / `skuId`, `mrp` and `discountedFinalPrice` per variation. §3.3's guess was right. |
+| **Payment** | **No API-completable method exists.** `get_payment_options` returns UPI intents (`gpay://upi/`, `phonepe://`…), a desktop scan-QR, and COD. Nothing else. `SwiggyPay` appears in the `checkout` schema but not in this account's live options. |
+| Checkout | Not atomic despite the docs. `checkout` creates a `PENDING_PAYMENT` order returning `orderId` + `paasId`; payment settles out of band; `confirm_order` finalises. Also **capped at ₹1000** per cart. |
+| Addresses | `create_address` and `delete_address` **do not exist** on the live server — 14 tools, not the 16 documented. `get_addresses` is read-only. |
+| Rate limits | **No `X-RateLimit-*` headers on any response**, contrary to the operate docs. The documented 70/min general, 30/min writes must be counted locally. |
+| Wire | No `initialize` handshake and no `Mcp-Session-Id` — a bearer token alone is enough. `Accept` **must** offer `text/event-stream` or the server answers `406`, even though it replies `application/json`. |
+
+**Why.** The payment row decides it. Every available method terminates in a human: a UPI intent is
+a deep link into an app on a phone, a QR needs scanning, COD needs cash at a door where our
+recipient is not the payer. A procurement path that requires an operator to approve each payment is
+strictly worse than the Playwright path [D-009](#d-009--the-browser-adapter-is-a-ts-sidecar-not-a-rust-crate)
+already specs for Blinkit, and it is the one part of this we cannot automate our way past.
+
+Two of the other rows are independently fatal to ordering even if payment were solved. The **₹1000
+cart cap** is below a plausible gift basket. The **absence of `create_address`** breaks
+[11-procurement](./docs/11-procurement.md) §1's just-in-time address push outright: we could only
+deliver to addresses already saved on the account by hand, and this is a product where every order
+goes somewhere new.
+
+The read path has the opposite profile. It is everything §3.3 wanted and could not safely have —
+real prices, per-line stock, pod `storeId`, stable product identity — with no impersonation, no
+Cloudflare, and no ToS exposure. Two constraints bound it: bulk catalogue export is explicitly
+prohibited, and 70 req/min is **per authenticated user**, which the shared `client_id` means we
+cannot raise by registering more clients, only by holding more Swiggy accounts. So live price and
+availability move to MCP; the precompute crawl in [README](./README.md) does not.
+
+**Consequence.** Instamart no longer needs the impersonation stack or the cookie jar — but it also
+never graduates to a supplier we can order from, so basket splitting stays a computed-and-logged
+signal for it, per the v1 non-goals. The one-cart-per-account constraint of §1 still holds, so the
+lease still holds. Addresses are a per-call `addressId` rather than account state, which removes
+the selected-address contention §1 worries about.
+
+[D-010](#d-010--otp-is-human-in-the-loop-in-v1-and-never-on-the-procurement-path) still applies
+here, on a **5-day clock rather than an unpredictable one**. Its load-bearing half — OTP never
+blocks a procurement — costs nothing to honour on a read path, and its human-intake half is easier
+than for Blinkit because expiry is known in advance and can be refreshed before it bites rather
+than in response to a failure. It does not need a session keeper; it needs a calendar.
+
+**The open question worth an email.** `SwiggyPay` is named in the `checkout` schema as a payment
+group. If it is a prepaid wallet that settles server-side, it is the only thing that would make
+this an order path, and it maps exactly onto the funded-account model
+[10-roadmap](./docs/10-roadmap.md) item 15 already plans. Ask builders@swiggy.in before writing
+this off permanently. Note that production access also has to clear eligibility — the programme
+wants "agents for real Swiggy users", and our buyer is abroad and is not one.
+
+**Reversal cost.** Low both ways. The read path sits behind the same trait as the other two
+platforms and the flip is already per-method. The order-path half is a decision not to build
+something.
+
+---
+
 ## Decision index
 
 | ID | Decision | Reversal cost |
@@ -338,3 +413,4 @@ send in v1. It is retained there as the reference for the second implementation.
 | D-009 | Browser adapter is a TS sidecar — **amends D-001** | Low |
 | D-010 | OTP human-in-the-loop, never on the procurement path | Low |
 | D-011 | v1 read path is the web host, not the Android API | Low |
+| D-012 | Swiggy MCP is Instamart's read path; it cannot be an order path | Low |

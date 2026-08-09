@@ -35,6 +35,18 @@ This is cheap to get right at signup and expensive to correct afterwards. See
 
 **Ordering through consumer accounts is against every one of these platforms' terms of service.**
 
+> **One supplier is now outside this.** Per
+> [D-012](../DECISIONS.md#d-012--swiggy-mcp-is-a-sanctioned-read-path-for-instamart-and-cannot-be-the-order-path),
+> Instamart reads through Swiggy's official MCP server under OAuth. That is a sanctioned integration,
+> not a tolerated one, and it is the supplier relationship §2's closing paragraph asks for — arriving
+> for the read path only. It does **not** extend to ordering: Swiggy exposes no payment method that
+> completes without a human, so there is no sanctioned order path to take. The exposure below is
+> unchanged for Blinkit and Zepto, and Blinkit is the only platform we actually order through.
+>
+> Note the eligibility wording if we ever apply for production access: the programme is for
+> "agents/products for real Swiggy users", and our buyer is abroad and is not one. Worth resolving
+> in writing before relying on it.
+
 That is a fact about this business model. It is not a risk we can engineer away, and pretending
 otherwise in internal documents helps nobody. What we can do is understand its actual shape.
 

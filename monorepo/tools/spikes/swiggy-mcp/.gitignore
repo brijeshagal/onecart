@@ -1,0 +1,6 @@
+# Real OAuth tokens for a real Swiggy account.
+.tokens.json
+# Raw responses carry the account's real addresses and order history — PII.
+# Redact by hand before promoting anything into crates/adapters/*/fixtures/.
+fixtures/
+node_modules/

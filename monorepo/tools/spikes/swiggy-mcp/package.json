@@ -1,0 +1,16 @@
+{
+  "name": "swiggy-mcp-spike",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "spike": "tsx src/spike.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

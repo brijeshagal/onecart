@@ -1,0 +1,18 @@
+[package]
+name = "instamart"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+constants = { path = "../../constants" }
+harness = { path = "../../harness" }
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+tokio.workspace = true
+# Same client as blinkit, but built WITHOUT .emulation(). See lib.rs — this is a
+# sanctioned API. wreq-util is deliberately absent from this crate's deps so an
+# impersonation profile cannot be added here without noticing.
+wreq.workspace = true

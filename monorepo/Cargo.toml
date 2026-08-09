@@ -3,6 +3,7 @@ resolver = "3"
 members = [
     "crates/constants",
     "crates/adapters/blinkit",
+    "crates/adapters/instamart",
     "crates/harness",
     "tools/codegen",
     "tools/migrate",

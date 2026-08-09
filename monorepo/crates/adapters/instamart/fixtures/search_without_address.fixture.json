@@ -1,0 +1,29 @@
+{
+  "name": "search_without_address",
+  "description": "THE important fixture. Instamart answers HTTP 200 with isError:true and a human sentence where the payload goes. It parses. Anything branching on status would cache this and serve it as a catalog. Same assertions as the happy path on purpose — this proves the validator would catch it. Must stay RED.",
+  "platform": "instamart",
+  "request": {
+    "method": "POST",
+    "url": "https://mcp.swiggy.com/im",
+    "query": {},
+    "headers": {
+      "accept": "application/json, text/event-stream",
+      "content-type": "application/json",
+      "mcp-protocol-version": "2025-06-18"
+    },
+    "cookies": {},
+    "body": "{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"arguments\":{\"query\":\"toor dal\"},\"name\":\"search_products\"}}"
+  },
+  "expect": "reject",
+  "assertions": [
+    {
+      "kind": "is_true",
+      "path": "/success"
+    },
+    {
+      "kind": "array_min_len",
+      "path": "/data/products",
+      "min": 5
+    }
+  ]
+}

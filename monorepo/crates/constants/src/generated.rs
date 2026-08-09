@@ -26,7 +26,7 @@ impl Platform {
         match self {
             Platform::Blinkit => &PlatformSpec { id: "blinkit", display_name: "Blinkit", order_enabled: true, read_host: "blinkit.com", impersonate: "chrome137", app_version: "18.9.3", app_client: "consumer_web" },
             Platform::Zepto => &PlatformSpec { id: "zepto", display_name: "Zepto", order_enabled: false, read_host: "www.zeptonow.com", impersonate: "chrome137", app_version: "26.3.1", app_client: "android" },
-            Platform::Instamart => &PlatformSpec { id: "instamart", display_name: "Swiggy Instamart", order_enabled: false, read_host: "www.swiggy.com", impersonate: "chrome137", app_version: "", app_client: "web" },
+            Platform::Instamart => &PlatformSpec { id: "instamart", display_name: "Swiggy Instamart", order_enabled: false, read_host: "mcp.swiggy.com", impersonate: "", app_version: "", app_client: "mcp" },
         }
     }
 }

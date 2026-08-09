@@ -1,0 +1,36 @@
+{
+  "name": "tools_list",
+  "description": "Drift detection. The tool surface is the contract, and Swiggy has already shipped one that differs from its own docs — 14 tools live against 16 documented, with create_address absent (D-012). If a tool we depend on is renamed or withdrawn, this goes red before a customer notices.",
+  "platform": "instamart",
+  "request": {
+    "method": "POST",
+    "url": "https://mcp.swiggy.com/im",
+    "query": {},
+    "headers": {
+      "accept": "application/json, text/event-stream",
+      "content-type": "application/json",
+      "mcp-protocol-version": "2025-06-18"
+    },
+    "cookies": {},
+    "body": "{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"tools/list\"}"
+  },
+  "expect": "pass",
+  "assertions": [
+    {
+      "kind": "array_min_len",
+      "path": "/tools",
+      "min": 10
+    },
+    {
+      "kind": "any_eq",
+      "path": "/tools",
+      "field": "/name",
+      "value": "search_products"
+    },
+    {
+      "kind": "each_has",
+      "path": "/tools",
+      "field": "/inputSchema"
+    }
+  ]
+}

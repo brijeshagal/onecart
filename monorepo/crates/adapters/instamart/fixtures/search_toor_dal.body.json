@@ -1,0 +1,993 @@
+{
+  "data": {
+    "nextOffset": "1",
+    "products": [
+      {
+        "badges": [
+          {
+            "backgroundColor": "#4FA6FE",
+            "text": "BESTSELLER",
+            "type": "BADGE_TYPE_BEST_SELLER"
+          }
+        ],
+        "brand": "Tata Sampann",
+        "displayName": "Tata Sampann Unpolished Toor Dal (Arhar Dal)",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "34N31GBHHF",
+        "productId": "CZN16LX6D0",
+        "variations": [
+          {
+            "brandName": "Tata Sampann",
+            "displayName": "Tata Sampann Unpolished Toor Dal (Arhar Dal)",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/eda40bda-ba3b-4fab-97ba-ccbd28c106cf_K71D7X8L8P_MN_15122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 5,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 113,
+              "offerPrice": 99,
+              "unitLevelPrice": "198/kg"
+            },
+            "quantityDescription": "500 g",
+            "rating": {
+              "count": "18.9k",
+              "value": "4.6"
+            },
+            "skuId": "4WSOII43CG",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "K71D7X8L8P",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "badges": [
+          {
+            "backgroundColor": "rgba(2,6,12,0.05)",
+            "text": "AD",
+            "type": "BADGE_TYPE_AD"
+          }
+        ],
+        "brand": "Amul",
+        "displayName": "Amul Organic Masoor Dal",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": true,
+        "parentProductId": "M3OUN9X59G",
+        "productId": "6I426TP1U9",
+        "variations": [
+          {
+            "brandName": "Amul",
+            "displayName": "Amul Organic Masoor Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/00e59852-1341-48fc-9b1c-80845efe004c_SL2QDO3EYQ_MN_16122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 1,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 165,
+              "offerPrice": 148,
+              "unitLevelPrice": "148/kg"
+            },
+            "quantityDescription": "1 kg",
+            "rating": {
+              "count": "131",
+              "value": "4.5"
+            },
+            "skuId": "JQO15LP5P3",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "SL2QDO3EYQ",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "badges": [
+          {
+            "backgroundColor": "#4FA6FE",
+            "text": "BESTSELLER",
+            "type": "BADGE_TYPE_BEST_SELLER"
+          }
+        ],
+        "brand": "Tata Sampann",
+        "displayName": "Tata Sampann Unpolished Toor/Arhar Dal",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "P92F6UNGFR",
+        "productId": "TVDSXRJGU0",
+        "variations": [
+          {
+            "brandName": "Tata Sampann",
+            "displayName": "Tata Sampann Unpolished Toor/Arhar Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/290757fa-e817-4831-a8cc-eb67c2b35198_20ZC326JM5_MN_15122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 1,
+            "maxQuantityMessage": "Only 1 unit(s) of this item can be added per order.",
+            "price": {
+              "mrp": 448,
+              "offerPrice": 342,
+              "unitLevelPrice": "171/kg"
+            },
+            "quantityDescription": "1 kg x 2",
+            "rating": {
+              "count": "36k",
+              "value": "4.6"
+            },
+            "skuId": "Z1QHJ032HP",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "9U0SO8X0IJ",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          },
+          {
+            "brandName": "Tata Sampann",
+            "displayName": "Tata Sampann Unpolished Toor/Arhar Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/290757fa-e817-4831-a8cc-eb67c2b35198_20ZC326JM5_MN_15122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 2,
+            "maxQuantityMessage": "Only 2 unit(s) of this item can be added per order.",
+            "price": {
+              "mrp": 224,
+              "offerPrice": 171,
+              "unitLevelPrice": "171/kg"
+            },
+            "quantityDescription": "1 kg",
+            "rating": {
+              "count": "36k",
+              "value": "4.6"
+            },
+            "skuId": "1N33VAWQJU",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "20ZC326JM5",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "badges": [
+          {
+            "backgroundColor": "rgba(2,6,12,0.05)",
+            "text": "AD",
+            "type": "BADGE_TYPE_AD"
+          }
+        ],
+        "brand": "Fortune",
+        "displayName": "Fortune Unpolished Arhar Dal",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": true,
+        "parentProductId": "UOA1IHCR9D",
+        "productId": "27CDSXYN5W",
+        "variations": [
+          {
+            "brandName": "Fortune",
+            "displayName": "Fortune Unpolished Arhar Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2026/7/22/e4cf3045-53a4-462a-a3d4-3264befc62d1_8906008815153_01_MN_737389bd-87e2-4b4d-953c-bc1b0a24fd50.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 3,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 249,
+              "offerPrice": 170,
+              "unitLevelPrice": "170/kg"
+            },
+            "quantityDescription": "1 kg",
+            "rating": {
+              "count": "6.9k",
+              "value": "4.5"
+            },
+            "skuId": "PQDWDUZSOR",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "GMD4IYICXT",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "brand": "Scootsy",
+        "displayName": "Basic Toor Dal",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "4UBFHGWC9F",
+        "productId": "7DBAVWDSIQ",
+        "variations": [
+          {
+            "brandName": "",
+            "displayName": "Basic Toor Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/10/3/7dc690f8-0ee2-48cd-8684-280b1c1512f6_72163_1.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 3,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 420,
+              "offerPrice": 278,
+              "unitLevelPrice": "139/kg"
+            },
+            "quantityDescription": "1 kg x 2",
+            "rating": {
+              "count": "31.9k",
+              "value": "4.4"
+            },
+            "skuId": "IDCL9LK0SY",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "PTK8USAIHH",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          },
+          {
+            "brandName": "Scootsy",
+            "displayName": "Basic Toor Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/31d52d84-1113-4345-bdc0-06c003315d1e_YT2NIZ1BOF_MN_16122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 6,
+            "maxQuantityMessage": "Only 6 unit(s) of this item can be added per order.",
+            "price": {
+              "mrp": 210,
+              "offerPrice": 139,
+              "unitLevelPrice": "139/kg"
+            },
+            "quantityDescription": "1 kg",
+            "rating": {
+              "count": "31.9k",
+              "value": "4.4"
+            },
+            "skuId": "H00R4P8NJK",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "YT2NIZ1BOF",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "badges": [
+          {
+            "backgroundColor": "rgba(2,6,12,0.05)",
+            "text": "AD",
+            "type": "BADGE_TYPE_AD"
+          }
+        ],
+        "brand": "BETTER NUTRITION",
+        "displayName": "Better Nutrition Biofortified Arhar Dal | High Protein | Rich in Iron & Zinc",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": true,
+        "parentProductId": "MVIBESDVTF",
+        "productId": "M93BC2W1NT",
+        "variations": [
+          {
+            "brandName": "BETTER NUTRITION",
+            "displayName": "Better Nutrition Biofortified Arhar Dal | High Protein | Rich in Iron & Zinc",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2026/3/25/9d1daae0-8cd5-4f3c-b610-745f150edcec_mn_bg_removed_AL10_65f78c06-2984-4ab1-841f-0a30932a6e4d.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 1,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 250,
+              "offerPrice": 207,
+              "unitLevelPrice": "207/kg"
+            },
+            "quantityDescription": "1 kg",
+            "skuId": "VCAMIR7AN3",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "W0QL9LGNIF",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "brand": "Supreme Harvest",
+        "displayName": "Supreme Harvest Toor Dal (Arhar Dal)",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "WUD50JNHMM",
+        "productId": "6465SQ9AMY",
+        "variations": [
+          {
+            "brandName": "Supreme Harvest",
+            "displayName": "Supreme Harvest Toor Dal (Arhar Dal)",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2026/6/22/1d272480-ed6c-4c73-aab0-30793e6cf87b_15591_1.jpg",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 5,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 132,
+              "offerPrice": 81,
+              "unitLevelPrice": "162/kg"
+            },
+            "quantityDescription": "500 g",
+            "rating": {
+              "count": "18.8k",
+              "value": "4.5"
+            },
+            "skuId": "J4ZR8JSVNN",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "A2DRMW669N",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "badges": [
+          {
+            "backgroundColor": "rgba(2,6,12,0.05)",
+            "text": "AD",
+            "type": "BADGE_TYPE_AD"
+          }
+        ],
+        "brand": "Dehaat Honest Farms",
+        "displayName": "Dehaat Honest Farms Toor Dal (Unpolished, Pesticide Free)",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": true,
+        "parentProductId": "NTXJYFDJRB",
+        "productId": "SFVGWU235U",
+        "variations": [
+          {
+            "brandName": "Dehaat Honest Farms",
+            "displayName": "Dehaat Honest Farms Toor Dal (Unpolished, Pesticide Free)",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/c6343d5d-4a6e-4f28-8714-a5ef137a12ba_ZZGY0BXKPC_MN_16122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 3,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 280,
+              "offerPrice": 191,
+              "unitLevelPrice": "191/kg"
+            },
+            "quantityDescription": "1 kg",
+            "rating": {
+              "count": "441",
+              "value": "4.6"
+            },
+            "skuId": "O6D59CW4MN",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "ZZGY0BXKPC",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "brand": "Supreme Harvest",
+        "displayName": "Supreme Harvest Toor Dal (Arhar Dal)",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "KNEBUVFTD6",
+        "productId": "B56Q568P16",
+        "variations": [
+          {
+            "brandName": "Supreme Harvest",
+            "displayName": "Supreme Harvest Toor Dal (Arhar Dal)",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2026/6/22/b4692ca3-26b5-4c00-b725-fb2828c036c5_15592_1.jpg",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 3,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 246,
+              "offerPrice": 168,
+              "unitLevelPrice": "168/kg"
+            },
+            "quantityDescription": "1 kg",
+            "rating": {
+              "count": "8.3k",
+              "value": "4.5"
+            },
+            "skuId": "S2FOC7OFGK",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "0WF643CH0N",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "badges": [
+          {
+            "backgroundColor": "rgba(2,6,12,0.05)",
+            "text": "AD",
+            "type": "BADGE_TYPE_AD"
+          }
+        ],
+        "brand": "Amul",
+        "displayName": "Amul Organic Chana Dal",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": true,
+        "parentProductId": "35GHB5WIXR",
+        "productId": "YV2OONOCJN",
+        "variations": [
+          {
+            "brandName": "Amul",
+            "displayName": "Amul Organic Chana Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/32d341bb-7536-4877-b1d5-4fdbd46f25a6_C2JIS7J1ST_MN_15122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 1,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 88,
+              "offerPrice": 77,
+              "unitLevelPrice": "154/kg"
+            },
+            "quantityDescription": "500 g",
+            "rating": {
+              "count": "202",
+              "value": "4.5"
+            },
+            "skuId": "ZA60LWA2L2",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "C2JIS7J1ST",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "brand": "Mango",
+        "displayName": "Mango Premium Toor Dal",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "P2CRF0WOAU",
+        "productId": "SMW8XVVOSJ",
+        "variations": [
+          {
+            "brandName": "Mango",
+            "displayName": "Mango Premium Toor Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/2d1e5bee-ab41-41b8-9569-4ebba61494b7_UCDI7LCIUF_MN_15122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 4,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 149,
+              "offerPrice": 61,
+              "unitLevelPrice": "122/kg"
+            },
+            "quantityDescription": "500 g",
+            "rating": {
+              "count": "155",
+              "value": "4.3"
+            },
+            "skuId": "4L25U01N0X",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "UCDI7LCIUF",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "badges": [
+          {
+            "backgroundColor": "rgba(2,6,12,0.05)",
+            "text": "AD",
+            "type": "BADGE_TYPE_AD"
+          }
+        ],
+        "brand": "Popular Organics",
+        "displayName": "Popular Organics Toor Dal",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": true,
+        "parentProductId": "494WQ4TL5R",
+        "productId": "778CRZLODK",
+        "variations": [
+          {
+            "brandName": "Popular Organics",
+            "displayName": "Popular Organics Toor Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/b7d37af7-c8aa-4fef-82b4-93c4d8169a40_F624AQ657B_MN_15122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 1,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 265,
+              "offerPrice": 190,
+              "unitLevelPrice": "190/kg"
+            },
+            "quantityDescription": "1 kg",
+            "rating": {
+              "count": "83",
+              "value": "4.4"
+            },
+            "skuId": "ULK6MU1NZV",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "F624AQ657B",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "brand": "Fortune",
+        "displayName": "Fortune Arhar Dal Unpolished Pouch",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "05TI8DRODW",
+        "productId": "DVGS3J4TAL",
+        "variations": [
+          {
+            "brandName": "Fortune",
+            "displayName": "Fortune Arhar Dal Unpolished Pouch",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/acec2ad0-ccd8-4e54-aa59-b4dfe6202728_O7UXTP2CNP_MN_15122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 1,
+            "maxQuantityMessage": "Only 1 unit(s) of this item can be added per order.",
+            "price": {
+              "mrp": 129,
+              "offerPrice": 94,
+              "unitLevelPrice": "188/kg"
+            },
+            "quantityDescription": "500 g",
+            "rating": {
+              "count": "4.9k",
+              "value": "4.5"
+            },
+            "skuId": "BJWJABO5UT",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "O7UXTP2CNP",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "badges": [
+          {
+            "backgroundColor": "#002E99",
+            "text": "SWITCH",
+            "type": "BADGE_TYPE_INSTA_UPGRADE"
+          },
+          {
+            "backgroundColor": "rgba(2,6,12,0.05)",
+            "text": "AD",
+            "type": "BADGE_TYPE_AD"
+          }
+        ],
+        "brand": "organic tattva",
+        "displayName": "organic tattva Arhar Tur Dal",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": true,
+        "parentProductId": "Z3R10V8KU7",
+        "productId": "UUNC5WR71Q",
+        "variations": [
+          {
+            "brandName": "organic tattva",
+            "displayName": "organic tattva Arhar Tur Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/8c07b1da-5e56-4a79-bb69-eb5e21ab8843_W37UC85T6J_MN_15122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 2,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 270,
+              "offerPrice": 172,
+              "unitLevelPrice": "172/kg"
+            },
+            "quantityDescription": "1 kg",
+            "rating": {
+              "count": "721",
+              "value": "4.5"
+            },
+            "skuId": "8C79498PLK",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "W37UC85T6J",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "brand": "RENTIO",
+        "displayName": "RENTIO Premium Desi Oiled Toor Dal",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "6S13QPDOGJ",
+        "productId": "03UALJJO77",
+        "variations": [
+          {
+            "brandName": "RENTIO",
+            "displayName": "RENTIO Premium Desi Oiled Toor Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/64877cb0-7ba5-479e-8eaa-e4574d264989_8VDGMALCM3_MN_16122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 3,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 500,
+              "offerPrice": 356,
+              "unitLevelPrice": "178/kg"
+            },
+            "quantityDescription": "2 kg",
+            "rating": {
+              "count": "169",
+              "value": "4.6"
+            },
+            "skuId": "BPA1LIUAR4",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "8VDGMALCM3",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "badges": [
+          {
+            "backgroundColor": "#002E99",
+            "text": "SWITCH",
+            "type": "BADGE_TYPE_INSTA_UPGRADE"
+          },
+          {
+            "backgroundColor": "rgba(2,6,12,0.05)",
+            "text": "AD",
+            "type": "BADGE_TYPE_AD"
+          }
+        ],
+        "brand": "Too Yumm!",
+        "displayName": "Too Yumm Moong Dal Namkeen, 35% Less Saturated Fats, No Palm Oil Healthy Munchies",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": true,
+        "parentProductId": "WRDRUADZM8",
+        "productId": "ZXDS94BXWT",
+        "variations": [
+          {
+            "brandName": "Too Yumm!",
+            "displayName": "Too Yumm Moong Dal Namkeen, 35% Less Saturated Fats, No Palm Oil Healthy Munchies",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2026/6/15/001091f7-6f95-4db3-880b-c21cbcfb1ec6_44031_1.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 2,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 55,
+              "offerPrice": 41,
+              "unitLevelPrice": "29.3/100 g"
+            },
+            "quantityDescription": "140 g",
+            "rating": {
+              "count": "2.2k",
+              "value": "4.5"
+            },
+            "skuId": "7HKTHVH6GI",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "BHGVU0AIT4",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "brand": "Tata Sampann",
+        "displayName": "Tata Sampann Unpolished Toor Dal (Arhar Dal)",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "H4VXSCREPS",
+        "productId": "1J312R9LEE",
+        "variations": [
+          {
+            "brandName": "Tata Sampann",
+            "displayName": "Tata Sampann Unpolished Toor Dal (Arhar Dal)",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/8afa49f8-eafd-4041-81e4-ed8424be600e_7UXLV345SM_MN_16122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 2,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 448,
+              "offerPrice": 356,
+              "unitLevelPrice": "178/kg"
+            },
+            "quantityDescription": "2 kg",
+            "rating": {
+              "count": "3k",
+              "value": "4.6"
+            },
+            "skuId": "FDCI3RGTJ6",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "7UXLV345SM",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "badges": [
+          {
+            "backgroundColor": "rgba(2,6,12,0.05)",
+            "text": "AD",
+            "type": "BADGE_TYPE_AD"
+          }
+        ],
+        "brand": "organic tattva",
+        "displayName": "Organic Tattva Arhar (Tur) Dal",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": true,
+        "parentProductId": "Z3R10V8KU7",
+        "productId": "96Y134GXNY",
+        "variations": [
+          {
+            "brandName": "organic tattva",
+            "displayName": "Organic Tattva Arhar (Tur) Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/385df741-b734-4724-9df2-99cf5f1285ed_4NYZ7TTTHR_MN_16122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 1,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 135,
+              "offerPrice": 117,
+              "unitLevelPrice": "234/kg"
+            },
+            "quantityDescription": "500 g",
+            "rating": {
+              "count": "337",
+              "value": "4.6"
+            },
+            "skuId": "6WT9F8Y93W",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "4NYZ7TTTHR",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "brand": "Mango",
+        "displayName": "Mango Premium Oily Toor Dal",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "272BTGMWCC",
+        "productId": "49CK22R124",
+        "variations": [
+          {
+            "brandName": "Mango",
+            "displayName": "Mango Premium Oily Toor Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/d0bfb2dd-0f09-4f73-a99a-ad368a757f4b_YTHYI9HJJJ_MN_16122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 3,
+            "maxQuantityMessage": "That’s all we have in stock at the moment!",
+            "price": {
+              "mrp": 149,
+              "offerPrice": 78,
+              "unitLevelPrice": "156/kg"
+            },
+            "quantityDescription": "500 g",
+            "rating": {
+              "count": "127",
+              "value": "4.3"
+            },
+            "skuId": "GTKDMKJ22A",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "YTHYI9HJJJ",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "badges": [
+          {
+            "backgroundColor": "rgba(2,6,12,0.05)",
+            "text": "AD",
+            "type": "BADGE_TYPE_AD"
+          }
+        ],
+        "brand": "Fortune",
+        "displayName": "Fortune Arhar Dal Unpolished Pouch",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": true,
+        "parentProductId": "05TI8DRODW",
+        "productId": "DVGS3J4TAL",
+        "variations": [
+          {
+            "brandName": "Fortune",
+            "displayName": "Fortune Arhar Dal Unpolished Pouch",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/acec2ad0-ccd8-4e54-aa59-b4dfe6202728_O7UXTP2CNP_MN_15122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 1,
+            "maxQuantityMessage": "Only 1 unit(s) of this item can be added per order.",
+            "price": {
+              "mrp": 129,
+              "offerPrice": 94,
+              "unitLevelPrice": "188/kg"
+            },
+            "quantityDescription": "500 g",
+            "rating": {
+              "count": "4.9k",
+              "value": "4.5"
+            },
+            "skuId": "BJWJABO5UT",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "O7UXTP2CNP",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      }
+    ],
+    "similarProducts": [
+      {
+        "badges": [
+          {
+            "backgroundColor": "#4FA6FE",
+            "text": "BESTSELLER",
+            "type": "BADGE_TYPE_BEST_SELLER"
+          }
+        ],
+        "brand": "Tata Sampann",
+        "displayName": "Tata Sampann Unpolished Moong Dal",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "ZU8SEMO04B",
+        "productId": "HPSMBHWP2R",
+        "variations": [
+          {
+            "brandName": "Tata Sampann",
+            "displayName": "Tata Sampann Unpolished Moong Dal",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/cfbe98e8-6409-4bf5-a01e-2e5d6d6880c9_BHFYUE7R97_MN_15122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 1,
+            "maxQuantityMessage": "Only 1 unit(s) of this item can be added per order.",
+            "price": {
+              "mrp": 107,
+              "offerPrice": 92,
+              "unitLevelPrice": "184/kg"
+            },
+            "quantityDescription": "500 g",
+            "rating": {
+              "count": "28.4k",
+              "value": "4.6"
+            },
+            "skuId": "616U75MGSG",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "BHFYUE7R97",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "badges": [
+          {
+            "backgroundColor": "#4FA6FE",
+            "text": "BESTSELLER",
+            "type": "BADGE_TYPE_BEST_SELLER"
+          }
+        ],
+        "brand": "Tata Sampann",
+        "displayName": "Tata Sampann Besan (chana no lot)",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "Y7BE99ZE6F",
+        "productId": "XOF9O48GLS",
+        "variations": [
+          {
+            "brandName": "Tata Sampann",
+            "displayName": "Tata Sampann Besan (chana no lot)",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/ciw/2025/12/16/3eb35cc5-b7f2-4129-8f71-66c19f8de23f_B9CBZ9W2YW_MN_15122025.png",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 1,
+            "maxQuantityMessage": "Only 1 unit(s) of this item can be added per order.",
+            "price": {
+              "mrp": 78,
+              "offerPrice": 60,
+              "unitLevelPrice": "120/kg"
+            },
+            "quantityDescription": "500 g",
+            "rating": {
+              "count": "42.4k",
+              "value": "4.5"
+            },
+            "skuId": "2VQ2JNC7PA",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "B9CBZ9W2YW",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      },
+      {
+        "brand": "Supreme Harvest",
+        "displayName": "Supreme Harvest Suji Rawa (Semolina)",
+        "inStock": true,
+        "isAvail": true,
+        "isPromoted": false,
+        "parentProductId": "TJM1XAXLWC",
+        "productId": "N2IL0LR6NR",
+        "variations": [
+          {
+            "brandName": "Supreme Harvest",
+            "displayName": "Supreme Harvest Suji Rawa (Semolina)",
+            "imageUrl": "https://media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2026/6/22/343d28f9-cf00-4f63-a4ea-120ebaa18ecb_15573_1.jpg",
+            "isInStockAndAvailable": true,
+            "maxQuantity": 1,
+            "maxQuantityMessage": "Only 1 unit(s) of this item can be added per order.",
+            "price": {
+              "mrp": 80,
+              "offerPrice": 53,
+              "unitLevelPrice": "53/kg"
+            },
+            "quantityDescription": "1 kg",
+            "rating": {
+              "count": "24.5k",
+              "value": "4.5"
+            },
+            "skuId": "X23VSLPKCU",
+            "sla": {
+              "unit": "MINS",
+              "value": "22"
+            },
+            "spinId": "YDJ6XLGYTT",
+            "vegClassifier": "VEG_CLASSIFIER_VEG"
+          }
+        ]
+      }
+    ]
+  },
+  "message": "Found 20 product(s) matching \"toor dal\" and 3 similar item(s).\n\nDISPLAY INSTRUCTIONS:\n- Products are grouped with their variations (e.g., \"Kurkure\" has variations \"75g\", \"75g x 3\")\n- Show each product with: Brand + Display Name\n- List variations under each product showing: quantity, price (MRP vs offer price if discounted)\n- Products with isPromoted=true are sponsored/featured products. ALWAYS display them with a ⭐ (star) emoji AND ALWAYS inform the user: \"⭐ = Featured/Sponsored product\"\n- \"products\" contains the directly matching (relevant) results — show these first\n- \"similarProducts\" contains 3 related/similar item(s) — show these in a separate \"Similar Items\" section BELOW the main results\n\nIMPORTANT - VARIANT SELECTION:\n- When a user asks to add a product (e.g., \"add maggi\"), you MUST first search for that product\n- If the search returns multiple variants of the same product, you MUST ask the user which specific variant they want before adding to cart\n- Example: \"I found Maggi noodles in different pack sizes: Single pack (₹14), Pack of 4 (₹52), Pack of 8 (₹98). Which one would you like to add?\"\n- Only add to cart after the user has explicitly selected a variant\n- Pass both spinId and skuId from the selected variant when adding items to cart via update_cart",
+  "success": true
+}

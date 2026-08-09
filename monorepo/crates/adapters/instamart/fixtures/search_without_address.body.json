@@ -1,0 +1,10 @@
+{
+  "content": [
+    {
+      "text": "addressId is required\nReport ID: ERR-MSLQ4W0N-T3J1\nSomething went wrong. If this persists, quote report ID: ERR-MSLQ4W0N-T3J1 when contacting support at mcp-support@swiggy.in.",
+      "type": "text"
+    }
+  ],
+  "isError": true,
+  "structuredContent": {}
+}

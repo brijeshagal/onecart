@@ -3,7 +3,7 @@
 export const PLATFORMS = {
   blinkit: { id: "blinkit", displayName: "Blinkit", orderEnabled: true, readHost: "blinkit.com", impersonate: "chrome137", appVersion: "18.9.3", appClient: "consumer_web" },
   zepto: { id: "zepto", displayName: "Zepto", orderEnabled: false, readHost: "www.zeptonow.com", impersonate: "chrome137", appVersion: "26.3.1", appClient: "android" },
-  instamart: { id: "instamart", displayName: "Swiggy Instamart", orderEnabled: false, readHost: "www.swiggy.com", impersonate: "chrome137", appVersion: "", appClient: "web" },
+  instamart: { id: "instamart", displayName: "Swiggy Instamart", orderEnabled: false, readHost: "mcp.swiggy.com", impersonate: "", appVersion: "", appClient: "mcp" },
 } as const;
 
 export type Platform = keyof typeof PLATFORMS;

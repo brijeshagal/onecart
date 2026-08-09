@@ -1,0 +1,44 @@
+{
+  "name": "search_toor_dal",
+  "description": "The core read. Proves we get product cards with stable identity (spinId), a per-variation price and a live stock flag. Prices arrive as JSON numbers here, not rendered strings like Blinkit's — harness::money is not on this path, only get_cart's billBreakdown would need it.",
+  "platform": "instamart",
+  "request": {
+    "method": "POST",
+    "url": "https://mcp.swiggy.com/im",
+    "query": {},
+    "headers": {
+      "accept": "application/json, text/event-stream",
+      "content-type": "application/json",
+      "mcp-protocol-version": "2025-06-18"
+    },
+    "cookies": {},
+    "body": "{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"arguments\":{\"addressId\":\"d9obd9c1d96ievt2sfsg\",\"query\":\"toor dal\"},\"name\":\"search_products\"}}"
+  },
+  "expect": "pass",
+  "assertions": [
+    {
+      "kind": "is_true",
+      "path": "/success"
+    },
+    {
+      "kind": "array_min_len",
+      "path": "/data/products",
+      "min": 5
+    },
+    {
+      "kind": "each_has",
+      "path": "/data/products",
+      "field": "/variations/0/spinId"
+    },
+    {
+      "kind": "each_has",
+      "path": "/data/products",
+      "field": "/variations/0/price/offerPrice"
+    },
+    {
+      "kind": "each_has",
+      "path": "/data/products",
+      "field": "/variations/0/isInStockAndAvailable"
+    }
+  ]
+}

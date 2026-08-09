@@ -34,8 +34,16 @@ app_client    = "android"
 [[platform]]
 id            = "instamart"
 display_name  = "Swiggy Instamart"
+# D-012: MCP exposes checkout, but no payment method completes without a human,
+# so this platform reads and never orders.
 order_enabled = false
-read_host     = "www.swiggy.com"
-impersonate   = "chrome137"
+# D-012: the read path is Swiggy's sanctioned MCP server, not the web scrape.
+# The adapter builds https://{read_host}/im. www.swiggy.com is the retained
+# fallback and lives in docs/03-adapters.md 3.3, not here.
+read_host     = "mcp.swiggy.com"
+# Deliberately empty. This is an authorised API we are invited to call —
+# impersonating a browser at it would be both pointless and dishonest. The
+# instamart crate has a test that fails if someone fills this in.
+impersonate   = ""
 app_version   = ""
-app_client    = "web"
+app_client    = "mcp"
